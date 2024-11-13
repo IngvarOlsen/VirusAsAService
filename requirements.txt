@@ -1,0 +1,10 @@
+flask
+Flask-SQLAlchemy
+flask-login
+sanix
+flask-socketio
+eventlet
+cryptography
+pycryptodome
+pyinstaller
+flask-cors
