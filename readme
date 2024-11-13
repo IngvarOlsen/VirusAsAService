@@ -1,1 +1,5 @@
-README
+For Windows via powershell
+git clone https://github.com/IngvarOlsen/VirusAsAService.git .
+python3 -m venv flask-venv 
+flask-venv\Scripts\activate.ps1
+pip install -r requirements.txt
