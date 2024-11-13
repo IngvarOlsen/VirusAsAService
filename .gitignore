@@ -1,0 +1,16 @@
+*.json
+*.key
+*.pem
+*.pyc
+
+website/static/sftp/images/*
+website/static/sftp/models/*
+virus/testapp/*
+website/__pycache__/*
+build/*
+dist/*
+Lib/*
+Scripts/*
+Include/*
+website/__pycache__
+flask-venv/*
