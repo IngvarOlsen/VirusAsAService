@@ -1,7 +1,5 @@
-<!-- {% extends "base.html" %}
-{% block title %}Login{% endblock %}
-{% block content %} -->
-
+{% extends "base.html" %} {% block title %}Login{% endblock %} 
+{% block content%}
 <!-- Meta and base style will be moved to base.html -->
 <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -160,7 +158,8 @@ button {
 		<!-- Logo or image -->
 		<div class="random-hover-effect">
 			<!-- <img src="{{ url_for('static', filename='butler.png') }}" style="height: 200px;" alt="Logo of Bitlus"> -->
-            <img src="butlercoat.PNG" style="height: 200px;" alt="Logo of Bitlus">
+            
+            <img src="static/butlercoat.PNG" style="height: 200px;" alt="Logo of Bitlus">
           
 		</div>
 
@@ -214,7 +213,6 @@ button {
 	</div>
 </div>
 
-<script src="https://code.jquery.com/jquery-3.7.1.min.js" crossorigin="anonymous"></script>
 
 <script>
 
@@ -292,7 +290,7 @@ $(document).ready(function() {
     }
 });
 </script>
-
+{% include 'scriptsImport.html' %}
 
 <!-- Link to JavaScript file -->
 <script src="{{ url_for('static', filename='login.js') }}"></script>
