@@ -13,6 +13,8 @@ class Virus(db.Model, UserMixin):
     heartbeat_rate = db.Column(db.String(500))
     use_case_settings = db.Column(db.String(500))
     user_id = db.Column(db.String(150))
+    #If virus is not alive it will kill itself upon update and data will be movre to archived
+    is_alive = db.Column(db.Boolean, unique=False, default=True) 
 
 class Hosts(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
@@ -21,3 +23,9 @@ class Hosts(db.Model, UserMixin):
     user_id = db.Column(db.String(150))
     virus_id = db.Column(db.String(150))
     log_info = db.Column(db.String(150))
+
+class Archived(db.Model, UserMixin):
+    id = db.Column(db.Integer, primary_key=True)
+    log_name = db.Column(db.String(500))
+    virus_id = db.Column(db.String(150))
+    user_id = db.Column(db.String(150))

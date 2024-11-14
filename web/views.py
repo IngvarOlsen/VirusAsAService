@@ -22,21 +22,20 @@ def home():
 @login_required
 def hosts():
     print(current_user.id)
-    # #dataToHtml = api.getHosts(str(current_user.id), "1234567890") #In real
-    # dataToSend = api.getHosts() # debug for user1
+    #dataToHtml = api.getHosts(str(current_user.id), "1234567890") #In real
+    dataToSend = api.getHosts() # debug for user1
     print(dataToSend)
 
-    #return render_template("home.html", user=current_user, dataToHtml = dataToSend)
-    return render_template("home.html", user=current_user,)
+    return render_template("home.html", user=current_user, dataToHtml = dataToSend)
 
 @views.route('/virus', methods=['GET', 'POST'])
 @login_required
 def virus():
-    # print(current_user.id)
-    # dataToSend = api.getVirus() 
+    print(current_user.id)
+    dataToSend = api.getVirus() 
     print(dataToSend)
 
-    return render_template("virus.html", user=current_user, )
+    return render_template("virus.html", user=current_user, dataToHtml = dataToSend)
 
     
 @views.route('/authtest', methods=['GET', 'POST'])
