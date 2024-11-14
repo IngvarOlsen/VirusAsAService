@@ -58,7 +58,7 @@ def sign_up():
             # new_user = User(email=email, first_name=name, password=generate_password_hash(
             #     password1, method='sha256'))
             new_user = User(email=email, password=generate_password_hash(
-                password1, method='sha256'))  # Create a new User object with the provided email and hashed password
+                password1))  # Create a new User object with the provided email and hashed password
             db.session.add(new_user)  # Add the new user to the database session
             db.session.commit()  # Commit the changes to the database
             login_user(new_user, remember=True)  # Log in the new user and remember the session
