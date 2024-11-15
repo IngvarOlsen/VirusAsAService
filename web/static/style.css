@@ -1,0 +1,69 @@
+ /* Gradient Background for the Wrapper */
+ body {
+    margin: 0; /* Remove default margin */
+    padding: 0; /* Remove default padding */
+    background: linear-gradient(to bottom right, #e1e4ff, #a8ceff,  #1a3eaa);
+    background-size: 200% 200%; /* Prevent visible loops */
+    animation: gradientAnimation 15s ease infinite; /* Optional animation */
+     
+  }
+
+  /* Optional Gradient Animation */
+  @keyframes gradientAnimation {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+  }
+
+
+.container {
+    background-color: #ffffff;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    padding: 2rem;
+    max-width: 400px;
+    width: 100%;
+    border-radius: 8px;
+    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+/* Form Titles */
+.formTitle {
+    font-size: 1.8rem;
+    margin-bottom: 1.5rem;
+    color: #333;
+}
+/* Form Styling */
+.form-group {
+    margin-bottom: 1rem;
+    text-align: left;
+}
+.form-group label {
+    font-size: 0.9rem;
+    color: #555;
+}
+.input {
+    width: 100%;
+    padding: 0.8rem;
+    font-size: 1rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    outline: none;
+    transition: border-color 0.3s;
+}
+
+.input:focus {
+    border-color: #007bff;
+}
+
+/* Button Styling */
+button {
+    cursor: pointer;
+    font-size: 1rem;
+    padding: 0.8rem 1.2rem;
+    margin-top: 1rem;
+    border: none;
+    border-radius: 4px;
+    transition: background-color 0.3s;
+}
