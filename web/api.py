@@ -16,6 +16,7 @@ os.environ['CURL_CA_BUNDLE'] = ''
 
 
 api = Blueprint('api', __name__)
+# For development token logic needs to be made
 userToken = '1234567890'
 
 def dbConnect():
@@ -33,71 +34,111 @@ def dbConnect():
 
 ###### Virus calls #######
 
-@api.route('/download')
-def download_exe():
-    exe_path = '/var/www/rubberduck/virus/generated_script.exe'  # Update with the actual path to your .exe file
-    return send_file(exe_path, as_attachment=True)
+# @api.route('/download')
+# def download_exe():
+#     exe_path = '/var/www/rubberduck/virus/generated_script.exe'  # Update with the actual path to your .exe file
+#     return send_file(exe_path, as_attachment=True)
 
 
-@api.route('/update', methods=['POST'])
-def update():
-    print("Virus update called!")
-    data = json.loads(request.data)
-    print(data)
-    try:
-        return jsonify({'message': 'success'})  # Return a valid response
-    except Exception as e:
-        print(e)
-        return jsonify({'message': str(e)})  # Return a v
+# @api.route('/update', methods=['POST'])
+# def update():
+#     print("Virus update called!")
+#     data = json.loads(request.data)
+#     print(data)
+#     try:
+#         return jsonify({'message': 'success'})  # Return a valid response
+#     except Exception as e:
+#         print(e)
+#         return jsonify({'message': str(e)})  # Return a v
 
 #####
 
 ###### Create virus ######
-@login_required
-@api.route('/virusmake', methods=['GET', 'POST'])
-def virusmake():
-    virus.test()
-    try:
-        virus.generateExe("generated_script.py")
-        return jsonify({'message': 'success'})  # Return a valid response
-    except Exception as e:
-        print(e)
-        return jsonify({'message': str(e)})  # Return a valid response with the error message
+# @login_required
+# @api.route('/virusmake', methods=['GET', 'POST'])
+# def virusmake():
+#     virus.test()
+#     try:
+#         virus.generateExe("generated_script.py")
+#         return jsonify({'message': 'success'})  # Return a valid response
+#     except Exception as e:
+#         print(e)
+#         return jsonify({'message': str(e)})  # Return a valid response with the error message
    
 
 
 
 ##### SAVE DATA APIS #####
-## saves a virus 
+
 @api.route('/savevirus', methods=['POST'])
-def saveVirus():
-    data = json.loads(request.data)
-    print(data)
-    user_id = data['user_id']
-    token = data['token']
-    virus_type = data['virus_type']
-    name = data['name']
-    heartbeat_rate = data['heartbeat_rate']
-    print(virus_type)
-    print(user_id)
-    print(name)
-    print(token)
-    if token == userToken :
-        try:
-            dbConnect()
-            curs.execute("INSERT INTO Virus (virus_type, name, heartbeat_rate, user_id) VALUES (?, ?, ?, ?)", (virus_type, name, heartbeat_rate, user_id))
-            conn.commit()
-            conn.close()
-            print("Success")
-            flash('Virus Created!', category='success')
-            return jsonify({'message': 'success'})
-        except Exception as e:
-            print(e)
-            return jsonify({'message': e})
-    else:
-        print("token not valid or duplicate virus")
-        flash('Duplicate virus  or wrong access token', category='error')
-        return jsonify({'message': 'token not valid or duplicate virus '})
+def save_virus():
+    print("Save virus called")
+    try:
+        # Parse request data
+        data = json.loads(request.data)
+        print(data)
+        user_id = data.get('user_id')  # User ID of the creator
+        print(user_id)
+        token = data.get('token')  # Access token for validation
+        print(token)
+        name = data.get('name')  # Name of the virus
+        print(name)
+        heartbeat_rate = data.get('heartbeat_rate')  # Heartbeat rate of the virus
+        print(heartbeat_rate)
+        use_case_settings = data.get('use_case_settings')  # Use cases as a comma-separated string
+        
+        # Token validation (replace 'userToken' with your actual validation logic)
+        if token != userToken:  
+            return jsonify({'message': 'Invalid token or duplicate virus'}), 403
+
+        # Save the virus to the database
+        new_virus = Virus(
+            name=name,
+            heartbeat_rate=heartbeat_rate,
+            use_case_settings=','.join(use_case_settings),  # Ensure it's stored as a comma-separated string
+            user_id=user_id,
+            is_alive=True
+        )
+        db.session.add(new_virus)
+        db.session.commit()
+
+        return jsonify({'message': 'Virus created successfully!'}), 201
+
+    except Exception as e:
+        # Log the exception and return an error response
+        print(f"Error saving virus: {e}")
+        return jsonify({'message': 'An error occurred', 'error': str(e)}), 500
+
+# ## saves a virus old
+# @api.route('/savevirus', methods=['POST'])
+# def saveVirus():
+#     data = json.loads(request.data)
+#     print(data)
+#     user_id = data['user_id']
+#     token = data['token']
+#     virus_type = data['virus_type']
+#     name = data['name']
+#     heartbeat_rate = data['heartbeat_rate']
+#     print(virus_type)
+#     print(user_id)
+#     print(name)
+#     print(token)
+#     if token == userToken :
+#         try:
+#             dbConnect()
+#             curs.execute("INSERT INTO Virus (virus_type, name, heartbeat_rate, user_id) VALUES (?, ?, ?, ?)", (virus_type, name, heartbeat_rate, user_id))
+#             conn.commit()
+#             conn.close()
+#             print("Success")
+#             flash('Virus Created!', category='success')
+#             return jsonify({'message': 'success'})
+#         except Exception as e:
+#             print(e)
+#             return jsonify({'message': e})
+#     else:
+#         print("token not valid or duplicate virus")
+#         flash('Duplicate virus  or wrong access token', category='error')
+#         return jsonify({'message': 'token not valid or duplicate virus '})
 
 
 ## saves a hosts 
@@ -181,8 +222,8 @@ def getHosts(userId = "1", token = "1234567890"):
 
 ####### DELETE APIS ##########
 
-@api.route('/deletevirus', methods=['DELETE'])
-@login_required
+@api.route('/deletevirus', methods=['POST'])
+#@login_required
 def deleteVirus():
     print("deleteVirus called")
     data = request.get_json()

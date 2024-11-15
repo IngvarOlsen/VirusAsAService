@@ -12,67 +12,58 @@ Virus
   <!-- Form for creating a new virus -->
   <div style="text-align: left; margin-bottom: 20px;">
       <h3>Create a New Virus</h3>
-      <form method="POST" action="/create-virus">
-          <div class="form-group">
-              <label for="virusName">Virus Name</label>
-              <input type="text" class="form-control" id="virusName" name="virus_name" placeholder="Enter Virus Name" required>
-          </div>
-          <div class="form-group">
-              <label for="virusType">Virus Type</label>
-              <select class="form-control" id="virusType" name="virus_type" required>
-                  <option value="Keylogger">Keylogger</option>
-                  <option value="C2C">Command & Control</option>
-                  <option value="Ransomware">Ransomware</option>
-                  <option value="Obfuscation">Obfuscation</option>
-                  <option value="DLL Side-loading">DLL Side-loading</option>
-              </select>
-          </div>
-          <div class="form-group">
-              <label for="heartbeatRate">Heartbeat Rate (in ms)</label>
-              <input type="number" class="form-control" id="heartbeatRate" name="heartbeat_rate" placeholder="Enter Heartbeat Rate" min="100" step="50" required>
-          </div>
-          
-          <!-- Use Case Grid -->
-          <div class="form-group">
-              <label>Use Cases</label>
-              <div class="usecase-grid">
-                  <div class="form-check">
-                      <input class="form-check-input" type="checkbox" id="usecaseRansomware" name="use_cases" value="Ransomware Simulation">
-                      <label class="form-check-label" for="usecaseRansomware">Ransomware Simulation</label>
-                  </div>
-                  <div class="form-check">
-                      <input class="form-check-input" type="checkbox" id="usecaseDNSTunneling" name="use_cases" value="DNS Tunneling">
-                      <label class="form-check-label" for="usecaseDNSTunneling">DNS Tunneling</label>
-                  </div>
-                  <div class="form-check">
-                      <input class="form-check-input" type="checkbox" id="usecaseNetRecon" name="use_cases" value="Net.exe Recon">
-                      <label class="form-check-label" for="usecaseNetRecon">Net.exe Recon</label>
-                  </div>
-                  <div class="form-check">
-                      <input class="form-check-input" type="checkbox" id="usecaseDLLSideLoading" name="use_cases" value="DLL Side Loading">
-                      <label class="form-check-label" for="usecaseDLLSideLoading">DLL Side Loading</label>
-                  </div>
-                  <div class="form-check">
-                      <input class="form-check-input" type="checkbox" id="usecaseRegistryEdits" name="use_cases" value="Registry Edits">
-                      <label class="form-check-label" for="usecaseRegistryEdits">Registry Edits</label>
-                  </div>
-                  <div class="form-check">
-                      <input class="form-check-input" type="checkbox" id="usecaseScheduledTasks" name="use_cases" value="Scheduled Tasks">
-                      <label class="form-check-label" for="usecaseScheduledTasks">Scheduled Tasks</label>
-                  </div>
-                  <div class="form-check">
-                      <input class="form-check-input" type="checkbox" id="usecaseEncryptedTraffic" name="use_cases" value="Encrypted Traffic">
-                      <label class="form-check-label" for="usecaseEncryptedTraffic">Encrypted Traffic</label>
-                  </div>
-                  <div class="form-check">
-                      <input class="form-check-input" type="checkbox" id="usecaseNonStandardPorts" name="use_cases" value="Traffic on none standard ports">
-                      <label class="form-check-label" for="usecaseNonStandardPorts">Traffic on None Standard Ports</label>
-                  </div>
-              </div>
-          </div>
-          
-          <button type="submit" class="btn btn-success">Create Virus</button>
-      </form>
+      <!-- <form method="POST" action="/save-virus"> -->
+      <form method="POST">
+        <div class="form-group">
+            <label for="virusName">Virus Name</label>
+            <input type="text" class="form-control" id="virusName" name="name" placeholder="Enter Virus Name" required>
+        </div>
+        <div class="form-group">
+            <label for="heartbeatRate">Heartbeat Rate (in ms)</label>
+            <input type="number" class="form-control" id="heartbeatRate" name="heartbeat_rate" placeholder="Enter Heartbeat Rate" min="100" step="50" required>
+        </div>
+
+        <!-- Use Case Grid -->
+        <div class="form-group">
+            <label>Use Cases</label>
+            <div class="usecase-grid">
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="usecaseRansomware" name="use_case_settings" value="Ransomware Simulation">
+                    <label class="form-check-label" for="usecaseRansomware">Ransomware Simulation</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="usecaseDNSTunneling" name="use_case_settings" value="DNS Tunneling">
+                    <label class="form-check-label" for="usecaseDNSTunneling">DNS Tunneling</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="usecaseNetRecon" name="use_case_settings" value="Net.exe Recon">
+                    <label class="form-check-label" for="usecaseNetRecon">Net.exe Recon</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="usecaseDLLSideLoading" name="use_case_settings" value="DLL Side Loading">
+                    <label class="form-check-label" for="usecaseDLLSideLoading">DLL Side Loading</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="usecaseRegistryEdits" name="use_case_settings" value="Registry Edits">
+                    <label class="form-check-label" for="usecaseRegistryEdits">Registry Edits</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="usecaseScheduledTasks" name="use_case_settings" value="Scheduled Tasks">
+                    <label class="form-check-label" for="usecaseScheduledTasks">Scheduled Tasks</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="usecaseEncryptedTraffic" name="use_case_settings" value="Encrypted Traffic">
+                    <label class="form-check-label" for="usecaseEncryptedTraffic">Encrypted Traffic</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="usecaseNonStandardPorts" name="use_case_settings" value="Traffic on none standard ports">
+                    <label class="form-check-label" for="usecaseNonStandardPorts">Traffic on None Standard Ports</label>
+                </div>
+            </div>
+        </div>
+
+        <button type="submit" class="btn btn-success">Create Virus</button>
+    </form>
   </div>
 
   <!-- List of existing viruses -->
@@ -81,13 +72,13 @@ Virus
       {% for row in dataToHtml %}
           <div class="card" style="margin-bottom: 15px;">
               <h5 class="card-header" style="color:black; background-color: rgb(145, 247, 159);">
-                  {{ row[2] }} ({{ row[1] }})
+                {{ row[1] }}
               </h5>
               <div class="card-body" style="text-align: left;">
                   <p style="color:black"><strong>ID:</strong> {{ row[0] }}</p>
-                  <p style="color:black"><strong>Type:</strong> {{ row[1] }}</p>
-                  <p style="color:black"><strong>Heartbeat Rate:</strong> {{ row[3] }} ms</p>
-                  <p style="color:black"><strong>Creator ID:</strong> {{ row[4] }}</p>
+                  <p style="color:black"><strong>Name:</strong> {{ row[1] }}</p>
+                  <p style="color:black"><strong>Heartbeat Rate:</strong> {{ row[2] }} ms</p>
+                  <p style="color:black"><strong>Enabled usecases:</strong> {{ row[3] }}</p>
               </div>
               <div class="card-footer">
                   <button type="button" class="btn btn-danger" onClick="deleteVirus({{ user.id }}, {{ row[0] }})">Delete Virus</button>
@@ -109,15 +100,59 @@ Virus
 </style>
 
 <script>
-  // Function to delete a virus
-  function deleteVirus(userId, virusId) {
-      if (confirm('Are you sure you want to delete this virus?')) {
-          fetch(`/delete-virus/${virusId}`, {
+    // Needs actual token logic
+    var testToken = "1234567890";
+
+  document.querySelector('form').addEventListener('submit', async function (e) {
+      e.preventDefault(); // Prevent default form submission
+
+      // Collect form data
+      const formData = new FormData(e.target);
+      const data = {
+          user_id: "{{ user.id }}",
+          token: testToken, 
+          name: formData.get('name'),
+          heartbeat_rate: formData.get('heartbeat_rate'),
+          use_case_settings: Array.from(
+              formData.getAll('use_case_settings') // Collect all selected checkboxes
+          ),
+      };
+
+      try {
+          // Send POST request with JSON data
+          const response = await fetch('/savevirus', {
               method: 'POST',
               headers: {
                   'Content-Type': 'application/json',
               },
-              body: JSON.stringify({ user_id: userId }),
+              body: JSON.stringify(data),
+          });
+
+          if (response.ok) {
+              const result = await response.json();
+              alert(result.message);
+              location.reload(); // Reload the page to reflect new data
+          } else {
+              const error = await response.json();
+              alert('Error: ' + error.message);
+          }
+      } catch (err) {
+          console.error('Error saving virus:', err);
+          alert('An error occurred while saving the virus.');
+      }
+  });
+
+
+
+  // Function to delete a virus
+  function deleteVirus(userId, virusId) {
+      if (confirm('Are you sure you want to delete this virus?')) {
+          fetch(`/deletevirus`, {
+              method: 'POST',
+              headers: {
+                  'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({ user_id: userId, virus_id: virusId, token: testToken}),
           }).then((response) => {
               if (response.ok) {
                   location.reload();
