@@ -22,7 +22,7 @@ def net_exe():
         command = "net {}".format(i)
         subprocess.run(['powershell', command], shell=True)
     
-    print(os.uname())
+    #print(os.uname())
 
 # Registry memory edit functionality
 def register_edits():
