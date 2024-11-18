@@ -7,15 +7,17 @@ Virus
 {% block content %}
 
 <div class="wrapper">
-  <h1 align="center" style="color:black; margin: 15px;">Virus Dashboard</h1>
+  <h1 align="center" style="color:black; margin: 15px;">Active Test Viruses</h1>
 
   <!-- Form for creating a new virus -->
   <div style="text-align: left; margin-bottom: 20px;">
-      <h3>Create a New Virus</h3>
+      <h3>Create a New Test Virus</h3>
+    
+      <form method="POST" action="{{ url_for('api.saveVirus') }}">
       <!-- <form method="POST" action="/save-virus"> -->
-      <form method="POST">
+      <!-- <form method="POST"> -->
         <div class="form-group">
-            <label for="virusName">Virus Name</label>
+            <label for="virusName">Test Virus Name</label>
             <input type="text" class="form-control" id="virusName" name="name" placeholder="Enter Virus Name" required>
         </div>
         <div class="form-group">
@@ -62,12 +64,46 @@ Virus
             </div>
         </div>
 
-        <button type="submit" class="btn btn-success">Create Virus</button>
+        <button type="submit" class="btn btn-success">Create Test Virus</button>
     </form>
   </div>
 
   <!-- List of existing viruses -->
-  <h3>Existing Viruses</h3>
+
+<!-- List of existing viruses -->
+<h3>Existing Viruses</h3>
+<div>
+    {% for row in dataToHtml %}
+        <div class="card" style="margin-bottom: 15px;">
+            <h5 class="card-header" style="color:black; background-color: rgb(199, 223, 255);">
+                {{ row[1] }}
+            </h5>
+            <div class="card-body" style="text-align: left;">
+                <p style="color:black"><strong>ID:</strong> {{ row[0] }}</p>
+                <p style="color:black"><strong>Name:</strong> {{ row[1] }}</p>
+                <p style="color:black"><strong>Heartbeat Rate:</strong> {{ row[2] }} ms</p>
+                <p style="color:black"><strong>Enabled usecases:</strong> {{ row[3] }}</p>
+            </div>
+            <div class="card-footer">
+                <!-- <form method="POST" action="{{ url_for('api.archiveVirus', virus_id=row[0]) }}"> -->
+                <form method="POST" action="{{ url_for('api.archiveVirus') }}">
+                    <input type="hidden" name="virus_id" value="{{ row[0] }}"> 
+                    <button type="submit" class="btn btn-warning">Archive Virus</button>
+                </form>
+                <!-- Form for deleting a virus -->
+                <form method="POST" action="{{ url_for('api.deleteVirus') }}">
+                    <input type="hidden" name="virus_id" value="{{ row[0] }}"> 
+                    <!-- <input type="hidden" name="user_id" value="{{ user.id }}"> -->
+                    <!-- <input type="hidden" name="user_token" value="1234567890"> -->
+                    <button type="submit" class="btn btn-danger">Delete Virus</button>
+                </form>
+            </div>
+        </div>
+    {% endfor %}
+</div>
+
+  
+  <!-- <h3>Old virus show with javascript to api</h3>
   <div>
       {% for row in dataToHtml %}
           <div class="card" style="margin-bottom: 15px;">
@@ -86,7 +122,7 @@ Virus
           </div>
       {% endfor %}
   </div>
-</div>
+</div> -->
 
 <!-- Styling for grid layout -->
 <style>
@@ -100,68 +136,68 @@ Virus
 </style>
 
 <script>
-    // Needs actual token logic
-    var testToken = "1234567890";
+//     // Needs actual token logic
+//     var testToken = "1234567890";
 
-  document.querySelector('form').addEventListener('submit', async function (e) {
-      e.preventDefault(); // Prevent default form submission
+//   document.querySelector('form').addEventListener('submit', async function (e) {
+//       e.preventDefault(); // Prevent default form submission
 
-      // Collect form data
-      const formData = new FormData(e.target);
-      const data = {
-          user_id: "{{ user.id }}",
-          token: testToken, 
-          name: formData.get('name'),
-          heartbeat_rate: formData.get('heartbeat_rate'),
-          use_case_settings: Array.from(
-              formData.getAll('use_case_settings') // Collect all selected checkboxes
-          ),
-      };
+//       // Collect form data
+//       const formData = new FormData(e.target);
+//       const data = {
+//           user_id: "{{ user.id }}",
+//           token: testToken, 
+//           name: formData.get('name'),
+//           heartbeat_rate: formData.get('heartbeat_rate'),
+//           use_case_settings: Array.from(
+//               formData.getAll('use_case_settings') // Collect all selected checkboxes
+//           ),
+//       };
 
-      try {
-          // Send POST request with JSON data
-          const response = await fetch('/savevirus', {
-              method: 'POST',
-              headers: {
-                  'Content-Type': 'application/json',
-              },
-              body: JSON.stringify(data),
-          });
+//       try {
+//           // Send POST request with JSON data
+//           const response = await fetch('/savevirus', {
+//               method: 'POST',
+//               headers: {
+//                   'Content-Type': 'application/json',
+//               },
+//               body: JSON.stringify(data),
+//           });
 
-          if (response.ok) {
-              const result = await response.json();
-              alert(result.message);
-              location.reload(); // Reload the page to reflect new data
-          } else {
-              const error = await response.json();
-              alert('Error: ' + error.message);
-          }
-      } catch (err) {
-          console.error('Error saving virus:', err);
-          alert('An error occurred while saving the virus.');
-      }
-  });
+//           if (response.ok) {
+//               const result = await response.json();
+//               alert(result.message);
+//               location.reload(); // Reload the page to reflect new data
+//           } else {
+//               const error = await response.json();
+//               alert('Error: ' + error.message);
+//           }
+//       } catch (err) {
+//           console.error('Error saving virus:', err);
+//           alert('An error occurred while saving the virus.');
+//       }
+//   });
 
 
 
-  // Function to delete a virus
-  function deleteVirus(userId, virusId) {
-      if (confirm('Are you sure you want to delete this virus?')) {
-          fetch(`/deletevirus`, {
-              method: 'POST',
-              headers: {
-                  'Content-Type': 'application/json',
-              },
-              body: JSON.stringify({ user_id: userId, virus_id: virusId, token: testToken}),
-          }).then((response) => {
-              if (response.ok) {
-                  location.reload();
-              } else {
-                  alert('Failed to delete the virus.');
-              }
-          });
-      }
-  }
+//   // Function to delete a virus
+//   function deleteVirus(userId, virusId) {
+//       if (confirm('Are you sure you want to delete this virus?')) {
+//           fetch(`/deletevirus`, {
+//               method: 'POST',
+//               headers: {
+//                   'Content-Type': 'application/json',
+//               },
+//               body: JSON.stringify({ user_id: userId, virus_id: virusId, token: testToken}),
+//           }).then((response) => {
+//               if (response.ok) {
+//                   location.reload();
+//               } else {
+//                   alert('Failed to delete the virus.');
+//               }
+//           });
+//       }
+//   }
 </script>
 
 {% include 'scriptsImport.html' %}

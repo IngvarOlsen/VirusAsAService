@@ -21,7 +21,7 @@ def create_app():
     app.register_blueprint(api, url_prefix='/')
 
    # from .models import User, Note
-    from .models import User, Virus, Hosts
+    from .models import User, Virus, Hosts, Archived
 
     with app.app_context():
         db.create_all()

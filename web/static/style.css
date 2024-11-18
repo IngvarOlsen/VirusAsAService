@@ -1,19 +1,19 @@
  /* Gradient Background for the Wrapper */
  body {
-    margin: 0; /* Remove default margin */
-    padding: 0; /* Remove default padding */
-    background: linear-gradient(to bottom right, #e1e4ff, #a8ceff,  #1a3eaa);
-    background-size: 200% 200%; /* Prevent visible loops */
-    animation: gradientAnimation 15s ease infinite; /* Optional animation */
+    margin: 0; 
+    padding: 0; 
+    background: linear-gradient(to bottom right, #e1e4ff, #59a1ff,  #3451a7);
+    background-size: 200% 200%; 
+    /* animation: gradientAnimation 15s ease infinite;  */
      
   }
 
-  /* Optional Gradient Animation */
-  @keyframes gradientAnimation {
+  /* Commented it out, uses allot of resources */
+  /* @keyframes gradientAnimation {
       0% { background-position: 0% 50%; }
       50% { background-position: 100% 50%; }
       100% { background-position: 0% 50%; }
-  }
+  } */
 
 
 .container {
