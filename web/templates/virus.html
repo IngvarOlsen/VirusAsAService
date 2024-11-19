@@ -85,6 +85,10 @@ Virus
                 <p style="color:black"><strong>Enabled usecases:</strong> {{ row[3] }}</p>
             </div>
             <div class="card-footer">
+                <form method="POST" action="{{ url_for('views.virusInfo') }}">
+                    <input type="hidden" name="virus_id" value="{{ row[0] }}"> 
+                    <button type="submit" class="btn btn-success">Virus Info</button>
+                </form>
                 <!-- <form method="POST" action="{{ url_for('api.archiveVirus', virus_id=row[0]) }}"> -->
                 <form method="POST" action="{{ url_for('api.archiveVirus') }}">
                     <input type="hidden" name="virus_id" value="{{ row[0] }}"> 

@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, flash, jsonify
+from flask import Blueprint, render_template, request, flash, jsonify, redirect, url_for
 from flask_login import login_required, current_user
 from sqlalchemy import Table, select, join, MetaData
 from sqlalchemy.orm import joinedload
@@ -69,6 +69,51 @@ def archived():
         print(f"Error retrieving archived viruses: {e}")
         flash('Failed to load archived viruses.', category='error')
         return redirect(url_for('views.virus'))  
+
+
+@views.route('/virusinfo', methods=['POST'])
+@login_required
+def virusInfo():
+    try:
+        virus_id = request.form.get("virus_id")
+        print("virus_id: ", virus_id)
+        # Query the Virus by ID and ensure it belongs to the current user
+        virus = Virus.query.filter_by(id=virus_id, user_id=current_user.id).first()
+        if not virus:
+            flash('Virus not found or unauthorized.', category='error')
+            return redirect(url_for('views.virus'))
+
+        # Query all Hosts related to this Virus
+        hosts = Hosts.query.filter_by(virus_id=virus_id).all()
+
+        # Format data for the template
+        data_to_send = {
+            'virus': {
+                'id': virus.id,
+                'name': virus.name,
+                'heartbeat_rate': virus.heartbeat_rate,
+                'use_case_settings': virus.use_case_settings,
+                'is_alive': virus.is_alive,
+            },
+            'hosts': [
+                {
+                    'id': host.id,
+                    'host_name': host.host_name,
+                    'last_heartbeat': host.last_heartbeat,
+                    'log_info': host.log_info,
+                }
+                for host in hosts
+            ]
+        }
+        # Debugging output
+        print(data_to_send)
+
+        return render_template('virusinfo.html', data=data_to_send, user=current_user)
+
+    except Exception as e:
+        print(f"Error retrieving virus info: {e}")
+        flash('Failed to load virus info.', category='error')
+        return redirect(url_for('views.virus'))
 
     
 @views.route('/authtest', methods=['GET', 'POST'])

@@ -1,0 +1,41 @@
+{% extends "base.html" %} 
+{% include "cssImport.html" %} 
+{% block title %}
+Virus
+{% endblock %} 
+
+{% block content %}
+<div class="wrapper">
+
+<h1 align="center" style="color:black; margin: 15px;">Archived Test Viruses</h1>
+
+<div class="container">
+    <h1>Virus Information</h1>
+    <div class="virus-details">
+        <h2>Virus Details</h2>
+        <p><strong>ID:</strong> {{ data.virus.id }}</p>
+        <p><strong>Name:</strong> {{ data.virus.name }}</p>
+        <p><strong>Heartbeat Rate:</strong> {{ data.virus.heartbeat_rate }}</p>
+        <p><strong>Use Case Settings:</strong> {{ data.virus.use_case_settings }}</p>
+        <p><strong>Status:</strong> {{ "Active" if data.virus.is_alive else "Archived" }}</p>
+    </div>
+
+    <hr>
+
+    <h2>Hosts</h2>
+    <div class="hosts-list">
+        {% for host in data.hosts %}
+            <div class="host-card">
+                <h3>Host: {{ host.host_name }}</h3>
+                <p><strong>Host ID:</strong> {{ host.id }}</p>
+                <p><strong>Last Heartbeat:</strong> {{ host.last_heartbeat }}</p>
+                <p><strong>Log Info:</strong> {{ host.log_info }}</p>
+            </div>
+            <hr>
+        {% endfor %}
+    </div>
+</div>
+  
+{% include 'scriptsImport.html' %}
+
+{% endblock %}
