@@ -1,8 +1,9 @@
-from flask import Blueprint, render_template, request, flash, redirect, url_for
+from flask import Blueprint, render_template, request, flash, redirect, url_for, session
 from .models import User  # Importing the User model from the local models module
 from werkzeug.security import generate_password_hash, check_password_hash
 from . import db  # Importing the database object from the local module
 from flask_login import login_user, login_required, logout_user, current_user
+import secrets
 
 auth = Blueprint('auth', __name__)  # Creating a Blueprint named 'auth'
 
@@ -17,9 +18,16 @@ def login():
         user = User.query.filter_by(email=email).first()  # Query the database for a user with the provided email
         if user:  # If a user with the email is found
             if check_password_hash(user.password, password):  # Check if the provided password matches the hashed password stored in the database
+                # Generate the session token and which will be used to access all APIs on website more securly
+                token = secrets.token_hex(32)
+                print(token)
+                user.token = token 
+                db.session.commit()
+                session['token'] = token
                 flash('Logged in successfully!', category='success')  # Display a flash message indicating successful login
-                login_user(user, remember=True)  # Log in the user and remember the session
-                return redirect(url_for('views.home'))  # Redirect the user to the home page
+                login_user(user)
+                #login_user(user, remember=True)  # Log in the user and remember the session
+                return redirect(url_for('views.virus', token=token))  # Redirect the user to the home page
             else:  # If the password doesn't match
                 flash('Incorrect password, try again.', category='error')  # Display a flash message indicating incorrect password
         else:  # If no user with the email is found

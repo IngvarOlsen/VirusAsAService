@@ -1,6 +1,6 @@
 import requests
 import base64
-from flask import Blueprint, render_template, request, flash, jsonify, send_file, redirect, url_for
+from flask import Blueprint, render_template, request, flash, jsonify, send_file, redirect, url_for, session
 from flask_login import login_required, current_user
 #from .models import Note, ImageSet, Image
 from .models import Virus, Hosts, Archived
@@ -20,12 +20,28 @@ api = Blueprint('api', __name__)
 # For development token logic needs to be made
 userToken = '1234567890'
 
+##### Helper Functions ######
+
+#Connects to DB for manual SQL statements, needs to be param bound and closed after
 def dbConnect():
     global conn
     #conn = sqlite3.connect('/var/www/instance/database.db')
     conn = sqlite3.connect('instance/database.db')
     global curs
     curs = conn.cursor()
+
+
+def validateToken():
+    sessionToken = session['token']
+    print(f"session[token] = {sessionToken}")
+    print(f"current_user.token = {current_user.token}")
+    if 'token' not in session or session['token'] != current_user.token:
+        flash('Session expired or invalid token. Please log in again.', category='error')
+        logout_user()
+        return False
+    return True
+
+
 
 
 #############################
@@ -114,33 +130,35 @@ def dnsTunnelingHandler():
 def saveVirus():
     print("Save virus called")
     try:
-        # Get form data
-        name = request.form.get('name')  # Virus name
-        heartbeat_rate = request.form.get('heartbeat_rate')  # Heartbeat rate
-        use_case_settings = request.form.getlist('use_case_settings')  # Use cases (list of selected checkboxes)
-        
-        # Debugging output
-        print(f"Name: {name}")
-        print(f"Heartbeat Rate: {heartbeat_rate}")
-        print(f"Use Case Settings: {use_case_settings}")
+        # Validates token against session and on DB
+        if validateToken():
+            # Get form data
+            name = request.form.get('name') 
+            heartbeat_rate = request.form.get('heartbeat_rate') 
+            use_case_settings = request.form.getlist('use_case_settings')  
+            
+            # Debugging output
+            print(f"Name: {name}")
+            print(f"Heartbeat Rate: {heartbeat_rate}")
+            print(f"Use Case Settings: {use_case_settings}")
 
-        # Validate required fields
-        if not name or not heartbeat_rate:
-            return jsonify({'message': 'Name and Heartbeat Rate are required'}), 400
+            # Validate required fields
+            if not name or not heartbeat_rate:
+                return jsonify({'message': 'Name and Heartbeat Rate are required'}), 400
 
-        # Save the virus to the database
-        new_virus = Virus(
-            name=name,
-            heartbeat_rate=heartbeat_rate,
-            use_case_settings=','.join(use_case_settings),  # Convert list to comma-separated string
-            user_id=current_user.id,  # Use the authenticated user's ID
-            is_alive=True
-        )
-        db.session.add(new_virus)
-        db.session.commit()
+            # Save the virus to the database
+            new_virus = Virus(
+                name=name,
+                heartbeat_rate=heartbeat_rate,
+                use_case_settings=','.join(use_case_settings),  # Convert list to comma-separated string
+                user_id=current_user.id,  # Use the authenticated user's ID
+                is_alive=True
+            )
+            db.session.add(new_virus)
+            db.session.commit()
 
-        flash('Virus created successfully!', category='success')
-        return redirect(url_for('views.virus'))  # Adjust to your virus dashboard route
+            flash('Virus created successfully!', category='success')
+            return redirect(url_for('views.virus'))  # Adjust to your virus dashboard route
 
     except Exception as e:
         # Log the error and redirect with an error message
@@ -229,13 +247,12 @@ def saveHost():
     print(data)
     user_id = data['user_id']
     virus_id = data['virus_id']
-    token = data['token']
     pc_name = data['pc_name']
     country = data['country']
     host_notes = data['host_notes']
     settings = data['settings']
     last_heartbeat = data['last_heartbeat']
-    if token == userToken :
+    if validateToken():
         try:
             dbConnect()
             curs.execute("INSERT INTO Hosts (user_id, virus_id, pc_name, country, host_notes, settings, last_heartbeat) VALUES (?, ?, ?, ?, ?, ?, ?)", (user_id, virus_id, pc_name, country, host_notes, settings, last_heartbeat))
@@ -263,16 +280,17 @@ def saveHost():
 def getActiveVirus():
     print("getactivevirus")
     try:
-        dbConnect()
-        print("Trying to get virus table data")
+        if validateToken():
+            dbConnect()
+            print("Trying to get virus table data")
 
-        curs.execute("SELECT * FROM Virus WHERE user_id = ? AND is_alive = 1", (str(current_user.id)))
-        rows = curs.fetchall()
+            curs.execute("SELECT * FROM Virus WHERE user_id = ? AND is_alive = 1", (str(current_user.id)))
+            rows = curs.fetchall()
 
-        conn.close()
-        print("jsondump")
-        print(json.dumps(rows))
-        return json.loads(json.dumps(rows))
+            conn.close()
+            print("jsondump")
+            print(json.dumps(rows))
+            return json.loads(json.dumps(rows))
     except Exception as e:
         print(e)
         return jsonify({'message': e})
@@ -283,16 +301,18 @@ def getActiveVirus():
 @api.route('/getvirus', methods=['GET'])
 def getVirus():
     try:
-        dbConnect()
-        print("Trying to get virus table data")
+        # Validates session token against DB token
+        if validateToken():
+            dbConnect()
+            print("Trying to get virus table data")
 
-        curs.execute("SELECT * FROM Virus WHERE user_id = ?", (str(current_user.id)))
-        rows = curs.fetchall()
+            curs.execute("SELECT * FROM Virus WHERE user_id = ?", (str(current_user.id)))
+            rows = curs.fetchall()
 
-        conn.close()
-        print("jsondump")
-        print(json.dumps(rows))
-        return json.loads(json.dumps(rows))
+            conn.close()
+            print("jsondump")
+            print(json.dumps(rows))
+            return json.loads(json.dumps(rows))
     except Exception as e:
         print(e)
         return jsonify({'message': e})
@@ -303,19 +323,25 @@ def getVirus():
 def getHosts():
     print("getHosts")
     try:
-        dbConnect()
-        print("Trying to get Hosts table data")
-        curs.execute("SELECT * FROM Hosts WHERE user_id = ?", (str(current_user.id)))
-        rows = curs.fetchall()
-        conn.close()
-        print("jsondump")
-        print(json.dumps(rows))
-        return json.loads(json.dumps(rows))
+        #token = "shit"
+        # print(f"token = {token}")
+        # print(f"current_user.token = {current_user.token}")
+        
+        # Calls helper function to validate session token to db token
+        if validateToken():
+            dbConnect()
+            print("Trying to get Hosts table data")
+            curs.execute("SELECT * FROM Hosts WHERE user_id = ?", (str(current_user.id)))
+            rows = curs.fetchall()
+            conn.close()
+            print("jsondump")
+            print(json.dumps(rows))
+            return json.loads(json.dumps(rows))
     except Exception as e:
         print(e)
-        return jsonify({'message': e})
+        return jsonify({'message': 'Token not valid'}), 403
     else:
-        return jsonify({'message': 'token not valid'})
+        return jsonify({'message': "Some other error happened"}), 500
 
 ####### Archive ########
 @api.route('/archivevirus', methods=['POST'])
@@ -323,34 +349,36 @@ def getHosts():
 def archiveVirus():
     print("archiveVirus called")
     try:
-        virus_id = request.form.get("virus_id")
-        # Retrieve the virus from the database
-        virus = Virus.query.get(virus_id)
+        # Validates session token against DB token
+        if validateToken():
+            virus_id = request.form.get("virus_id")
+            # Retrieve the virus from the database
+            virus = Virus.query.get(virus_id)
 
-        # Ensure the virus exists and belongs to the current user
-        if not virus or int(virus.user_id) != int(current_user.id):
-            flash('Virus not found or unauthorized.', category='error')
+            # Ensure the virus exists and belongs to the current user
+            if not virus or int(virus.user_id) != int(current_user.id):
+                flash('Virus not found or unauthorized.', category='error')
+                return redirect(url_for('views.virus'))  
+
+            # Check if the virus is already archived
+            if not virus.is_alive:
+                flash('Virus is already archived.', category='warning')
+                return redirect(url_for('views.virus'))  
+
+            # Create a new entry in the Archived table
+            archived_entry = Archived(
+                log_name=f"Archived_{virus.name}",  
+                virus_id=virus.id,
+                user_id=current_user.id
+            )
+            db.session.add(archived_entry)
+
+            # Update the virus to mark it as not alive
+            virus.is_alive = False
+            db.session.commit()
+
+            flash('Virus archived successfully!', category='success')
             return redirect(url_for('views.virus'))  
-
-        # Check if the virus is already archived
-        if not virus.is_alive:
-            flash('Virus is already archived.', category='warning')
-            return redirect(url_for('views.virus'))  
-
-        # Create a new entry in the Archived table
-        archived_entry = Archived(
-            log_name=f"Archived_{virus.name}",  
-            virus_id=virus.id,
-            user_id=current_user.id
-        )
-        db.session.add(archived_entry)
-
-        # Update the virus to mark it as not alive
-        virus.is_alive = False
-        db.session.commit()
-
-        flash('Virus archived successfully!', category='success')
-        return redirect(url_for('views.virus'))  
 
     except Exception as e:
         # Log the error and redirect with an error message
@@ -366,33 +394,35 @@ def archiveVirus():
 def deleteVirus():
     print("deleteVirus called")
     try:
-        # Retrieve the virus from the database
-        
-        virus_id = request.form.get("virus_id")
-        virus = Virus.query.get(virus_id)
-        print("virus_id")
-        print(virus_id)
-        print("virus.user_id")
-        print(virus.user_id)
-        print("current_user.id")
-        print(current_user.id)
+        # Validates session token against DB token
+        if validateToken():
+            # Retrieve the virus from the database
+            
+            virus_id = request.form.get("virus_id")
+            virus = Virus.query.get(virus_id)
+            print("virus_id")
+            print(virus_id)
+            print("virus.user_id")
+            print(virus.user_id)
+            print("current_user.id")
+            print(current_user.id)
 
-        # Ensure the virus exists and belongs to the current user
-        if int(virus.user_id) != int(current_user.id):
-            flash('Virus not found or unauthorized.', category='error')
+            # Ensure the virus exists and belongs to the current user
+            if int(virus.user_id) != int(current_user.id):
+                flash('Virus not found or unauthorized.', category='error')
+                return redirect(url_for('views.virus'))  
+
+            # Delete the virus
+            dbConnect()
+            print("Trying to delete Virus")
+            curs.execute("DELETE FROM virus WHERE id = ? AND user_id = ?", (virus_id, current_user.id))
+            conn.commit()
+            conn.close()
+            # db.session.delete(virus)
+            # db.session.commit()
+
+            flash('Virus deleted successfully!', category='success')
             return redirect(url_for('views.virus'))  
-
-        # Delete the virus
-        dbConnect()
-        print("Trying to delete Virus")
-        curs.execute("DELETE FROM virus WHERE id = ? AND user_id = ?", (virus_id, current_user.id))
-        conn.commit()
-        conn.close()
-        # db.session.delete(virus)
-        # db.session.commit()
-
-        flash('Virus deleted successfully!', category='success')
-        return redirect(url_for('views.virus'))  
 
     except Exception as e:
         print(f"Error deleting virus: {e}")

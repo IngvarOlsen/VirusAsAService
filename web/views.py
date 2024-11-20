@@ -13,10 +13,12 @@ import collections
 
 views = Blueprint('views', __name__)
 
-@views.route('/', methods=['GET', 'POST'], endpoint='home')
-@login_required
-def home():
-    return render_template("home.html", user=current_user)
+# @views.route('/', methods=['GET', 'POST'], endpoint='home')
+# @login_required
+# def home():
+#     token = request.args.get('token')  # Retrieve the token from the query parameter
+#     print(f"Token received: {token}")  # Debugging output
+#     return render_template("home.html", user=current_user)
 
 
 @views.route('/hosts', methods=['GET', 'POST'])
@@ -27,8 +29,9 @@ def hosts():
     dataToSend = api.getHosts() # debug for user1
     print(dataToSend)
 
-    return render_template("home.html", user=current_user, dataToHtml = dataToSend)
+    return render_template("hosts.html", user=current_user, dataToHtml = dataToSend)
 
+@views.route('/', methods=['GET', 'POST'])
 @views.route('/virus', methods=['GET', 'POST'])
 @login_required
 def virus():
