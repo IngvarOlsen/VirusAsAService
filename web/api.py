@@ -1,4 +1,5 @@
 import requests
+import base64
 from flask import Blueprint, render_template, request, flash, jsonify, send_file, redirect, url_for
 from flask_login import login_required, current_user
 #from .models import Note, ImageSet, Image
@@ -27,10 +28,46 @@ def dbConnect():
     curs = conn.cursor()
 
 
-#######################
-####### APIs ##########
-#######################
+#############################
+####### USECASE APIs ########
+#############################
+@api.route('/dnstunneling', methods=['GET', 'POST'])
+def dnsTunnelingHandler():
+    try:
+        # Extract the host from the request headers
+        full_host = request.headers.get('Host')
+        if not full_host:
+            return jsonify({'message': 'Host header is required'}), 400
+        # {base64}.bitlus.online
+        # Split the host and extract the subdomain and get teh first part before the dot
+        subdomain = full_host.split('.')[0]  
+        if not subdomain:
+            return jsonify({'message': 'Invalid DNS tunneling format'}), 400
+        # Decode the base64 payload
+        try:
+            decoded_data = base64.b64decode(subdomain).decode('utf-8')
+        except Exception as e:
+            return jsonify({'message': 'Invalid base64 payload in subdomain', 'error': str(e)}), 400
+        # Log the received and decoded data 
+        print(f"Received subdomain (base64): {subdomain}")
+        print(f"Decoded data: {decoded_data}")
+        # Prepare example response to send back to the one who requested
+        response = {
+            'message': 'DNS tunneling processed successfully',
+            'decoded_data': decoded_data,
+        }
+        return jsonify(response), 200
 
+    except Exception as e:
+        print(f"Error handling DNS tunneling: {e}")
+        return jsonify({'message': 'An error occurred while processing DNS tunneling', 'error': str(e)}), 500
+
+
+
+
+#####################################
+####### DATA HANDLING APIs ##########
+#####################################
 
 ###### Virus calls #######
 
