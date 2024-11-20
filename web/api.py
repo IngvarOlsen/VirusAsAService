@@ -266,7 +266,7 @@ def getActiveVirus():
         dbConnect()
         print("Trying to get virus table data")
 
-        curs.execute("SELECT * FROM Virus WHERE user_id = ? AND is_alive = 1", (current_user.id))
+        curs.execute("SELECT * FROM Virus WHERE user_id = ? AND is_alive = 1", (str(current_user.id)))
         rows = curs.fetchall()
 
         conn.close()
