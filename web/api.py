@@ -253,19 +253,20 @@ def saveHost():
         return jsonify({'message': 'token not valid'})
 
 
-
+#########################
 ##### GET DATA APIS #####
+#########################
+
 ## Get all active virus for the user to display in virus view, needs to be remade together with getvirus, kind of bloat
 @login_required
 @api.route('/getactivevirus', methods=['GET'])
-def getActiveVirus(userId = "1", token = "1234567890"):
+def getActiveVirus():
     print("getactivevirus")
-    if token == userToken:
         try:
             dbConnect()
             print("Trying to get virus table data")
 
-            curs.execute("SELECT * FROM Virus WHERE user_id = ? AND is_alive = 1", (userId))
+            curs.execute("SELECT * FROM Virus WHERE user_id = ? AND is_alive = 1", (current_user.id))
             rows = curs.fetchall()
 
             conn.close()
