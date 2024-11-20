@@ -16,6 +16,26 @@
   } */
 
 
+  .cardButton {
+    -webkit-appearance: none;
+       -moz-appearance: none;
+            appearance: none;
+    outline: 0;
+    background-color: rgb(210, 241, 255);
+    border: 0;
+    padding: 10px 10px;
+    margin: 3px;
+    color: #1d1d1d;
+    border-radius: 3px;
+    width: 120px;
+    cursor: pointer;
+    font-size: 18px;
+    transition-duration: 0.25s;
+  }
+  .cardButton:hover {
+    background-color: #399cff;
+  }
+
 .container {
     background-color: #ffffff;
     margin-top: 20px;
