@@ -13,3 +13,6 @@ pip install -r requirements.txt
 
 Run the app, with the optional --debug for more info
 flask --debug run
+
+For hosting dev
+flask run --host=0.0.0.0 
