@@ -1,7 +1,15 @@
-For Windows via powershell:
-
+Clone down the project in the current folder
 git clone https://github.com/IngvarOlsen/VirusAsAService.git .
+
+Make venv
 python3 -m venv flask-venv 
-flask-venv\Scripts\activate.ps1
+
+Activate venv
+flask-venv\Scripts\activate.ps1 (Windows)
+source flask-venv/bin/activate (Linux)
+
+Install requirements
 pip install -r requirements.txt
-flask run
+
+Run the app, with the optional --debug for more info
+flask --debug run
