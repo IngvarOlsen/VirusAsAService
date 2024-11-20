@@ -31,27 +31,29 @@ def dbConnect():
 #############################
 ####### USECASE APIs ########
 #############################
-@api.route('/dnstunneling', methods=['GET', 'POST'])
+@api.route('/api/dnstunneling', methods=['GET', 'POST'])
 def dnsTunnelingHandler():
     try:
-        # Extract the host from the request headers
+        # Extract the subdomain 
         full_host = request.headers.get('Host')
         if not full_host:
             return jsonify({'message': 'Host header is required'}), 400
-        # {base64}.bitlus.online
-        # Split the host and extract the subdomain and get teh first part before the dot
-        subdomain = full_host.split('.')[0]  
+
+        # Get the subdomain portion 
+        subdomain = full_host.split('.')[0]
         if not subdomain:
             return jsonify({'message': 'Invalid DNS tunneling format'}), 400
-        # Decode the base64 payload
+
+        # Decode the URL-safe Base64 payload
         try:
-            decoded_data = base64.b64decode(subdomain).decode('utf-8')
+            decoded_data = base64.urlsafe_b64decode(subdomain).decode('utf-8')
         except Exception as e:
             return jsonify({'message': 'Invalid base64 payload in subdomain', 'error': str(e)}), 400
-        # Log the received and decoded data 
+
+        # Log the received and decoded data
         print(f"Received subdomain (base64): {subdomain}")
         print(f"Decoded data: {decoded_data}")
-        # Prepare example response to send back to the one who requested
+
         response = {
             'message': 'DNS tunneling processed successfully',
             'decoded_data': decoded_data,
