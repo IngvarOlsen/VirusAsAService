@@ -262,20 +262,20 @@ def saveHost():
 @api.route('/getactivevirus', methods=['GET'])
 def getActiveVirus():
     print("getactivevirus")
-        try:
-            dbConnect()
-            print("Trying to get virus table data")
+    try:
+        dbConnect()
+        print("Trying to get virus table data")
 
-            curs.execute("SELECT * FROM Virus WHERE user_id = ? AND is_alive = 1", (current_user.id))
-            rows = curs.fetchall()
+        curs.execute("SELECT * FROM Virus WHERE user_id = ? AND is_alive = 1", (current_user.id))
+        rows = curs.fetchall()
 
-            conn.close()
-            print("jsondump")
-            print(json.dumps(rows))
-            return json.loads(json.dumps(rows))
-        except Exception as e:
-            print(e)
-            return jsonify({'message': e})
+        conn.close()
+        print("jsondump")
+        print(json.dumps(rows))
+        return json.loads(json.dumps(rows))
+    except Exception as e:
+        print(e)
+        return jsonify({'message': e})
     else:
         return jsonify({'message': 'token not valid'})
 
