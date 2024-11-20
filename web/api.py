@@ -281,42 +281,39 @@ def getActiveVirus():
 
 @login_required
 @api.route('/getvirus', methods=['GET'])
-def getVirus(userId = "1", token = "1234567890"):
-    print("getvirus")
-    if token == userToken:
-        try:
-            dbConnect()
-            print("Trying to get virus table data")
+def getVirus():
+    try:
+        dbConnect()
+        print("Trying to get virus table data")
 
-            curs.execute("SELECT * FROM Virus WHERE user_id = ?", (userId))
-            rows = curs.fetchall()
+        curs.execute("SELECT * FROM Virus WHERE user_id = ?", (str(current_user.id)))
+        rows = curs.fetchall()
 
-            conn.close()
-            print("jsondump")
-            print(json.dumps(rows))
-            return json.loads(json.dumps(rows))
-        except Exception as e:
-            print(e)
-            return jsonify({'message': e})
+        conn.close()
+        print("jsondump")
+        print(json.dumps(rows))
+        return json.loads(json.dumps(rows))
+    except Exception as e:
+        print(e)
+        return jsonify({'message': e})
     else:
         return jsonify({'message': 'token not valid'})        
 
 @api.route('/gethosts', methods=['GET'])
-def getHosts(userId = "1", token = "1234567890"):
+def getHosts():
     print("getHosts")
-    if token == userToken:
-        try:
-            dbConnect()
-            print("Trying to get Hosts table data")
-            curs.execute("SELECT * FROM Hosts WHERE user_id = ?", (userId))
-            rows = curs.fetchall()
-            conn.close()
-            print("jsondump")
-            print(json.dumps(rows))
-            return json.loads(json.dumps(rows))
-        except Exception as e:
-            print(e)
-            return jsonify({'message': e})
+    try:
+        dbConnect()
+        print("Trying to get Hosts table data")
+        curs.execute("SELECT * FROM Hosts WHERE user_id = ?", (str(current_user.id)))
+        rows = curs.fetchall()
+        conn.close()
+        print("jsondump")
+        print(json.dumps(rows))
+        return json.loads(json.dumps(rows))
+    except Exception as e:
+        print(e)
+        return jsonify({'message': e})
     else:
         return jsonify({'message': 'token not valid'})
 
@@ -448,18 +445,17 @@ def deleteHost():
     token = data['token']
     print(id)
     print(token)
-    if token == userToken:
-        try:
-            dbConnect()
-            print("Trying to delete Host")
-            curs.execute("DELETE FROM Hosts WHERE id = ? AND user_id = ?", (id, user_id))
-            conn.commit()
-            conn.close()
-            print("Host deleted")
-            flash('Host deleted!', category='success')
-            return jsonify({'message': 'success'})
-        except Exception as e:
-            return jsonify({'message': e})
+    try:
+        dbConnect()
+        print("Trying to delete Host")
+        curs.execute("DELETE FROM Hosts WHERE id = ? AND user_id = ?", (id, str(current_user.id)))
+        conn.commit()
+        conn.close()
+        print("Host deleted")
+        flash('Host deleted!', category='success')
+        return jsonify({'message': 'success'})
+    except Exception as e:
+        return jsonify({'message': e})
     else:
         return jsonify({'message': 'token not valid'})
 
