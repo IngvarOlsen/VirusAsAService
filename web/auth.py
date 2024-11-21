@@ -71,6 +71,6 @@ def sign_up():
             db.session.commit()  # Commit the changes to the database
             login_user(new_user, remember=True)  # Log in the new user and remember the session
             flash('Account created!', category='success')  # Display a flash message indicating successful account creation
-            return redirect(url_for('views.home'))  # Redirect the user to the home page
+            return redirect(url_for('views.virus'))  # Redirect the user to the home page
 
     return render_template("login.html", user=current_user)  # Render the login template with the current user
