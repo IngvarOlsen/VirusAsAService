@@ -46,33 +46,54 @@ def virus():
 @login_required
 def archived():
     try:
-        # Query to join Archived and Virus
-        archived_viruses = db.session.query(Archived, Virus).join(
-            Virus, Archived.virus_id == Virus.id
-        ).filter(Archived.user_id == current_user.id).all()
+        # Query to join Archived, Virus, and Hosts
+        archived_viruses = (
+            db.session.query(Archived, Virus, Hosts)
+            .join(Virus, Archived.virus_id == Virus.id)
+            .outerjoin(Hosts, Virus.id == Hosts.virus_id)  # Use outer join to include viruses without hosts
+            .filter(Archived.user_id == current_user.id)
+            .all()
+        )
 
         # Format the data for the template
-        data_to_send = [
-            {
-                'archived_id': archived.id,
-                'log_name': archived.log_name,
-                'virus_name': virus.name,
-                'heartbeat_rate': virus.heartbeat_rate,
-                'use_case_settings': virus.use_case_settings,
-                'virus_id': virus.id,
-            }
-            for archived, virus in archived_viruses
-        ]
+        data_to_send = {}
+        for archived, virus, host in archived_viruses:
+            virus_id = virus.id
+            if virus_id not in data_to_send:
+                # Initialize data for this virus
+                data_to_send[virus_id] = {
+                    'archived_id': archived.id,
+                    'log_name': archived.log_name,
+                    'virus_name': virus.name,
+                    'heartbeat_rate': virus.heartbeat_rate,
+                    'use_case_settings': virus.use_case_settings,
+                    'virus_id': virus.id,
+                    'hosts': [],
+                }
 
-        print(data_to_send) 
+            # Append host data if available
+            if host:
+                data_to_send[virus_id]['hosts'].append({
+                    'host_name': host.host_name,
+                    'last_heartbeat': host.last_heartbeat,
+                    'log_info': host.log_info,
+                })
 
-        return render_template("archived.html", user=current_user, dataToHtml=data_to_send)
+        # Convert the data_to_send to a list for easier rendering
+        data_to_send_list = list(data_to_send.values())
+
+        print(data_to_send_list)
+
+        return render_template(
+            "archived.html",
+            user=current_user,
+            dataToHtml=data_to_send_list
+        )
 
     except Exception as e:
         print(f"Error retrieving archived viruses: {e}")
         flash('Failed to load archived viruses.', category='error')
-        return redirect(url_for('views.virus'))  
-
+        return redirect(url_for('views.virus'))
 
 @views.route('/virusinfo', methods=['POST'])
 @login_required

@@ -10,28 +10,39 @@ Virus
 <h1 align="center" style="color:black; margin: 15px;">Archived Test Viruses</h1>
 
 <table style="color:black;">
-    {% for row in dataToHtml %}
-        <tr>
-                  <div class="row">
-                    <div class="col-md-12">
-                      <div class="card">
-                        <h5 class="card-header" style="color:black; background-color: rgb(145, 247, 159);"  >{{row[3]}}</h5>
-                        
-                        <div class="card-body" style="text-align: left;">
-                          <p class="card-text" style="color:black">virus id: {{row[0]}} </p>
-                          <p class="card-text" style="color:black">virus type: {{row[1]}}</p>
-                          <p class="card-text" style="color:black">virus name: {{row[2]}}</p>
-                          <p class="card-text" style="color:black">virus heartbeat rate : {{row[3]}}</p>
-                          <p class="card-text" style="color:black">virus creator id: {{row[4]}}</p>
-                          <p class="card-text" style="color:black">virus creator id: {{row[4]}}</p>
-                        </div>
-                        <footer class="card-footer">
-                          <button type="button" class="btn btn-danger button" onClick="deleteVirus({{user.id}}, {{row[0]}})">Delete Virus</button>
-                        </footer> 
+  {% for virus in dataToHtml %}
+  <div class="card" style="margin-bottom: 20px;">
+      <h5 class="card-header">Archived Log: {{ virus.log_name }}</h5>
+      <div class="card-body">
+          <p><strong>Virus Name:</strong> {{ virus.virus_name }}</p>
+          <p><strong>Heartbeat Rate:</strong> {{ virus.heartbeat_rate }} ms</p>
+          <p><strong>Use Cases:</strong> {{ virus.use_case_settings }}</p>
+  
+          <h6>Hosts:</h6>
+          {% if virus.hosts %}
+          <ul>
+              {% for host in virus.hosts %}
+              
+              <button class="btn btn-link" type="button" data-bs-toggle="collapse" data-bs-target="#hostLogs-{{ loop.index }}" aria-expanded="false" aria-controls="hostLogs-{{ loop.index }}"></button>
+                  <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#hostLogs-{{ host.host_name }}" aria-expanded="false" aria-controls="hostLogs-{{ host.host_name }}">
+                      View Logs for Host: {{ host.host_name }}
+                  </button>
+  
+                  <div class="collapse" id="hostLogs-{{ host.host_name }}">
+                      <div class="card card-body">
+                          <p><strong>Last Heartbeat:</strong> {{ host.last_heartbeat }}</p>
+                          <p><strong>Log Info:</strong> {{ host.log_info }}</p>
                       </div>
-                    </div>
-      </tr>  
-    {% endfor %}
+                  </div>
+              
+              {% endfor %}
+          </ul>
+          {% else %}
+          <p>No hosts connected.</p>
+          {% endif %}
+      </div>
+  </div>
+  {% endfor %}
   </table>
   
 <!-- <table >
@@ -51,5 +62,10 @@ Virus
     {% endfor %}
 </table> -->
 {% include 'scriptsImport.html' %}
+<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<!-- Bootstrap JavaScript -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 {% endblock %}
