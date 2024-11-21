@@ -17,9 +17,12 @@ class Virus(db.Model, UserMixin):
     heartbeat_rate = db.Column(db.String(500))
     use_case_settings = db.Column(db.String(1000))
     user_id = db.Column(db.String(150))
-
-    #If virus is not alive it will kill itself upon update and data will be move to archived model db
+    # If virus is not alive it will kill itself upon update and data will be move to archived model db
     is_alive = db.Column(db.Boolean, unique=False, default=True) 
+    # Once the virus have been compiled it will be updated with the path of the virus
+    storage_path = db.Column(db.String(500))
+    # Virus API Handle, once the path is set the virus can be downloaded with a unique API key handle
+    virus_api = db.Column(db.String(500))
 
 class Hosts(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
@@ -35,6 +38,13 @@ class Archived(db.Model, UserMixin):
     virus_id = db.Column(db.String(150))
     user_id = db.Column(db.String(150))
 
+#Handles pending compiling jobs gets saved together when a new virus is made and updated to finished once done
+class CompilingHandler(db.Model, UserMixin):
+    id = db.Column(db.Integer, primary_key=True)
+    virus_id = db.Column(db.String(150))
+    user_id = db.Column(db.String(150))
+    # Will either have pending or done
+    status = db.Column(db.String(150))
 
 # Waits for the insert virus to have succesfully inserted to SQL and then saves a test host, but only does it for the first user created
 @event.listens_for(Virus, 'after_insert')
