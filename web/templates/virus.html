@@ -63,7 +63,7 @@ Virus
                 </div>
             </div>
         </div>
-        <input type="hidden" id="authToken" name="authToken" value="{{ session['token'] }}">
+        
         <button type="submit" class="btn btn-success">Create Test Virus</button>
     </form>
   </div>
@@ -86,20 +86,20 @@ Virus
             </div>
             <div class="card-footer" style="display: flex;">
                 <form method="POST" action="{{ url_for('views.virusInfo') }}">
-                    <input type="hidden" id="authToken" name="authToken" value="{{ session['token'] }}">
+                    
                     <input type="hidden" name="virus_id" value="{{ row[0] }}"> 
                     <button type="submit" class="cardButton">Info</button>
                 </form>
                 <!-- <form method="POST" action="{{ url_for('api.archiveVirus', virus_id=row[0]) }}"> -->
                 <form method="POST" action="{{ url_for('api.archiveVirus') }}">
-                    <input type="hidden" id="authToken" name="authToken" value="{{ session['token'] }}">
+                    
                     <input type="hidden" name="virus_id" value="{{ row[0] }}"> 
                     <button type="submit" class="cardButton">Archive</button>
                 </form>
                 <!-- Form for deleting a virus -->
                 <form method="POST" action="{{ url_for('api.deleteVirus') }}">
                     <input type="hidden" name="virus_id" value="{{ row[0] }}"> 
-                    <input type="hidden" id="authToken" name="authToken" value="{{ session['token'] }}">
+                    
                     <!-- <input type="hidden" name="user_id" value="{{ user.id }}"> -->
                     <!-- <input type="hidden" name="user_token" value="1234567890"> -->
                     <button type="submit" class="cardButton">Delete</button>
