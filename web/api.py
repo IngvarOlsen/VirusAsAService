@@ -3,13 +3,14 @@ import base64
 from flask import Blueprint, render_template, request, flash, jsonify, send_file, redirect, url_for, session
 from flask_login import login_required, current_user
 #from .models import Note, ImageSet, Image
-from .models import Virus, Hosts, Archived
+from .models import Virus, Hosts, Archived, CompilingHandler
 import sqlite3
 from . import db
 import json
 import os
 import socketio
 import secrets
+from werkzeug.utils import secure_filename
 
 auth = Blueprint('auth', __name__)  # Creating a Blueprint named 'auth'
 
@@ -21,9 +22,19 @@ api = Blueprint('api', __name__)
 # For development token logic needs to be made
 userToken = '1234567890'
 
-##### Helper Functions ######
 
-#Connects to DB for manual SQL statements, needs to be param bound and closed after
+relativeFolder = 'zippedFiles'
+rootPath = os.path.dirname(os.path.abspath(__file__))
+uploadFolder = os.path.join(rootPath, relativeFolder)
+os.makedirs(uploadFolder, exist_ok=True)
+
+
+#############################
+##### Helper Functions ######
+#############################
+
+# Connects to DB for manual SQL statements, though most DB access goes through SQLalchemy
+# Needs to be param bound and closed after
 def dbConnect():
     global conn
     #conn = sqlite3.connect('/var/www/instance/database.db')
@@ -43,6 +54,108 @@ def validateToken():
     return True
 
 
+#############################
+###### Compiling APIs #######
+#############################
+@api.route('/api/getpendingjob', methods=['GET'])
+def getPendingJob():
+    try:
+        # We need some logic to authenticate the get request, for new a bad seceret will be used
+        badSecret = "verySecretAuth"
+
+        # Extract API key from the headers
+        commonSeceret = request.headers.get('Authorization')
+        if not commonSeceret:
+            return jsonify({'message': 'API key is required'}), 403
+
+        # Fetch the first pending job
+        pendingJob = (
+            db.session.query(CompilingHandler)
+            .join(Virus, CompilingHandler.virus_id == Virus.id)
+            .filter(
+                CompilingHandler.status == "pending",
+                Virus.is_alive == True
+            )
+            .first()
+        )
+        if not pendingJob:
+            return jsonify({'message': 'No pending jobs available'}), 404
+
+        # Fetch the associated virus
+        virus = Virus.query.get(pendingJob.virus_id)
+        if not virus:
+            return jsonify({'message': 'Associated virus not found'}), 404
+
+        # Validate the API key
+        if badSecret != commonSeceret:
+            return jsonify({'message': 'Invalid API key'}), 403
+
+        # Prepare the response data
+        responseData = {
+            'job_id': pendingJob.id,
+            'virus_id': virus.id,
+            'virus_name': virus.name,
+            'heartbeat_rate': virus.heartbeat_rate,
+            'use_case_settings': virus.use_case_settings.split(','),  # Return as a list
+            'virus_api': virus.virus_api,
+        }
+        return jsonify(responseData), 200
+
+    except Exception as e:
+        print(f"Error fetching pending job: {e}")
+        return jsonify({'message': 'Error occurred while fetching pending job'}), 500
+
+
+@api.route('/api/uploadcompiledjob', methods=['POST'])
+def uploadCompiledJob():
+    try:
+        # Extract API key from the headers
+        print(request)
+        print(request.form)
+        print(request.files)
+        apiKey = request.headers.get('Authorization')
+        if not apiKey:
+            return jsonify({'message': 'API key is required'}), 403
+
+        # Extract the job ID and file from the request
+        jobId = request.form.get('job_id')
+        file = request.files.get('compiled_file')
+
+        if not jobId or not file:
+            return jsonify({'message': 'Job ID and compiled file are required'}), 400
+
+        # Fetch the compiling job
+        compilingJob = CompilingHandler.query.get(jobId)
+        if not compilingJob:
+            return jsonify({'message': 'Compiling job not found'}), 404
+
+        # Fetch the associated virus
+        virus = Virus.query.get(compilingJob.virus_id)
+        if not virus:
+            return jsonify({'message': 'Associated virus not found'}), 404
+
+        # Validate the API key
+        if virus.virus_api != apiKey:
+            return jsonify({'message': 'Invalid API key'}), 403
+
+        # Save the uploaded file
+        filename = secure_filename(f"{virus.name}_{virus.id}.zip")
+        filepath = os.path.join(uploadFolder, filename)
+        file.save(filepath)
+
+        # Update the virus with the file path
+        virus.storage_path = filepath
+        db.session.commit()
+
+        # Mark the job as completed
+        compilingJob.status = "done"
+        db.session.commit()
+
+        return jsonify({'message': 'Compiled file uploaded and job updated successfully'}), 200
+
+    except Exception as e:
+        print(f"Error uploading compiled job: {e}")
+        return jsonify({'message': 'Error occurred while uploading compiled job'}), 500
 
 
 #############################
@@ -155,12 +268,21 @@ def saveVirus():
                 name=name,
                 heartbeat_rate=heartbeat_rate,
                 use_case_settings=','.join(use_case_settings),  # Convert list to comma-separated string
-                user_id=current_user.id,  # Use the authenticated user's ID
+                user_id=current_user.id,  
                 is_alive=True,
                 virus_api=virus_api
 
             )
+
             db.session.add(new_virus)
+            db.session.commit()
+
+            new_job = CompilingHandler(
+                virus_id=new_virus.id,  # Can access the new virus ID after commit
+                user_id=current_user.id,  
+                status="pending"
+            )
+            db.session.add(new_job)
             db.session.commit()
 
             flash('Virus created successfully!', category='success')
@@ -195,7 +317,7 @@ def saveVirus():
 #         print(heartbeat_rate)
 #         use_case_settings = data.get('use_case_settings')  # Use cases as a comma-separated string
         
-#         # Token validation (replace 'userToken' with your actual validation logic)
+#         # Token validation 
 #         if token != userToken:  
 #             return jsonify({'message': 'Invalid token or duplicate virus'}), 403
 
