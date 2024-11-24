@@ -31,15 +31,54 @@ def hosts():
 
     return render_template("hosts.html", user=current_user, dataToHtml = dataToSend)
 
+# @views.route('/', methods=['GET', 'POST'])
+# @views.route('/virus', methods=['GET', 'POST'])
+# @login_required
+# def virus():
+#     print(current_user.id)
+#     dataToSend = api.getActiveVirus() 
+#     print(dataToSend)
+
+#     return render_template("virus.html", user=current_user, dataToHtml = dataToSend)
+
 @views.route('/', methods=['GET', 'POST'])
 @views.route('/virus', methods=['GET', 'POST'])
 @login_required
 def virus():
-    print(current_user.id)
-    dataToSend = api.getActiveVirus() 
-    print(dataToSend)
+    print(f"User ID: {current_user.id}")
 
-    return render_template("virus.html", user=current_user, dataToHtml = dataToSend)
+    try:
+        # Validate the token
+        if not api.validateToken():
+            flash("Invalid token. Please log in again.", category="error")
+            return redirect(url_for("auth.login"))
+
+        # Query the database using SQLAlchemy
+        active_viruses = Virus.query.filter_by(user_id=current_user.id, is_alive=True).all()
+
+        # Format the data as a list of dictionaries
+        dataToSend = [
+            {
+                'id': virus.id,
+                'name': virus.name,
+                'heartbeat_rate': virus.heartbeat_rate,
+                'use_case_settings': virus.use_case_settings,
+                'user_id': virus.user_id,
+                'is_alive': virus.is_alive,
+            }
+            for virus in active_viruses
+        ]
+
+        print("Formatted Data:", dataToSend)
+
+        # Render the template with the fetched data
+        return render_template("virus.html", user=current_user, dataToHtml=dataToSend)
+
+    except Exception as e:
+        # Handle exceptions and redirect to home
+        print(f"Error loading virus view: {e}")
+        flash("Failed to load active viruses.", category="error")
+        return redirect(url_for("views.home"))
 
 
 @views.route('/archived', methods=['GET', 'POST'])

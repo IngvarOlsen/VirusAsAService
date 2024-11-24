@@ -79,26 +79,27 @@ Virus
                 {{ row[1] }}
             </h5>
             <div class="card-body" style="text-align: left;">
-                <p style="color:black"><strong>ID:</strong> {{ row[0] }}</p>
-                <p style="color:black"><strong>Name:</strong> {{ row[1] }}</p>
-                <p style="color:black"><strong>Heartbeat Rate:</strong> {{ row[2] }} ms</p>
-                <p style="color:black"><strong>Enabled usecases:</strong> {{ row[3] }}</p>
+                <p style="color:black"><strong>ID:</strong> {{ row.id }}</p>
+                <p style="color:black"><strong>Name:</strong> {{ row.name }}</p>
+                <p style="color:black"><strong>Heartbeat Rate:</strong> {{ row.heartbeat_rate }} ms</p>
+                <p style="color:black"><strong>Enabled usecases:</strong> {{ row.use_case_settings }}</p>
+                <p style="color:black"><strong>Status:</strong> {{ row.is_alive }}</p>
             </div>
             <div class="card-footer" style="display: flex;">
                 <form method="POST" action="{{ url_for('views.virusInfo') }}">
                     
-                    <input type="hidden" name="virus_id" value="{{ row[0] }}"> 
+                    <input type="hidden" name="virus_id" value="{{ row.id }}"> 
                     <button type="submit" class="cardButton">Info</button>
                 </form>
                 <!-- <form method="POST" action="{{ url_for('api.archiveVirus', virus_id=row[0]) }}"> -->
                 <form method="POST" action="{{ url_for('api.archiveVirus') }}">
                     
-                    <input type="hidden" name="virus_id" value="{{ row[0] }}"> 
+                    <input type="hidden" name="virus_id" value="{{ row.id }}"> 
                     <button type="submit" class="cardButton">Archive</button>
                 </form>
                 <!-- Form for deleting a virus -->
                 <form method="POST" action="{{ url_for('api.deleteVirus') }}">
-                    <input type="hidden" name="virus_id" value="{{ row[0] }}"> 
+                    <input type="hidden" name="virus_id" value="{{ row.id }}"> 
                     
                     <!-- <input type="hidden" name="user_id" value="{{ user.id }}"> -->
                     <!-- <input type="hidden" name="user_token" value="1234567890"> -->

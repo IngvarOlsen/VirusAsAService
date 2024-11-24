@@ -274,50 +274,53 @@ def saveHost():
 ##### GET DATA APIS #####
 #########################
 
+# Migrated this to view.py
 ## Get all active virus for the user to display in virus view, needs to be remade together with getvirus, kind of bloat
-@login_required
-@api.route('/getactivevirus', methods=['GET'])
-def getActiveVirus():
-    print("getactivevirus")
-    try:
-        if validateToken():
-            dbConnect()
-            print("Trying to get virus table data")
+# @login_required
+# @api.route('/getactivevirus', methods=['GET'])
+# def getActiveVirus():
+#     print("getactivevirus")
+#     try:
+#         if validateToken():
+#             dbConnect()
+#             print("Trying to get virus table data")
 
-            curs.execute("SELECT * FROM Virus WHERE user_id = ? AND is_alive = 1", (str(current_user.id)))
-            rows = curs.fetchall()
+#             curs.execute("SELECT * FROM Virus WHERE user_id = ? AND is_alive = 1", (str(current_user.id)))
+#             rows = curs.fetchall()
 
-            conn.close()
-            print("jsondump")
-            print(json.dumps(rows))
-            return json.loads(json.dumps(rows))
-    except Exception as e:
-        print(e)
-        return jsonify({'message': e})
-    else:
-        return jsonify({'message': 'token not valid'})
+#             conn.close()
+#             print("jsondump")
+#             print(json.dumps(rows))
+#             return json.loads(json.dumps(rows))
 
-@login_required
-@api.route('/getvirus', methods=['GET'])
-def getVirus():
-    try:
-        # Validates session token against DB token
-        if validateToken():
-            dbConnect()
-            print("Trying to get virus table data")
+    
+#     except Exception as e:
+#         print(e)
+#         return jsonify({'message': e})
+#     else:
+#         return jsonify({'message': 'token not valid'})
 
-            curs.execute("SELECT * FROM Virus WHERE user_id = ?", (str(current_user.id)))
-            rows = curs.fetchall()
+# @login_required
+# @api.route('/getvirus', methods=['GET'])
+# def getVirus():
+#     try:
+#         # Validates session token against DB token
+#         if validateToken():
+#             dbConnect()
+#             print("Trying to get virus table data")
 
-            conn.close()
-            print("jsondump")
-            print(json.dumps(rows))
-            return json.loads(json.dumps(rows))
-    except Exception as e:
-        print(e)
-        return jsonify({'message': e})
-    else:
-        return jsonify({'message': 'token not valid'})        
+#             curs.execute("SELECT * FROM Virus WHERE user_id = ?", (str(current_user.id)))
+#             rows = curs.fetchall()
+
+#             conn.close()
+#             print("jsondump")
+#             print(json.dumps(rows))
+#             return json.loads(json.dumps(rows))
+#     except Exception as e:
+#         print(e)
+#         return jsonify({'message': e})
+#     else:
+#         return jsonify({'message': 'token not valid'})        
 
 @api.route('/gethosts', methods=['GET'])
 def getHosts():
