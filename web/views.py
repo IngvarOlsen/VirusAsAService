@@ -78,7 +78,7 @@ def virus():
         # Handle exceptions and redirect to home
         print(f"Error loading virus view: {e}")
         flash("Failed to load active viruses.", category="error")
-        return redirect(url_for("views.home"))
+        return redirect(url_for("views.hosts"))
 
 
 @views.route('/archived', methods=['GET', 'POST'])

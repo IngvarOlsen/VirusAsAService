@@ -22,7 +22,7 @@ class Virus(db.Model, UserMixin):
     # Once the virus have been compiled it will be updated with the path of the virus
     storage_path = db.Column(db.String(500))
     # Virus API Handle, once the path is set the virus can be downloaded with a unique API key handle
-    virus_api = db.Column(db.String(500))
+    virus_api = db.Column(db.String(500), unique=True)
 
 class Hosts(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)

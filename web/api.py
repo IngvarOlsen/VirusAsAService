@@ -136,15 +136,20 @@ def saveVirus():
             name = request.form.get('name') 
             heartbeat_rate = request.form.get('heartbeat_rate') 
             use_case_settings = request.form.getlist('use_case_settings')  
+            # Generate a unique API key
+            api_key = secrets.token_hex(32)
             
             # Debugging output
             print(f"Name: {name}")
             print(f"Heartbeat Rate: {heartbeat_rate}")
             print(f"Use Case Settings: {use_case_settings}")
+            print(f"API key: {api_key}")
 
             # Validate required fields
             if not name or not heartbeat_rate:
                 return jsonify({'message': 'Name and Heartbeat Rate are required'}), 400
+
+            
 
             # Save the virus to the database
             new_virus = Virus(
@@ -152,7 +157,9 @@ def saveVirus():
                 heartbeat_rate=heartbeat_rate,
                 use_case_settings=','.join(use_case_settings),  # Convert list to comma-separated string
                 user_id=current_user.id,  # Use the authenticated user's ID
-                is_alive=True
+                is_alive=True,
+                api_key=api_key
+
             )
             db.session.add(new_virus)
             db.session.commit()

@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, flash, redirect, url_for, session
+from flask import Blueprint, render_template, request, flash, redirect, url_for, session, make_response
 from .models import User  # Importing the User model from the local models module
 from werkzeug.security import generate_password_hash, check_password_hash
 from . import db  # Importing the database object from the local module
@@ -6,6 +6,12 @@ from flask_login import login_user, login_required, logout_user, current_user
 import secrets
 
 auth = Blueprint('auth', __name__)  # Creating a Blueprint named 'auth'
+
+def clear_all_cookies(response):
+    for cookie in request.cookies:
+        response.delete_cookie(cookie)
+    return response
+
 
 @auth.route('/login', methods=['GET', 'POST'])
 def login():
@@ -18,9 +24,11 @@ def login():
         user = User.query.filter_by(email=email).first()  # Query the database for a user with the provided email
         if user:  # If a user with the email is found
             if check_password_hash(user.password, password):  # Check if the provided password matches the hashed password stored in the database
+
                 # Generate the session token and which will be used to access all APIs on website more securly
                 token = secrets.token_hex(32)
                 print(token)
+                
                 user.token = token 
                 db.session.commit()
                 session['token'] = token
@@ -38,6 +46,9 @@ def login():
 @auth.route('/logout')
 @login_required  # Ensure that the user must be logged in to access this route
 def logout():
+    # Clears any cookies to avoid old tokens which will cause login errors
+    response = make_response(redirect(url_for('auth.login')))
+    response = clear_all_cookies(response)
     logout_user()  # Log out the current user
     return redirect(url_for('auth.login'))  # Redirect the user to the login page
 
@@ -45,6 +56,10 @@ def logout():
 @auth.route('/sign-up', methods=['GET', 'POST'])
 def sign_up():
     if request.method == 'POST':  # Check if the request method is POST
+         # Clears any cookies to avoid old tokens which will cause login errors, in case there was a session cookie already
+        response = make_response(redirect(url_for('views.virus')))
+        response = clear_all_cookies(response)
+        
         print(request.form)
         email = request.form.get('email')  # Get the value of 'email' from the form data
         # name = request.form.get('name')
@@ -63,6 +78,7 @@ def sign_up():
         elif len(password1) < 7:  # If the length of the password is less than 7 characters
             flash('Password must be at least 7 characters.', category='error')  # Display a flash message indicating that the password is too short
         else:  # If all the validation checks pass
+ 
             # new_user = User(email=email, first_name=name, password=generate_password_hash(
             #     password1, method='sha256'))
             new_user = User(email=email, password=generate_password_hash(
