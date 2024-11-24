@@ -9,9 +9,17 @@ auth = Blueprint('auth', __name__)  # Creating a Blueprint named 'auth'
 
 def clear_all_cookies(response):
     for cookie in request.cookies:
+        print("clear_all_cookies")
         response.delete_cookie(cookie)
     return response
 
+# @auth.after_request
+# def clear_cookies_after_request(response):
+#     if 'clear_cookies' in session:  # Check if cookies need to be cleared
+#         for cookie in request.cookies:
+#             response.set_cookie(cookie, '', expires=0)
+#         session.pop('clear_cookies')  # Remove the flag after clearing cookies
+#     return response
 
 @auth.route('/login', methods=['GET', 'POST'])
 def login():
@@ -33,7 +41,8 @@ def login():
                 db.session.commit()
                 session['token'] = token
                 flash('Logged in successfully!', category='success')  # Display a flash message indicating successful login
-                login_user(user)
+                logout_user()
+                login_user(user, remember=False)
                 #login_user(user, remember=True)  # Log in the user and remember the session
                 return redirect(url_for('views.virus', token=token))  # Redirect the user to the home page
             else:  # If the password doesn't match
@@ -85,7 +94,8 @@ def sign_up():
                 password1))  # Create a new User object with the provided email and hashed password
             db.session.add(new_user)  # Add the new user to the database session
             db.session.commit()  # Commit the changes to the database
-            login_user(new_user, remember=True)  # Log in the new user and remember the session
+            logout_user()
+            login_user(new_user, remember=False)  # Log in the new user and remember the session
             flash('Account created!', category='success')  # Display a flash message indicating successful account creation
             return redirect(url_for('views.virus'))  # Redirect the user to the home page
 

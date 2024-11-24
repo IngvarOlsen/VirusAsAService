@@ -9,8 +9,9 @@ from . import db
 import json
 import os
 import socketio
+import secrets
 
-
+auth = Blueprint('auth', __name__)  # Creating a Blueprint named 'auth'
 
 ## Ignore temp lack of ssl
 os.environ['CURL_CA_BUNDLE'] = ''
@@ -137,19 +138,17 @@ def saveVirus():
             heartbeat_rate = request.form.get('heartbeat_rate') 
             use_case_settings = request.form.getlist('use_case_settings')  
             # Generate a unique API key
-            api_key = secrets.token_hex(32)
+            virus_api = secrets.token_hex(32)
             
             # Debugging output
             print(f"Name: {name}")
             print(f"Heartbeat Rate: {heartbeat_rate}")
             print(f"Use Case Settings: {use_case_settings}")
-            print(f"API key: {api_key}")
+            print(f"API key: {virus_api}")
 
             # Validate required fields
             if not name or not heartbeat_rate:
                 return jsonify({'message': 'Name and Heartbeat Rate are required'}), 400
-
-            
 
             # Save the virus to the database
             new_virus = Virus(
@@ -158,20 +157,23 @@ def saveVirus():
                 use_case_settings=','.join(use_case_settings),  # Convert list to comma-separated string
                 user_id=current_user.id,  # Use the authenticated user's ID
                 is_alive=True,
-                api_key=api_key
+                virus_api=virus_api
 
             )
             db.session.add(new_virus)
             db.session.commit()
 
             flash('Virus created successfully!', category='success')
-            return redirect(url_for('views.virus'))  # Adjust to your virus dashboard route
+            return redirect(url_for('views.virus')) 
+        # else:
+        #     print("Token did not match ")
+        #     return redirect(url_for('auth.logout')) 
 
     except Exception as e:
         # Log the error and redirect with an error message
         print(f"Error saving virus: {e}")
         flash('An error occurred while saving the virus.', category='error')
-        return redirect(url_for('views.virus'))  # Adjust to your virus dashboard route
+        return redirect(url_for('auth.logout'))  
 
 ## OLD json virus save
 # @api.route('/savevirus', methods=['POST'])
@@ -347,6 +349,9 @@ def getHosts():
             print("jsondump")
             print(json.dumps(rows))
             return json.loads(json.dumps(rows))
+        else:         
+            print("Token did not match ")
+            return redirect(url_for('auth.logout')) 
     except Exception as e:
         print(e)
         return jsonify({'message': 'Token not valid'}), 403
@@ -389,12 +394,15 @@ def archiveVirus():
 
             flash('Virus archived successfully!', category='success')
             return redirect(url_for('views.virus'))  
+        else:
+            print("Token did not match ")
+            return redirect(url_for('auth.logout')) 
 
     except Exception as e:
         # Log the error and redirect with an error message
         print(f"Error archiving virus: {e}")
         flash('An error occurred while archiving the virus.', category='error')
-        return redirect(url_for('views.virus'))  
+        return redirect(url_for('auth.logout'))  
 
 
 
@@ -432,7 +440,10 @@ def deleteVirus():
             # db.session.commit()
 
             flash('Virus deleted successfully!', category='success')
-            return redirect(url_for('views.virus'))  
+            return redirect(url_for('views.virus')) 
+        else:
+            print("Token did not match ")
+            return redirect(url_for('auth.logout'))  
 
     except Exception as e:
         print(f"Error deleting virus: {e}")
