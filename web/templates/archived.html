@@ -21,19 +21,20 @@ Virus
           <h6>Hosts:</h6>
           {% if virus.hosts %}
           <ul>
+              <!-- Need to store th outerloop in a variable so its possoble to see the outerloop index -->
+              {% set outer_loop = loop %}
               {% for host in virus.hosts %}
               
-              <button class="btn btn-link" type="button" data-bs-toggle="collapse" data-bs-target="#hostLogs-{{ loop.index }}" aria-expanded="false" aria-controls="hostLogs-{{ loop.index }}"></button>
-                  <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#hostLogs-{{ host.host_name }}" aria-expanded="false" aria-controls="hostLogs-{{ host.host_name }}">
-                      View Logs for Host: {{ host.host_name }}
-                  </button>
-  
-                  <div class="collapse" id="hostLogs-{{ host.host_name }}">
-                      <div class="card card-body">
-                          <p><strong>Last Heartbeat:</strong> {{ host.last_heartbeat }}</p>
-                          <p><strong>Log Info:</strong> {{ host.log_info }}</p>
-                      </div>
-                  </div>
+              <button class="btn btn-link toggle-btn" data-target="hostLogs-{{ outer_loop.index }}-{{ loop.index }}">
+                View Logs for Host: {{ host.host_name }}
+            </button>
+
+            <div class="host-logs" id="hostLogs-{{ outer_loop.index }}-{{ loop.index }}" style="display: none; margin-top: 10px;">
+                <div class="card card-body">
+                    <p><strong>Last Heartbeat:</strong> {{ host.last_heartbeat }}</p>
+                    <p><strong>Log Info:</strong> {{ host.log_info }}</p>
+                </div>
+            </div>
               
               {% endfor %}
           </ul>
@@ -45,6 +46,29 @@ Virus
   {% endfor %}
   </table>
   
+
+  <script>
+    //toggling log visibility
+    document.addEventListener("DOMContentLoaded", function () {
+        const toggleButtons = document.querySelectorAll(".toggle-btn");
+    
+        toggleButtons.forEach((button) => {
+            button.addEventListener("click", function () {
+                const targetId = this.getAttribute("data-target");
+                const targetElement = document.getElementById(targetId);
+    
+                if (targetElement.style.display === "none") {
+                    targetElement.style.display = "block";
+                    this.textContent = "Hide Logs for Host";
+                } else {
+                    targetElement.style.display = "none";
+                    this.textContent = "View Logs for Host";
+                }
+            });
+        });
+    });
+    </script>
+    
 <!-- <table >
     <tr>
         <th>ID</th>
@@ -62,10 +86,7 @@ Virus
     {% endfor %}
 </table> -->
 {% include 'scriptsImport.html' %}
-<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
-<!-- Bootstrap JavaScript -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 {% endblock %}
+
