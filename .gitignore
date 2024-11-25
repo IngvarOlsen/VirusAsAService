@@ -8,6 +8,7 @@ website/static/sftp/models/*
 virus/testapp/*
 website/__pycache__/*
 compiler/build/*
+compiler/test_virus.py
 build/*
 dist/*
 Lib/*
@@ -39,3 +40,4 @@ test/lib/library.zip
 test/lib/select.pyd
 test/lib/unicodedata.pyd
 test/lib/email/architecture.rst
+
