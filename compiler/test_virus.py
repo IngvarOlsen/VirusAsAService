@@ -3,11 +3,11 @@ import requests
 import logging
 
 # Configurable Variables
-API_KEY = "5d919e9d20b27444e28d96af1b56f5e5efd8b1afa2b440250b8ba23053541258"  
+API_KEY = "ec6299c92a1a774af43410895c4746669b497f5bf424122d4b0178501492cc58"  
 USE_CASES = {
-    ['Ransomware Simulation']
+    'ransomware_simulation': True, 'dns_tunneling': True, 'net_recon': True, 'dll_side_loading': True, 'registry_edits': True, 'scheduled_tasks': True, 'encrypted_traffic': True, 'traffic_non_standard_ports': True
 }
-heartbeatRate = 11  # in seconds
+heartbeatRate = 1111  # in seconds
 
 # Helper Functions
 def loggingFunc(log_data):

@@ -4,18 +4,12 @@ import logging
 
 # Configurable Variables
 API_KEY = "PLACEHOLDER_API_KEY"  
-USE_CASES = {
-    PLACEHOLDER_USE_CASES
-}
+USE_CASES = PLACEHOLDER_USE_CASES
+
 heartbeatRate = PLACEHOLDER_HEARTBEAT_RATE  # in seconds
 
 # Helper Functions
 def loggingFunc(log_data):
-    """
-    Logs data locally to a file.
-
-    :param log_data: The log message or data to be logged.
-    """
     try:
         # Configure logging settings
         logging.basicConfig(
@@ -87,15 +81,36 @@ def dns_tunneling():
     loggingFunc("Executing DNS tunneling simulation.")
     return {"use_case": "dns_tunneling", "status": "completed"}
 
+def net_recon():
+    loggingFunc("net recon simulation.")
+    return {"use_case": "net_recon", "status": "completed"}
+
+def dll_side_loading():
+    loggingFunc("DLL side loading simulation.")
+    return {"use_case": "dll_side_loading", "status": "completed"}
+
+def registry_edits():
+    loggingFunc("registry edits loading simulation.")
+    return {"use_case": "registry_edits", "status": "completed"}
+
+def scheduled_tasks():
+    loggingFunc("scheduled tasks simulation.")
+    return {"use_case": "scheduled_tasks", "status": "completed"}
+
+def encrypted_traffic():
+    loggingFunc("scheduled tasks simulation.")
+    return {"use_case": "encrypted_traffic", "status": "completed"}
+
+def traffic_non_standard_ports():
+    loggingFunc("scheduled tasks simulation.")
+    return {"use_case": "encrypted_traffic", "status": "completed"}
+
 
 # The rest of the usecases
 
 
 # Execution Flow Functions
 def useCaseChecker():
-    """
-    Executes use cases based on the USE_CASES configuration.
-    """
     logs = []
     for use_case, enabled in USE_CASES.items():
         if enabled:
@@ -109,10 +124,6 @@ def useCaseChecker():
 
 
 def heart_beat():
-    """
-    Sends periodic heartbeat signals to the API.
-    If the API responds with a stop signal, triggers cleanup.
-    """
     try:
         while True:
             response = requests.post(

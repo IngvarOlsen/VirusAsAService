@@ -16,6 +16,34 @@ build_dir = "build"
 dist_dir = "dist"
 compiled_zip_path = "compiled_test_virus.zip"
 
+# Formats the incoming usecases, if its present in the data it will be equal true, and parsed for the placeholder value
+def format_use_case_settings(use_case_settings):
+    # Mapping of received settings to function-compatible names
+    use_case_map = {
+        "Ransomware Simulation": "ransomware_simulation",
+        "DNS Tunneling": "dns_tunneling",
+        "Net.exe Recon": "net_recon",
+        "DLL Side Loading": "dll_side_loading",
+        "Registry Edits": "registry_edits",
+        "Scheduled Tasks": "scheduled_tasks",
+        "Encrypted Traffic": "encrypted_traffic",
+        "Traffic on none standard ports": "traffic_non_standard_ports"
+    }
+
+    # Generate the output dictionary
+    formatted_settings = {
+        use_case_map[setting]: True
+        for setting in use_case_settings
+        if setting in use_case_map
+    }
+
+    # Add all other use cases as False if not in use_case_settings
+    for key in use_case_map.values():
+        if key not in formatted_settings:
+            formatted_settings[key] = False
+
+    return formatted_settings
+
 
 # Fetch pending job from the server
 def get_pending_job():
@@ -37,7 +65,7 @@ def create_test_virus(template_path, output_path, job_data):
         # Replace placeholders in the template
         script_content = script_content.replace("PLACEHOLDER_API_KEY", job_data["virus_api"])
         script_content = script_content.replace("PLACEHOLDER_HEARTBEAT_RATE", str(job_data["heartbeat_rate"]))
-        script_content = script_content.replace("PLACEHOLDER_USE_CASES", str(job_data["use_case_settings"]))
+        script_content = script_content.replace("PLACEHOLDER_USE_CASES", str(format_use_case_settings(job_data["use_case_settings"])))
 
         with open(output_path, 'w') as output_file:
             output_file.write(script_content)
@@ -144,10 +172,33 @@ def upload_compiled_virus(zip_path, job_id, api_key):
             )
             if response.status_code == 200:
                 print("Compiled file uploaded successfully")
+                return True
             else:
                 print(f"Error uploading file: {response.json().get('message')}")
+                return False
     except Exception as e:
         print(f"Error uploading compiled virus: {e}")
+        return False
+
+# Cleans up the build files and zip file after the upload is complete
+def clean_up_folders(build_folder, zip_path):
+    try:
+        # Remove the build directory
+        if os.path.exists(build_folder):
+            shutil.rmtree(build_folder)
+            print(f"Cleaned up build folder: {build_folder}")
+
+        # Remove the zip file
+        if os.path.exists(zip_path):
+            os.remove(zip_path)
+            print(f"Cleaned up zip file: {zip_path}")
+        # Remove the new test_virus.py which have been filled out with new variables in placeholder slots
+        # if os.path.exists("test_virus.py"):
+        #     os.remove("test_virus.py")
+        #     print(f"Cleaned up zip file: test_virus.py")
+
+    except Exception as e:
+        print(f"Error during cleanup: {e}")
 
 # Main execution flow
 if __name__ == "__main__":
@@ -177,8 +228,12 @@ if __name__ == "__main__":
         print(f"Compiled and zipped virus is ready at: {zip_path}")
 
 
-    # Step 5: Upload the compiled virus
-    upload_compiled_virus(zip_path, job_data["job_id"], job_data["virus_api"])
+
+    # Step 5: Upload the compiled virus, and cleans up the build project in case it's successfull
+    if upload_compiled_virus(zip_path, job_data["job_id"], job_data["virus_api"]):
+        clean_up_folders(build_dir, compiled_zip_path)
+    else:
+        print("Could not upload the zip file")
 
 
 
