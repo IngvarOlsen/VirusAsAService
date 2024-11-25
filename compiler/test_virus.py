@@ -1,15 +1,16 @@
 import time
 import requests
 import logging
+import socket # Only gets used to get hostname 
 
 # Configurable Variables
-API_KEY = "f783f3021e9f4c9c217e4a5de5d00e025b93ca91245b3a9bfdd27424d2f21664"  
-USE_CASES = {'ransomware_simulation': True, 'dns_tunneling': True, 'encrypted_traffic': True, 'traffic_non_standard_ports': True, 'net_recon': False, 'dll_side_loading': False, 'registry_edits': False, 'scheduled_tasks': False}
+API_KEY = "4f300d801d8a81426755f5d09d2e0db613580d88dbbe6d6359e2f98f49c97019"  
+USE_CASES = {'ransomware_simulation': True, 'encrypted_traffic': True, 'dns_tunneling': False, 'net_recon': False, 'dll_side_loading': False, 'registry_edits': False, 'scheduled_tasks': False, 'traffic_non_standard_ports': False}
 
 heartbeatRate = 11  # in seconds
 
 # Helper Functions
-def loggingFunc(log_data):
+def logging_func(log_data):
     try:
         # Configure logging settings
         logging.basicConfig(
@@ -31,24 +32,24 @@ def loggingFunc(log_data):
     except Exception as e:
         print(f"Error during logging: {e}")
 
-def cleanUp():
+def clean_up():
     try:
         for use_case, enabled in USE_CASES.items():
             if enabled:
-                loggingFunc(f"Cleaning up changes for {use_case}.")
-                # Add specific cleanup code for each use case here
-        loggingFunc("Cleanup completed. Deleting self.")
+                logging_func(f"Cleaning up changes for {use_case}.")
+                # Add specific clean_up code for each use case here
+        logging_func("Clean_up completed. Deleting self.")
 
         # Self-delete
-        # deleteSelf()
+        # delete_self()
 
     except Exception as e:
-        loggingFunc(f"Error during cleanup: {e}")
+        logging_func(f"Error during clean_up: {e}")
 
 
-def dataToSend(data):
-
+def data_to_send(data):
     try:
+    
         response = requests.post(
             "http://127.0.0.1:5000/api/datatosend",
             json={"api_key": API_KEY, "data": data},
@@ -61,52 +62,51 @@ def dataToSend(data):
         print(f"Error in data sending: {e}")
 
 
-def deleteSelf():
-
+def delete_self():
     import os
     try:
         os.remove(__file__)
         print("Self-deletion complete.")
     except Exception as e:
-        loggingFunc(f"Error in self-deletion: {e}")
+        logging_func(f"Error in self-deletion: {e}")
 
 
 # Use Case Functions
 def ransomware_simulation():
-    loggingFunc("Executing ransomware simulation.")
+    logging_func("Executing ransomware simulation.")
     return {"use_case": "ransomware_simulation", "status": "completed"}
 
 def dns_tunneling():
-    loggingFunc("Executing DNS tunneling simulation.")
+    logging_func("Executing DNS tunneling simulation.")
     return {"use_case": "dns_tunneling", "status": "completed"}
 
 def net_recon():
-    loggingFunc("net recon simulation.")
+    logging_func("net recon simulation.")
     return {"use_case": "net_recon", "status": "completed"}
 
 def dll_side_loading():
-    loggingFunc("DLL side loading simulation.")
+    logging_func("DLL side loading simulation.")
     return {"use_case": "dll_side_loading", "status": "completed"}
 
 def registry_edits():
-    loggingFunc("registry edits loading simulation.")
+    logging_func("registry edits loading simulation.")
     return {"use_case": "registry_edits", "status": "completed"}
 
 def scheduled_tasks():
-    loggingFunc("scheduled tasks simulation.")
+    logging_func("scheduled tasks simulation.")
     return {"use_case": "scheduled_tasks", "status": "completed"}
 
 def encrypted_traffic():
-    loggingFunc("scheduled tasks simulation.")
+    logging_func("scheduled tasks simulation.")
     return {"use_case": "encrypted_traffic", "status": "completed"}
 
 def traffic_non_standard_ports():
-    loggingFunc("traffic_non_standard_ports simulation.")
+    logging_func("traffic_non_standard_ports simulation.")
     return {"use_case": "traffic_non_standard_ports", "status": "completed"}
 
 
 # Execution Flow Functions
-def useCaseChecker():
+def use_case_checker():
     logs = []
     for use_case, enabled in USE_CASES.items():
         if enabled:
@@ -115,7 +115,7 @@ def useCaseChecker():
                 result = func()
                 logs.append(result)
             else:
-                loggingFunc(f"Use case function {use_case} not found.")
+                logging_func(f"Use case function {use_case} not found.")
     return logs
 
 
@@ -130,30 +130,36 @@ def heart_beat():
             if response.status_code == 200:
                 print(response.json())
                 if response.json().get("is_alive") == "False":
-                    loggingFunc("Received stop signal. Initiating cleanup.")
-                    cleanUp()
+                    logging_func("Received stop signal. Initiating clean_up.")
+                    clean_up()
                     break
             else:
-                print(f"Heartbeat failed: {response.status_code}")
+                print(f"Heartbeat response: {response.status_code}")
             time.sleep(heartbeatRate)
     except Exception as e:
-        loggingFunc(f"Error in heartbeat: {e}")
+        logging_func(f"Error in heartbeat: {e}")
 
 
 # Main Execution
 if __name__ == "__main__":
     try:
-        loggingFunc("Starting test virus execution.")
+        logging_func("Starting test virus execution.")
         
         # Step 1: Execute use cases and collect aggregated logs
-        logs = useCaseChecker()
-        loggingFunc(f"Aggregated logs: {logs}")
+        logs = use_case_checker()
+        payload = {
+            "data": logs,
+            "host_name": socket.gethostname()
+        }
+        print(socket.gethostname())
+        logging_func(f"log_info: {logs}, host_name: {socket.gethostname()}")
 
         # Step 2: Send aggregated logs to the API
-        dataToSend(logs)
+        data_to_send(payload)
+
 
         # Step 3: Enter heartbeat monitoring
         heart_beat()
 
     except Exception as e:
-        loggingFunc(f"Error in main execution: {e}")
+        logging_func(f"Error in main execution: {e}")

