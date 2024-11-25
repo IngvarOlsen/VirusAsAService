@@ -674,29 +674,28 @@ def deleteHost():
 @api.route('/setinactive', methods=['POST'])
 @login_required
 def setInactive():
-
     try:
         # Retrieve the virus ID from the request form data
         virus_id = request.form.get('virus_id')
-
         if not virus_id:
             return jsonify({'message': 'Virus ID is required'}), 400
-
         # Query the virus associated with the current user
         virus = Virus.query.filter_by(id=virus_id, user_id=current_user.id).first()
-
         if not virus:
             return jsonify({'message': 'Virus not found or unauthorized'}), 404
-
         # Update the is_alive attribute
         virus.is_alive = False
         db.session.commit()
-
-        return jsonify({'message': f'Virus {virus.name} has been marked as inactive.', 'status': 'success'}), 200
+        flash('Virus set as inactive.', category='success')
+        return redirect(url_for('views.virus'))  
+        #return jsonify({'message': f'Virus {virus.name} has been marked as inactive.', 'status': 'success'}), 200
 
     except Exception as e:
         print(f"Error in set_inactive: {e}")
-        return jsonify({'message': 'Internal server error'}), 500    
+        
+        flash('Could not set the virus as inactiave.', category='error')
+        return redirect(url_for('views.virus'))  
+        #return jsonify({'message': 'Internal server error'}), 500    
 
 
 ########## Testing area ############
