@@ -16,3 +16,12 @@ flask --debug run
 
 For hosting dev
 flask run --host=0.0.0.0 
+
+For Browsers like Brave, disable shields as it will interfere with cookies and login session
+
+---------------------------------------------------
+For compiler have Python 3.8 to 3.12.
+cd compiler
+python3 -m venv compiler-venv 
+pip install --upgrade cx_Freeze
+pip install requests
