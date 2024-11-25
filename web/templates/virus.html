@@ -105,6 +105,10 @@ Virus
                     <!-- <input type="hidden" name="user_token" value="1234567890"> -->
                     <button type="submit" class="cardButton">Delete</button>
                 </form>
+                <form method="POST" action="{{ url_for('api.setInactive') }}">
+                    <input type="hidden" name="virus_id" value="{{ row.id }}"> 
+                    <button type="submit" class="cardButton">Deactivate</button>
+                </form>
             </div>
         </div>
     {% endfor %}

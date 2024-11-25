@@ -76,7 +76,6 @@ def ransomware_simulation():
     loggingFunc("Executing ransomware simulation.")
     return {"use_case": "ransomware_simulation", "status": "completed"}
 
-
 def dns_tunneling():
     loggingFunc("Executing DNS tunneling simulation.")
     return {"use_case": "dns_tunneling", "status": "completed"}
@@ -102,11 +101,8 @@ def encrypted_traffic():
     return {"use_case": "encrypted_traffic", "status": "completed"}
 
 def traffic_non_standard_ports():
-    loggingFunc("scheduled tasks simulation.")
-    return {"use_case": "encrypted_traffic", "status": "completed"}
-
-
-# The rest of the usecases
+    loggingFunc("traffic_non_standard_ports simulation.")
+    return {"use_case": "traffic_non_standard_ports", "status": "completed"}
 
 
 # Execution Flow Functions
@@ -128,10 +124,12 @@ def heart_beat():
         while True:
             response = requests.post(
                 "http://127.0.0.1:5000/api/heartbeat",
-                json={"api_key": API_KEY},
+                json={"Authorization": API_KEY},
             )
+            print(response)
             if response.status_code == 200:
-                if response.json().get("stop_signal"):
+                print(response.json())
+                if response.json().get("is_alive") == "False":
                     loggingFunc("Received stop signal. Initiating cleanup.")
                     cleanUp()
                     break

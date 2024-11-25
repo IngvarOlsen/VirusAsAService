@@ -3,19 +3,13 @@ import requests
 import logging
 
 # Configurable Variables
-API_KEY = "ec6299c92a1a774af43410895c4746669b497f5bf424122d4b0178501492cc58"  
-USE_CASES = {
-    'ransomware_simulation': True, 'dns_tunneling': True, 'net_recon': True, 'dll_side_loading': True, 'registry_edits': True, 'scheduled_tasks': True, 'encrypted_traffic': True, 'traffic_non_standard_ports': True
-}
-heartbeatRate = 1111  # in seconds
+API_KEY = "f783f3021e9f4c9c217e4a5de5d00e025b93ca91245b3a9bfdd27424d2f21664"  
+USE_CASES = {'ransomware_simulation': True, 'dns_tunneling': True, 'encrypted_traffic': True, 'traffic_non_standard_ports': True, 'net_recon': False, 'dll_side_loading': False, 'registry_edits': False, 'scheduled_tasks': False}
+
+heartbeatRate = 11  # in seconds
 
 # Helper Functions
 def loggingFunc(log_data):
-    """
-    Logs data locally to a file.
-
-    :param log_data: The log message or data to be logged.
-    """
     try:
         # Configure logging settings
         logging.basicConfig(
@@ -82,20 +76,37 @@ def ransomware_simulation():
     loggingFunc("Executing ransomware simulation.")
     return {"use_case": "ransomware_simulation", "status": "completed"}
 
-
 def dns_tunneling():
     loggingFunc("Executing DNS tunneling simulation.")
     return {"use_case": "dns_tunneling", "status": "completed"}
 
+def net_recon():
+    loggingFunc("net recon simulation.")
+    return {"use_case": "net_recon", "status": "completed"}
 
-# The rest of the usecases
+def dll_side_loading():
+    loggingFunc("DLL side loading simulation.")
+    return {"use_case": "dll_side_loading", "status": "completed"}
+
+def registry_edits():
+    loggingFunc("registry edits loading simulation.")
+    return {"use_case": "registry_edits", "status": "completed"}
+
+def scheduled_tasks():
+    loggingFunc("scheduled tasks simulation.")
+    return {"use_case": "scheduled_tasks", "status": "completed"}
+
+def encrypted_traffic():
+    loggingFunc("scheduled tasks simulation.")
+    return {"use_case": "encrypted_traffic", "status": "completed"}
+
+def traffic_non_standard_ports():
+    loggingFunc("traffic_non_standard_ports simulation.")
+    return {"use_case": "traffic_non_standard_ports", "status": "completed"}
 
 
 # Execution Flow Functions
 def useCaseChecker():
-    """
-    Executes use cases based on the USE_CASES configuration.
-    """
     logs = []
     for use_case, enabled in USE_CASES.items():
         if enabled:
@@ -109,18 +120,16 @@ def useCaseChecker():
 
 
 def heart_beat():
-    """
-    Sends periodic heartbeat signals to the API.
-    If the API responds with a stop signal, triggers cleanup.
-    """
     try:
         while True:
             response = requests.post(
                 "http://127.0.0.1:5000/api/heartbeat",
-                json={"api_key": API_KEY},
+                headers={"Authorization": API_KEY},
             )
+            print(response)
             if response.status_code == 200:
-                if response.json().get("stop_signal"):
+                print(response.json())
+                if response.json().get("is_alive") == "False":
                     loggingFunc("Received stop signal. Initiating cleanup.")
                     cleanUp()
                     break
