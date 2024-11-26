@@ -1,6 +1,6 @@
 # Note for API, for now internal calls on the webpage will be using /function, while externals will be using /api/function 
 
-from flask import Blueprint, render_template, request, flash, jsonify, send_file, redirect, url_for, session
+from flask import Blueprint, render_template, request, flash, jsonify, send_file, redirect, url_for, session, send_from_directory
 from flask_login import login_required, current_user
 from werkzeug.utils import secure_filename
 from datetime import datetime
@@ -160,6 +160,7 @@ def uploadCompiledJob():
     except Exception as e:
         print(f"Error uploading compiled job: {e}")
         return jsonify({'message': 'Error occurred while uploading compiled job'}), 500
+    
     
 
 #############################
@@ -772,6 +773,109 @@ def setInactive():
         flash('Could not set the virus as inactiave.', category='error')
         return redirect(url_for('views.virus'))  
         #return jsonify({'message': 'Internal server error'}), 500    
+
+
+#############################
+#### Virus Download APIs ####
+#############################
+
+# External API endoint, takes API key and matches it with the relative virus and downloads it
+@api.route('/api/virusdownload', methods=['POST'])
+def virusDownload():
+    try:
+        # Retrieve the virus ID from the form
+        virus_api = request.json.get('api_key')
+
+        if not virus_api:
+            return jsonify({'message': 'Invalid API key'}), 404
+
+        # Querying the database for the virus using its ID
+        virus = Virus.query.get(virus_api)
+
+        if not virus:
+            return jsonify({'message': 'Virus not found'}), 400
+
+        # Checking if the virus has a compiled file path
+        if not virus.storage_path:
+           return jsonify({'message': 'Virus not avaliable for download'}), 400
+
+        # Setting where the zip is stores from thevirus.storage_path
+        zip_directory = os.path.dirname(virus.storage_path)
+
+        # Setting the filename of the file
+        file_name = os.path.basename(virus.storage_path)
+
+        # Using Flaskss send_from_directory to send the file to the API caller
+        return send_from_directory(
+            directory=zip_directory,
+            path=file_name,
+            as_attachment=True
+        )
+    
+    except Exception as e:
+        # In case of other error it will just display internal server error, with the view of what error actually happened on server side
+        print(f"Error in dashboard download endpoint: {e}")
+        return jsonify({'message': 'Internal server error'}), 500
+
+
+
+    return send_file(exe_path, as_attachment=True)
+
+# Acts as a dashboard method for virus and checks if the user is logged in and tokens are valid
+@login_required
+@api.route('/internalvirusdownload', methods=['POST'])
+def internalVirusDownload():
+    try:
+        if not validateToken():
+            # Retrieve the virus ID from the form
+            virus_id = request.form.get('virus_id')
+
+            if not virus_id:
+                flash('Virus ID is required', category='error')
+                return redirect(url_for('views.virus')) 
+
+            # Query the database for the virus using its ID
+            virus = Virus.query.get(virus_id)
+
+            if not virus:
+                flash('Virus not found', category='error')
+                return redirect(url_for('views.virus')) 
+
+            # Ensure the current user owns the virus
+            if virus.user_id != current_user.id:
+                flash('Unauthorized access for this virus', category='error')
+
+            # Check if the virus has a compiled file path
+            if not virus.storage_path:
+                flash('Virus file not available for download', category='error')
+                return redirect(url_for('views.virus')) 
+
+            # Set where the zip is stores from thevirus.storage_path
+            zip_directory = os.path.dirname(virus.storage_path)
+
+            # Set the filename of the file
+            file_name = os.path.basename(virus.storage_path)
+
+            # Use Flask's send_from_directory to send the file
+            return send_from_directory(
+                directory=zip_directory,
+                path=file_name,
+                as_attachment=True
+            )
+        else:
+            # In case the token authentication fails, the user will be logged out and sent to login page
+            flash('Authentication failed for token', category='error')
+            return redirect(url_for('auth.logout')) 
+    
+    except Exception as e:
+        # In case of other error it will just display internal server error, with the view of what error actually happened on server side
+        print(f"Error in dashboard download endpoint: {e}")
+        flash('Internal server error', category='error')
+        return redirect(url_for('views.virus')) 
+
+
+
+
 
 
 ########## Testing area ############

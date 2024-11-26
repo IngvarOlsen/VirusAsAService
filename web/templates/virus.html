@@ -109,6 +109,10 @@ Virus
                     <input type="hidden" name="virus_id" value="{{ row.id }}"> 
                     <button type="submit" class="cardButton">Deactivate</button>
                 </form>
+                <form method="POST" action="{{ url_for('api.internalVirusDownload') }}">
+                    <input type="hidden" name="virus_id" value="{{ row.id }}"> 
+                    <button type="submit" class="cardButton">Download ZIP</button>
+                </form>
             </div>
         </div>
     {% endfor %}
