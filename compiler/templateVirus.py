@@ -120,15 +120,19 @@ def use_case_checker():
 
 
 def heart_beat():
+    print("heart_beat called")
     try:
+        hostname = socket.gethostname()
+        print(hostname)
         while True:
             response = requests.post(
                 "http://127.0.0.1:5000/api/heartbeat",
-                headers={"Authorization": API_KEY},
+                json={"host_name": hostname, "api_key":API_KEY},
             )
-            print(response)
+            print(response.raw)
+            
             if response.status_code == 200:
-                print(response.json())
+                #print(response.json().get("message"))
                 if response.json().get("is_alive") == "False":
                     logging_func("Received stop signal. Initiating clean_up.")
                     clean_up()
@@ -147,11 +151,16 @@ if __name__ == "__main__":
         
         # Step 1: Execute use cases and collect aggregated logs
         logs = use_case_checker()
+        payload = {
+            "data": logs,
+            "host_name": socket.gethostname()
+        }
         print(socket.gethostname())
         logging_func(f"log_info: {logs}, host_name: {socket.gethostname()}")
 
         # Step 2: Send aggregated logs to the API
-        data_to_send(logs)
+        data_to_send(payload)
+
 
         # Step 3: Enter heartbeat monitoring
         heart_beat()
