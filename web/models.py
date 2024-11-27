@@ -10,7 +10,7 @@ class User(db.Model, UserMixin):
     email = db.Column(db.String(150), unique=True)
     password = db.Column(db.String(150))
     #Gets refreshed everytime the user logs in 
-    token = db.Column(db.String(500))
+    token = db.Column(db.String(500), unique=True)
 
 class Virus(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
@@ -31,10 +31,11 @@ class Hosts(db.Model, UserMixin):
     last_heartbeat = db.Column(db.String(500))
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     virus_id = db.Column(db.Integer, db.ForeignKey('virus.id'))
-    log_info = db.Column(db.String(150))
+    log_info = db.Column(db.String(500))
 
 class Archived(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
+    # log_name can be taken out but will do it tomorrow, might break some stuff
     log_name = db.Column(db.String(500))
     virus_id = db.Column(db.Integer, db.ForeignKey('virus.id'))
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))

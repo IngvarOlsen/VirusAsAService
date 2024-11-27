@@ -392,7 +392,8 @@
   animation: random-hover-animation 6s infinite;
 }
 
-
+/* For now commenting out the logo hover animation */
+/* 
 @keyframes random-hover-animation {
   0% {
       transform: none;
@@ -409,4 +410,4 @@
   100% {
       transform: none;
   }
-}
+} */
