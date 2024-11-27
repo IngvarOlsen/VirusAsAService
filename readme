@@ -25,3 +25,13 @@ cd compiler
 python3 -m venv compiler-venv 
 pip install --upgrade cx_Freeze
 pip install requests
+
+
+---------------------------------------------------
+For making prepared custom
+Have some c compiler
+winget install Microsoft.VisualStudio.2022.BuildTools --force --override "--wait --passive --add Microsoft.VisualStudio.Workload.VCTools --add Microsoft.VisualStudio.Component.VC.Tools.x86.x64 --add Microsoft.VisualStudio.Component.Windows10SDK"
+
+Will be using this repo as insperation 
+https://github.com/Pascal-0x90/sideloadr/tree/master
+
