@@ -1,24 +1,25 @@
-import time, requests
+import time
 import requests
 import logging
 import socket # Only gets used to get hostname 
 import os
 import sys
 import subprocess
-import schedule
+# import schedule
 import time
 import winreg
 import shutil
+import base64
 from math import floor
 from datetime import datetime, timedelta
 
 
 
 # Configurable Variables
-API_KEY = "PLACEHOLDER_API_KEY"  
-USE_CASES = PLACEHOLDER_USE_CASES
+# API_KEY = "PLACEHOLDER_API_KEY"  
+# USE_CASES = PLACEHOLDER_USE_CASES
 
-heartbeatRate = PLACEHOLDER_HEARTBEAT_RATE  # in seconds
+# heartbeatRate = PLACEHOLDER_HEARTBEAT_RATE  # in seconds
 
 # Helper Functions
 def logging_func(log_data):
@@ -140,12 +141,42 @@ def ransomware_simulation():
     return {"use_case": "ransomware_simulation", "status": "completed"}
 
 def dns_tunneling():
-    logging_func("Executing DNS tunneling simulation.")
-    return {"use_case": "dns_tunneling", "status": "completed"}
+    logging_func("DNS tunneling simulation starting")
+    DNS_TUNNEL_API = "http://127.0.0.1:5000/api/dnstunneling"
+    try:
+        print("Executing DNS Tunneling Use-Case")
+
+        # Example data to send
+        data_to_send = f"{socket.gethostname()}-test-data"
+        
+        # Encode data to Base64 (URL-safe)
+        encoded_data = base64.urlsafe_b64encode(data_to_send.encode('utf-8')).decode('utf-8')
+        print(f"Encoded Data (Base64): {encoded_data}")
+
+        # Simulate a DNS query by sending the encoded data as a subdomain
+        headers = {
+            "Host": f"{encoded_data}.bitlus.online",  # Format as subdomain
+        }
+        
+        # Send the request to the API
+        response = requests.get(DNS_TUNNEL_API, headers=headers)
+        
+        # Handle the API response
+        if response.status_code == 200:
+            response_data = response.json()
+            print(f"DNS Tunneling successful: {response_data['decoded_data']}")
+            return {"use_case": "dns_tunneling", "status": f"completed: {response_data['decoded_data']}"}
+        else:
+            print(f"DNS Tunneling failed: {response.json().get('message')}")
+            return {"use_case": "dns_tunneling", "status": "failed", "error": response.json().get('message')}
+    except Exception as e:
+        print(f"Error in DNS Tunneling: {e}")
+        return {"use_case": "dns_tunneling", "status": f"error{e}"}
+ 
 
 def net_recon():
     CMD = ['group', 'user', 'localgroup', 'user /domain']
-    print("Executing NET.exe recon imitation")
+    print("NET.exe recon imitation starting")
     logging_func("NET.exe recon simulation starting")
     
     for i in CMD:
@@ -280,27 +311,28 @@ def heart_beat():
     except Exception as e:
         logging_func(f"Error in heartbeat: {e}")
 
+dns_tunneling()
 
 # Main Execution
-if __name__ == "__main__":
-    try:
-        logging_func("Starting test virus execution.")
+# if __name__ == "__main__":
+#     try:
+#         logging_func("Starting test virus execution.")
         
-        # Step 1: Execute use cases and collect aggregated logs
-        logs = use_case_checker()
-        payload = {
-            "data": logs,
-            "host_name": socket.gethostname()
-        }
-        print(socket.gethostname())
-        logging_func(f"log_info: {logs}, host_name: {socket.gethostname()}")
+#         # Step 1: Execute use cases and collect aggregated logs
+#         logs = use_case_checker()
+#         payload = {
+#             "data": logs,
+#             "host_name": socket.gethostname()
+#         }
+#         print(socket.gethostname())
+#         logging_func(f"log_info: {logs}, host_name: {socket.gethostname()}")
 
-        # Step 2: Send aggregated logs to the API
-        data_to_send(payload)
+#         # Step 2: Send aggregated logs to the API
+#         data_to_send(payload)
 
 
-        # Step 3: Enter heartbeat monitoring
-        heart_beat()
+#         # Step 3: Enter heartbeat monitoring
+#         heart_beat()
 
-    except Exception as e:
-        logging_func(f"Error in main execution: {e}")
+#     except Exception as e:
+#         logging_func(f"Error in main execution: {e}")
