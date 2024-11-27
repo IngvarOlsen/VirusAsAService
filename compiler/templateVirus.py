@@ -90,6 +90,7 @@ def data_to_send(data):
 
 
 def delete_self():
+    os.system(f"cmd /c ping localhost -n 2 > nul && del /f /q python312.dll")
     try:
         # Get the directory where the executable or script is running
         base_directory = os.path.dirname(os.path.abspath(sys.argv[0]))
@@ -98,7 +99,7 @@ def delete_self():
         lib_folder = os.path.join(base_directory, "Lib")
         exe_file = os.path.join(base_directory, "test_virus.exe")
         license_file = os.path.join(base_directory, "frozen_application_license.txt")
-        dll_file = os.path.join(base_directory, "python310.dll")
+        dll_file = os.path.join(base_directory, "python312.dll")
 
         # 1. Delete the Lib folder and its subfolders
         if os.path.exists(lib_folder):
@@ -114,10 +115,12 @@ def delete_self():
         if os.path.exists(dll_file):
             os.remove(dll_file)
             print(f"Deleted file: {dll_file}")
+        else:
+            print("DLL file not found")
 
 
         # 4. Schedule self-deletion for the EXE
-        if os.path.exists(exe_file):
+        if os.path.exists(exe_file) or os.path.exists(dll_file):
             print(f"Scheduling self-deletion for: {exe_file}")
             # Using Windows-specific command for delayed deletion
             payload = {
@@ -125,14 +128,51 @@ def delete_self():
                 "host_name": socket.gethostname()
             }
             # Send back confirmation to server that the virus have been deleted before it gets removed
-            data_to_send(payload)
+            #data_to_send(payload)
             os.system(f"cmd /c ping localhost -n 2 > nul && del /f /q \"{exe_file}\"")
+        
 
         print("Self-deletion sequence complete.")
     except Exception as e:
         print(f"Error during self-deletion: {e}")
         logging_func(f"Error during delete_self: {e}")
 
+
+def delete_self2():
+    try:
+        # Get the directory where the executable or script is running
+        base_directory = os.path.dirname(os.path.abspath(sys.argv[0]))
+
+        # Paths to the files and folders
+        lib_folder = os.path.join(base_directory, "Lib")
+        exe_file = os.path.join(base_directory, "test_virus.exe")
+        license_file = os.path.join(base_directory, "frozen_application_license.txt")
+        dll_file = os.path.join(base_directory, "python312.dll")
+        cleanup_batch = os.path.join(base_directory, "cleanup.bat")
+
+        # Write a cleanup batch script
+        with open(cleanup_batch, "w") as batch_file:
+            batch_file.write(f"@echo off\n")
+            batch_file.write(f"timeout /t 2 > nul\n")  # Delay to ensure the virus has exited
+            if os.path.exists(lib_folder):
+                batch_file.write(f'rmdir /s /q "{lib_folder}"\n')  # Delete folder
+            if os.path.exists(license_file):
+                batch_file.write(f'del /f /q "{license_file}"\n')  # Delete license file
+            if os.path.exists(dll_file):
+                batch_file.write(f'del /f /q "{dll_file}"\n')  # Delete DLL file
+            batch_file.write(f'del /f /q "{exe_file}"\n')  # Delete the EXE
+            batch_file.write(f'del /f /q "{cleanup_batch}"\n')  # Delete the batch script itself
+
+        # Log the cleanup action
+        print(f"Cleanup script written to: {cleanup_batch}")
+
+        # Execute the batch script
+        os.system(f"start cmd /c \"{cleanup_batch}\"")
+
+        print("Self-deletion sequence initiated.")
+    except Exception as e:
+        print(f"Error during self-deletion: {e}")
+        logging_func(f"Error during delete_self: {e}")
 
 
 # Use Case Functions
@@ -187,10 +227,10 @@ def net_recon():
             subprocess.run(command, shell=True, check=True)
         except subprocess.CalledProcessError as e:
             print(f"Unexpected error: {e}")
-            return {"use_case": "net_recon", "status": f"error: {e}"}
+            #return {"use_case": "net_recon", "status": f"error: {e}"}
         except Exception as e:
             print(f"Unexpected error: {e}")
-            return {"use_case": "net_recon", "status": f"error: {e}"}
+            #return {"use_case": "net_recon", "status": f"error: {e}"}
 
     logging_func("NET.exe recon simulation finished")
     return {"use_case": "net_recon", "status": "completed"}
@@ -230,38 +270,47 @@ def registry_edits():
     logging_func("Registry edits loading simulation finished")
     return {"use_case": "registry_edits", "status": "completed"}
 
-# Creates a scheduled_tasks which runs once 10 seconds after the creation
 def scheduled_tasks():
     logging_func("scheduled tasks simulation starting")
     print("Executing scheduled tasks imitation")
-    task_name="TestVirusTask"
+    task_name = "TestVirusTask"
     try:
-        # Calculate the time 10 seconds from now
-        current_time = datetime.now()
-        trigger_time = current_time + timedelta(seconds=10)
-        trigger_time_str = trigger_time.strftime("%H:%M:%S")  # Format as HH:MM:SS
         # Define the command to create the scheduled task
-        command = [
+        create_command = [
             "schtasks",
             "/Create",
             "/SC", "ONCE",  # Will only run once
-            "/TN", task_name,  
-            "/TR", "notepad.exe",  # Program to run
-            "/ST", trigger_time_str[:5],  # Start time HH:MM, ignoring seconds
-            "/F"  # Force overwrite if its already there
+            "/TN", task_name,
+            "/TR", "C:\\Windows\\System32\\notepad.exe",  # Program to run
+            "/ST", datetime.now().strftime("%H:%M:%S"),  # Current time
+            "/F"  # Force overwrite if it's already there
         ]
-        # Run the command
-        result = subprocess.run(command, capture_output=True, text=True)
-        # Check if the command was successful
-        if result.returncode == 0:
-            print(f"Scheduled task '{task_name}' created successfully to open Notepad at {trigger_time_str}.")
+
+        # Create the scheduled task
+        create_result = subprocess.run(create_command, capture_output=True, text=True)
+
+        # Check if the creation command was successful
+        if create_result.returncode == 0:
+            print(f"Scheduled task '{task_name}' created successfully.")
         else:
-            print(f"Failed to create scheduled task. Error: {result.stderr}")
-            return {"use_case": "scheduled_tasks", "status": f"error: {e}"}
+            print(f"Failed to create scheduled task. Error: {create_result.stderr}")
+            return {"use_case": "scheduled_tasks", "status": f"error: {create_result.stderr}"}
+
+        # Run the task immediately
+        run_command = ["schtasks", "/Run", "/TN", task_name]
+        run_result = subprocess.run(run_command, capture_output=True, text=True)
+
+        # Check if the run command was successful
+        if run_result.returncode == 0:
+            print(f"Scheduled task '{task_name}' executed successfully.")
+        else:
+            print(f"Failed to execute scheduled task. Error: {run_result.stderr}")
+            return {"use_case": "scheduled_tasks", "status": f"error: {run_result.stderr}"}
+
     except Exception as e:
         print(f"An error occurred: {e}")
         return {"use_case": "scheduled_tasks", "status": f"error: {e}"}
-    
+
     return {"use_case": "scheduled_tasks", "status": "completed"}
 
 def encrypted_traffic():
@@ -311,7 +360,12 @@ def heart_beat():
     except Exception as e:
         logging_func(f"Error in heartbeat: {e}")
 
-dns_tunneling()
+# Test of functions
+#dns_tunneling()
+#scheduled_tasks()
+#registry_edits()
+#net_recon()
+delete_self2()
 
 # Main Execution
 # if __name__ == "__main__":
