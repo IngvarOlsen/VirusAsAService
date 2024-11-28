@@ -15,9 +15,9 @@ from datetime import datetime, timedelta
 
 
 
-# Configurable Variables
-# API_KEY = "PLACEHOLDER_API_KEY"  
-# USE_CASES = PLACEHOLDER_USE_CASES
+Configurable Variables
+API_KEY = "PLACEHOLDER_API_KEY"  
+USE_CASES = PLACEHOLDER_USE_CASES
 
 # heartbeatRate = PLACEHOLDER_HEARTBEAT_RATE  # in seconds
 
@@ -88,57 +88,7 @@ def data_to_send(data):
     except Exception as e:
         print(f"Error in data sending: {e}")
 
-
 def delete_self():
-    os.system(f"cmd /c ping localhost -n 2 > nul && del /f /q python312.dll")
-    try:
-        # Get the directory where the executable or script is running
-        base_directory = os.path.dirname(os.path.abspath(sys.argv[0]))
-
-        # Paths to the files and folders
-        lib_folder = os.path.join(base_directory, "Lib")
-        exe_file = os.path.join(base_directory, "test_virus.exe")
-        license_file = os.path.join(base_directory, "frozen_application_license.txt")
-        dll_file = os.path.join(base_directory, "python312.dll")
-
-        # 1. Delete the Lib folder and its subfolders
-        if os.path.exists(lib_folder):
-            shutil.rmtree(lib_folder)
-            print(f"Deleted folder: {lib_folder}")
-
-        # 2. Delete the license file
-        if os.path.exists(license_file):
-            os.remove(license_file)
-            print(f"Deleted file: {license_file}")
-
-        # 3. Delete the DLL file
-        if os.path.exists(dll_file):
-            os.remove(dll_file)
-            print(f"Deleted file: {dll_file}")
-        else:
-            print("DLL file not found")
-
-
-        # 4. Schedule self-deletion for the EXE
-        if os.path.exists(exe_file) or os.path.exists(dll_file):
-            print(f"Scheduling self-deletion for: {exe_file}")
-            # Using Windows-specific command for delayed deletion
-            payload = {
-                "data": "Test virus and files have succesfully been deleted",
-                "host_name": socket.gethostname()
-            }
-            # Send back confirmation to server that the virus have been deleted before it gets removed
-            #data_to_send(payload)
-            os.system(f"cmd /c ping localhost -n 2 > nul && del /f /q \"{exe_file}\"")
-        
-
-        print("Self-deletion sequence complete.")
-    except Exception as e:
-        print(f"Error during self-deletion: {e}")
-        logging_func(f"Error during delete_self: {e}")
-
-
-def delete_self2():
     try:
         # Get the directory where the executable or script is running
         base_directory = os.path.dirname(os.path.abspath(sys.argv[0]))

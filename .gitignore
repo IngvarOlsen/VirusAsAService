@@ -24,7 +24,11 @@ test.py
 test.zip
 *.zip
 *.log
-
+*.exe
+*.pyd
+*.dll
+*.dat
+*.rst
 test.spec
 test/frozen_application_license.txt
 test/python312.dll
@@ -42,3 +46,4 @@ test/lib/unicodedata.pyd
 test/lib/email/architecture.rst
 
 *test_virus*
+compiler/test/frozen_application_license.txt
