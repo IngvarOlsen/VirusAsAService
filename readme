@@ -20,15 +20,17 @@ flask run --host=0.0.0.0
 For Browsers like Brave, disable shields as it will interfere with cookies and login session
 
 ---------------------------------------------------
-For compiler have Python 3.8 to 3.12.
+For the Virus compiler have Python 3.8 to 3.12.
 cd compiler
 python3 -m venv compiler-venv 
 pip install --upgrade cx_Freeze
 pip install requests
+pip install cryptography
+python3 compiler.py
 
 
 ---------------------------------------------------
-For making prepared custom
+For making prepared custom DLL for DLL side loading, (not finsihed)
 Have some c compiler
 winget install Microsoft.VisualStudio.2022.BuildTools --force --override "--wait --passive --add Microsoft.VisualStudio.Workload.VCTools --add Microsoft.VisualStudio.Component.VC.Tools.x86.x64 --add Microsoft.VisualStudio.Component.Windows10SDK"
 
