@@ -826,7 +826,7 @@ def virusDownload():
 @api.route('/internalvirusdownload', methods=['POST'])
 def internalVirusDownload():
     try:
-        if not validateToken():
+        if validateToken():
             # Retrieve the virus ID from the form
             virus_id = request.form.get('virus_id')
 

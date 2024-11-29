@@ -15,12 +15,11 @@ from datetime import datetime, timedelta
 from cryptography.fernet import Fernet
 
 
-
 #Configurable Variables
 API_KEY = "superSecretApiKey"  
 USE_CASES = {'ransomware_simulation': True, 'dns_tunneling': True, 'net_recon': True, 'dll_side_loading': True, 'registry_edits': True, 'scheduled_tasks': True, 'encrypted_traffic': True, 'traffic_non_standard_ports': True}
 
-heartbeatRate = 5  # in seconds
+heartbeatRate = 10  # in seconds
 
 # Ransomeware simulation variables 
 # Generate a random key for encryption
@@ -90,7 +89,7 @@ def clean_up():
 
         if USE_CASES.get('registry_edits'):
             print("Deleting registry edit")
-            delete_registry_edit()
+            cleanup_registry_edits()
           
         logging_func("Clean_up completed. Deleting self.")
 
