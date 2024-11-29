@@ -1,5 +1,5 @@
 $apiUrl = "127.0.0.1:5000/api/virusdownload"
-$apiKey = "4f300d801d8a81426755f5d09d2e0db613580d88dbbe6d6359e2f98f49c97019"
+$apiKey = "superSecretApiKey"
 $outputFile = "testvirus.zip"
 
 # Prepare the JSON payload

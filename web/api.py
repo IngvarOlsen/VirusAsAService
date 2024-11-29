@@ -785,12 +785,15 @@ def virusDownload():
     try:
         # Retrieve the virus ID from the form
         virus_api = request.json.get('api_key')
+        print(virus_api)
 
         if not virus_api:
             return jsonify({'message': 'Invalid API key'}), 404
 
         # Querying the database for the virus using its ID
-        virus = Virus.query.get(virus_api)
+        #Virus.query.filter_by(id=virus_id, user_id=current_user.id).first()
+        virus = Virus.query.filter_by(virus_api=virus_api).first()
+        print(virus)
 
         if not virus:
             return jsonify({'message': 'Virus not found'}), 400
@@ -817,9 +820,7 @@ def virusDownload():
         print(f"Error in dashboard download endpoint: {e}")
         return jsonify({'message': 'Internal server error'}), 500
 
-
-
-    return send_file(exe_path, as_attachment=True)
+    # return send_file(exe_path, as_attachment=True)
 
 # Acts as a dashboard method for virus and checks if the user is logged in and tokens are valid
 @login_required
