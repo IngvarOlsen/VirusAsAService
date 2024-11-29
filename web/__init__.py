@@ -9,7 +9,7 @@ db = SQLAlchemy()
 DB_NAME = "database.db"
 
 # Import models directly for use in setup_demo_data
-from .models import User, Virus, Hosts
+from .models import User, Virus, Hosts, CompilingHandler
 
 def setup_demo_data():
     print("Setting up demo data...")
@@ -52,6 +52,16 @@ def setup_demo_data():
         db.session.add(test_host)
         db.session.commit()
         print("Demo host created.")
+
+                # Create a test host for the demo virus
+        test_compiling_job = CompilingHandler(
+            user_id=demo_user.id,
+            virus_id=test_virus.id,
+            status="pending"
+        )
+        db.session.add(test_compiling_job)
+        db.session.commit()
+        print("Demo pending job created")
     else:
         print("Demo data already exists.")
 

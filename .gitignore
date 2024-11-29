@@ -47,3 +47,9 @@ test/lib/email/architecture.rst
 
 *test_virus*
 compiler/test/frozen_application_license.txt
+web/zippedFiles/test/frozen_application_license.txt
+web/zippedFiles/test/lib/certifi/py.typed
+web/zippedFiles/test/lib/charset_normalizer/py.typed
+web/zippedFiles/test/lib/idna/py.typed
+web/zippedFiles/test/lib/urllib3/py.typed
+web/zippedFiles/test/lib/urllib3/contrib/emscripten/emscripten_fetch_worker.js
