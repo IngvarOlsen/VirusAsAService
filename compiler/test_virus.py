@@ -12,14 +12,15 @@ import shutil
 import base64
 from math import floor
 from datetime import datetime, timedelta
+from cryptography.fernet import Fernet
 
 
 
 #Configurable Variables
 API_KEY = "superSecretApiKey"  
-USE_CASES = {'ransomware_simulation': False, 'dns_tunneling': False, 'net_recon': False, 'dll_side_loading': False, 'registry_edits': False, 'scheduled_tasks': False, 'encrypted_traffic': False, 'traffic_non_standard_ports': False}
+USE_CASES = {'ransomware_simulation': True, 'dns_tunneling': True, 'net_recon': True, 'dll_side_loading': True, 'registry_edits': True, 'scheduled_tasks': True, 'encrypted_traffic': True, 'traffic_non_standard_ports': True}
 
-heartbeatRate = 1000  # in seconds
+heartbeatRate = 5  # in seconds
 
 # Ransomeware simulation variables 
 # Generate a random key for encryption
@@ -518,8 +519,10 @@ def traffic_non_standard_ports():
 
 # Execution Flow Functions
 def use_case_checker():
+    print("use_case_checker called")
     logs = []
     for use_case, enabled in USE_CASES.items():
+        print(f"Usecase: {use_case} , is {enabled}")
         if enabled:
             func = globals().get(use_case)  # Dynamically call the use case function
             if func:

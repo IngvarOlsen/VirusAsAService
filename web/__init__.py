@@ -30,8 +30,8 @@ def setup_demo_data():
         # Create a test virus for the demo user
         test_virus = Virus(
             name="Demo Virus",
-            heartbeat_rate="1000",
-            use_case_settings="ransomware_simulation,dns_tunneling, ransomware_simulation, encrypted_traffic, dns_tunneling, net_recon, dll_side_loading, registry_edits, scheduled_tasks, traffic_non_standard_ports",
+            heartbeat_rate="10",
+            use_case_settings="Ransomware Simulation,DNS Tunneling,Net.exe Recon,DLL Side Loading,Registry Edits,Scheduled Tasks,Encrypted Traffic,Traffic on none standard ports",
             user_id=demo_user.id,
             is_alive=True,
             virus_api="superSecretApiKey",
