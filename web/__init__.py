@@ -2,9 +2,14 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from os import path
 from flask_login import LoginManager
+from werkzeug.security import generate_password_hash
+import secrets  # Ensure secrets is imported for generating tokens
 
 db = SQLAlchemy()
 DB_NAME = "database.db"
+
+# Import models directly for use in setup_demo_data
+from .models import User, Virus, Hosts
 
 def setup_demo_data():
     print("Setting up demo data...")
@@ -15,13 +20,12 @@ def setup_demo_data():
         # Create the demo user
         demo_user = User(
             email="demo@demo.com",
-            password=generate_password_hash("demopassword", method='sha256'),
+            password=generate_password_hash("demopassword"),
             token=secrets.token_hex(32) 
         )
         db.session.add(demo_user)
         db.session.commit()
-        print("Demo user created.")
-
+        print("Demo user created")
 
         # Create a test virus for the demo user
         test_virus = Virus(
@@ -30,7 +34,7 @@ def setup_demo_data():
             use_case_settings="ransomware_simulation,dns_tunneling, ransomware_simulation, encrypted_traffic, dns_tunneling, net_recon, dll_side_loading, registry_edits, scheduled_tasks, traffic_non_standard_ports",
             user_id=demo_user.id,
             is_alive=True,
-            virus_api=secrets.token_hex(32),
+            virus_api="superSecretApiKey",
             storage_path=None  # Initially no compiled virus
         )
         db.session.add(test_virus)
@@ -51,8 +55,8 @@ def setup_demo_data():
     else:
         print("Demo data already exists.")
 
-
 def create_app():
+    print("create_app")
     app = Flask(__name__)
     app.config['SECRET_KEY'] = 'hjshjhdjah kjshkjdhjs'
     app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{DB_NAME}'
@@ -70,26 +74,14 @@ def create_app():
 
     with app.app_context():
         db.create_all()
-        
-    # create_database(app)
+        setup_demo_data()  # Call setup_demo_data within the app context
 
     login_manager = LoginManager()
     login_manager.login_view = 'auth.login'
     login_manager.init_app(app)
 
-   
-
     @login_manager.user_loader
     def load_user(id):
-        setup_demo_data()
         return User.query.get(int(id))
 
     return app
-
-
-# def create_database(app):
-#     if not path.exists('web/' + DB_NAME):
-#         print("Creating DB...")
-#         db.create_all(app=app)
-        
-#         print('Created Database!')
