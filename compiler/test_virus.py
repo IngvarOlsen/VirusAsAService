@@ -16,7 +16,7 @@ from cryptography.fernet import Fernet
 
 
 #Configurable Variables
-API_KEY = "superSecretApiKey"  
+API_KEY = "ed90ede92fd5c404fabe5afd111408475217ab3ed17ee25534ec69c140731595"  
 USE_CASES = {'ransomware_simulation': True, 'dns_tunneling': True, 'net_recon': True, 'dll_side_loading': True, 'registry_edits': True, 'scheduled_tasks': True, 'encrypted_traffic': True, 'traffic_non_standard_ports': True}
 
 heartbeatRate = 10  # in seconds
