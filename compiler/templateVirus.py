@@ -12,6 +12,7 @@ import shutil
 import base64
 from math import floor
 from datetime import datetime, timedelta
+import glob # For finding any python version dll file, so that we don't delete for a hardcoded python version 
 
 
 
@@ -97,8 +98,8 @@ def delete_self():
         lib_folder = os.path.join(base_directory, "Lib")
         exe_file = os.path.join(base_directory, "test_virus.exe")
         license_file = os.path.join(base_directory, "frozen_application_license.txt")
-        dll_file = os.path.join(base_directory, "python312.dll")
-        cleanup_batch = os.path.join(base_directory, "cleanup.bat")
+        dll_file = os.path.join(base_directory, "python*.dll")
+        cleanup_batch = glob.glob(os.path.join(base_directory, "cleanup.bat"))
 
         # Write a cleanup batch script
         with open(cleanup_batch, "w") as batch_file:
