@@ -47,6 +47,8 @@ class CompilingHandler(db.Model, UserMixin):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     # Will either have pending or done
     status = db.Column(db.String(150))
+    # Will try to add a functioanlity to display if the compiler is connected and ready for jobs as a nice to have if enough time is left
+    last_heartbeat = db.Column(db.String(500))
 
 # Waits for the insert virus to have succesfully inserted to SQL and then saves a test host, but only does it for the first user created
 @event.listens_for(Virus, 'after_insert')
