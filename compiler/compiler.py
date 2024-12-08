@@ -30,7 +30,7 @@ def format_use_case_settings(use_case_settings):
         "Traffic on none standard ports": "traffic_non_standard_ports"
     }
 
-    # Generate the output dictionary
+    # Generate the output 
     formatted_settings = {
         use_case_map[setting]: True
         for setting in use_case_settings
@@ -43,7 +43,6 @@ def format_use_case_settings(use_case_settings):
             formatted_settings[key] = False
 
     return formatted_settings
-
 
 # Fetch pending job from the server
 def get_pending_job():
@@ -62,7 +61,6 @@ def create_test_virus(template_path, output_path, job_data):
         with open(template_path, 'r') as template_file:
             script_content = template_file.read()
 
-        # Replace placeholders in the template
         script_content = script_content.replace("PLACEHOLDER_API_KEY", job_data["virus_api"])
         script_content = script_content.replace("PLACEHOLDER_HEARTBEAT_RATE", str(job_data["heartbeat_rate"]))
         script_content = script_content.replace("PLACEHOLDER_USE_CASES", str(format_use_case_settings(job_data["use_case_settings"])))
@@ -207,17 +205,14 @@ if __name__ == "__main__":
     if not job_data:
         print("No jobs available.")
         exit()
-
     # Step 2: Create the test virus script
     output_script_path = "test_virus.py"
     script_path = create_test_virus(template_path, output_script_path, job_data)
     if not script_path:
         print("Failed to create test virus script.")
         exit()
-
     # Step 3: Compile the test virus
     compile_test_virus(script_path)
-
     # Step 4: Zip the compiled virus
     zip_path = zip_compiled_virus(build_dir, compiled_zip_path)
     #zip_path = zip_compiled_virus(compiled_zip_path)
