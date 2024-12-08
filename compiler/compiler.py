@@ -8,8 +8,7 @@ import subprocess
 # API URLs and secrets
 api_get_url = "http://127.0.0.1:5000/api/getpendingjob"
 api_upload_url = "http://127.0.0.1:5000/api/uploadcompiledjob"
-secret = "verySecretAuth"  # Authorization header for fetching pending jobs
-
+secret = "verySecretAuth"  # Authorization header for fetching pending jobs, would have to be made an actual key which would be shared on deploying the compiler
 # Paths and filenames
 template_path = "templateVirus.py"
 build_dir = "build"
@@ -29,19 +28,16 @@ def format_use_case_settings(use_case_settings):
         "Encrypted Traffic": "encrypted_traffic",
         "Traffic on none standard ports": "traffic_non_standard_ports"
     }
-
     # Generate the output 
     formatted_settings = {
         use_case_map[setting]: True
         for setting in use_case_settings
         if setting in use_case_map
     }
-
     # Add all other use cases as False if not in use_case_settings
     for key in use_case_map.values():
         if key not in formatted_settings:
             formatted_settings[key] = False
-
     return formatted_settings
 
 # Fetch pending job from the server
@@ -55,16 +51,14 @@ def get_pending_job():
         print(f"Error fetching job: {response.json().get('message')}")
         return None
 
-# Modify the template with job-specific variables
+# Modifies the template pything virus and inserts the varibles for api_key, heartbeat_rate and use_cases
 def create_test_virus(template_path, output_path, job_data):
     try:
         with open(template_path, 'r') as template_file:
             script_content = template_file.read()
-
         script_content = script_content.replace("PLACEHOLDER_API_KEY", job_data["virus_api"])
         script_content = script_content.replace("PLACEHOLDER_HEARTBEAT_RATE", str(job_data["heartbeat_rate"]))
         script_content = script_content.replace("PLACEHOLDER_USE_CASES", str(format_use_case_settings(job_data["use_case_settings"])))
-
         with open(output_path, 'w') as output_file:
             output_file.write(script_content)
 
@@ -83,12 +77,9 @@ def compile_test_virus(script_path):
             shutil.rmtree(build_dir)
         if os.path.exists(dist_dir):
             shutil.rmtree(dist_dir)
-
-        # cx_Freeze setup
         print("Seting up freeze")
         # Path to the temporary setup script
         setup_script = "setup_compile.py"
-
         # Create a temporary setup script for cx_Freeze
         with open(setup_script, "w") as file:
             file.write(f"""
@@ -102,14 +93,11 @@ executables=[Executable("{script_path}")]
 )
 """)
         print("Setup script created.")
-
         # Run the build process using the setup script
         subprocess.run(["compiler-venv/Scripts/python", setup_script, "build"], check=True)
         print("Compilation complete.")
-
         # Clean up the setup script after compilation
         os.remove(setup_script)
-
     except subprocess.CalledProcessError as e:
         print(f"Error during compilation: {e}")
     except Exception as e:
@@ -140,9 +128,6 @@ def zip_compiled_virus(build_folder, zip_path):
     except Exception as e:
         print(f"Error zipping compiled virus: {e}")
         return None
-
-
-
 
 # def zip_compiled_virus(zip_path):
 #     try:
@@ -181,39 +166,37 @@ def upload_compiled_virus(zip_path, job_id, api_key):
 # Cleans up the build files and zip file after the upload is complete
 def clean_up_folders(build_folder, zip_path):
     try:
-        # Remove the build directory
+        # Removes the build directory
         if os.path.exists(build_folder):
             shutil.rmtree(build_folder)
             print(f"Cleaned up build folder: {build_folder}")
-
-        # Remove the zip file
+        # Removes the zip file
         if os.path.exists(zip_path):
             os.remove(zip_path)
             print(f"Cleaned up zip file: {zip_path}")
-        # Remove the new test_virus.py which have been filled out with new variables in placeholder slots
+        # Removes the new test_virus.py which have been filled out with new variables in placeholder slots
         # if os.path.exists("test_virus.py"):
         #     os.remove("test_virus.py")
         #     print(f"Cleaned up zip file: test_virus.py")
-
     except Exception as e:
         print(f"Error during cleanup: {e}")
 
 # Main execution flow
 if __name__ == "__main__":
-    # Step 1: Fetch a pending job
+    # Step 1 Fetch a pending job
     job_data = get_pending_job()
     if not job_data:
         print("No jobs available.")
         exit()
-    # Step 2: Create the test virus script
+    # Step 2 Create the test virus script
     output_script_path = "test_virus.py"
     script_path = create_test_virus(template_path, output_script_path, job_data)
     if not script_path:
         print("Failed to create test virus script.")
         exit()
-    # Step 3: Compile the test virus
+    # Step 3 Compile the test virus
     compile_test_virus(script_path)
-    # Step 4: Zip the compiled virus
+    # Step 4 Zip the compiled virus
     zip_path = zip_compiled_virus(build_dir, compiled_zip_path)
     #zip_path = zip_compiled_virus(compiled_zip_path)
     if not zip_path:
@@ -221,10 +204,7 @@ if __name__ == "__main__":
         exit()
     else:
         print(f"Compiled and zipped virus is ready at: {zip_path}")
-
-
-
-    # Step 5: Upload the compiled virus, and cleans up the build project in case it's successfull
+    # Step 5 Upload the compiled virus, and cleans up the build project in case its successfull
     if upload_compiled_virus(zip_path, job_data["job_id"], job_data["virus_api"]):
         clean_up_folders(build_dir, compiled_zip_path)
     else:
