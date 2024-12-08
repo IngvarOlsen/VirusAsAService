@@ -12,7 +12,7 @@ STRING $url = 'http://127.0.0.1:5000/api/virusdownload'
 ENTER
 STRING $zipPath = "$testPath\downloaded.zip" 
 ENTER
-STRING $extractPath = "$testPath\extracted"  
+STRING $extractPath = "$testPath"  
 ENTER
 STRING $exePath = "$extractPath\test_virus.exe"  
 ENTER
