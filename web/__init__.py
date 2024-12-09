@@ -3,6 +3,7 @@ from flask_sqlalchemy import SQLAlchemy
 from os import path
 from flask_login import LoginManager
 from werkzeug.security import generate_password_hash
+import os
 import secrets  # Ensure secrets is imported for generating tokens
 
 db = SQLAlchemy()
@@ -10,6 +11,18 @@ DB_NAME = "database.db"
 
 # Import models directly for use in setup_demo_data
 from .models import User, Virus, Hosts, CompilingHandler
+
+# Is there is no secret key it will create one, instead of just hardcoding it
+def get_or_generate_secret_key():
+    secret_file = "secret_key.txt"
+    if os.path.exists(secret_file):
+        with open(secret_file, "r") as f:
+            return f.read().strip()
+    else:
+        secret = os.urandom(24).hex()
+        with open(secret_file, "w") as f:
+            f.write(secret)
+        return secret
 
 def setup_demo_data():
     print("Setting up demo data...")
@@ -68,7 +81,8 @@ def setup_demo_data():
 def create_app():
     print("create_app")
     app = Flask(__name__)
-    app.config['SECRET_KEY'] = 'hjshjhdjah kjshkjdhjs'
+    app.config['SECRET_KEY'] = get_or_generate_secret_key()
+    print(app.config['SECRET_KEY'])
     app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{DB_NAME}'
     db.init_app(app)
 

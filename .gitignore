@@ -53,3 +53,4 @@ web/zippedFiles/test/lib/charset_normalizer/py.typed
 web/zippedFiles/test/lib/idna/py.typed
 web/zippedFiles/test/lib/urllib3/py.typed
 web/zippedFiles/test/lib/urllib3/contrib/emscripten/emscripten_fetch_worker.js
+secret_key.txt

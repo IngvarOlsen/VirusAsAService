@@ -40,7 +40,7 @@ def format_use_case_settings(use_case_settings):
             formatted_settings[key] = False
     return formatted_settings
 
-# Fetch pending job from the server
+# Fetch pending job from the server, gets returned once job at a time
 def get_pending_job():
     response = requests.get(api_get_url, headers={"Authorization": secret})
     if response.status_code == 200:
@@ -51,7 +51,7 @@ def get_pending_job():
         print(f"Error fetching job: {response.json().get('message')}")
         return None
 
-# Modifies the template pything virus and inserts the varibles for api_key, heartbeat_rate and use_cases
+# Modifies the template py testvirus and inserts the varibles for api_key, heartbeat_rate and use_cases
 def create_test_virus(template_path, output_path, job_data):
     try:
         with open(template_path, 'r') as template_file:
