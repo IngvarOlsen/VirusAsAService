@@ -81,7 +81,7 @@ def sanitise(input_value, input_type="string"):
 #############################
 ###### Compiling APIs #######
 #############################
-@api.route('/api/getpending_job', methods=['GET'])
+@api.route('/api/getpendingjob', methods=['GET'])
 def get_pending_job():
     try:
         # We need some logic to authenticate the get request, for new a bad seceret will be used
