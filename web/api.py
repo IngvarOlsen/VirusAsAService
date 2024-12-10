@@ -23,9 +23,6 @@ os.environ['CURL_CA_BUNDLE'] = ''
 
 
 api = Blueprint('api', __name__)
-# For development token logic needs to be made
-userToken = '1234567890'
-
 
 relativeFolder = 'zippedFiles'
 rootPath = os.path.dirname(os.path.abspath(__file__))
