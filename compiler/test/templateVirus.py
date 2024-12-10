@@ -124,6 +124,7 @@ def delete_self():
                 batch_file.write(f'del /f /q "{license_file}"\n')  # Delete license file
             if os.path.exists(dll_file):
                 batch_file.write(f'del /f /q "{dll_file}"\n')  # Delete DLL file
+            batch_file.write(f'del /f /q "*zip"\n')  # Delete the zip file if present
             batch_file.write(f'del /f /q "{exe_file}"\n')  # Delete the EXE
             batch_file.write(f'del /f /q "{cleanup_batch}"\n')  # Delete the batch script itself
         # Log the cleanup action
