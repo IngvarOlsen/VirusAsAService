@@ -37,7 +37,7 @@ os.makedirs(uploadFolder, exist_ok=True)
 
 # Connects to DB for manual SQL statements, though most DB access goes through SQLalchemy and does not use this helper function
 # Needs to be param bound and closed after
-def dbConnect():
+def db_connect():
     global conn
     #conn = sqlite3.connect('/var/www/instance/database.db')
     conn = sqlite3.connect('instance/database.db')
@@ -46,8 +46,8 @@ def dbConnect():
 
 
 def validate_token():
-    sessionToken = session['token']
-    print(f"session[token] = {sessionToken}")
+    session_token = session['token']
+    print(f"session[token] = {session_token}")
     print(f"current_user.token = {current_user.token}")
     if 'token' not in session or session['token'] != current_user.token:
         flash('Session expired or invalid token. Please log in again.', category='error')
@@ -83,19 +83,19 @@ def sanitise(input_value, input_type="string"):
 #############################
 ###### Compiling APIs #######
 #############################
-@api.route('/api/getpendingjob', methods=['GET'])
-def getPendingJob():
+@api.route('/api/getpending_job', methods=['GET'])
+def get_pending_job():
     try:
         # We need some logic to authenticate the get request, for new a bad seceret will be used
-        badSecret = "verySecretAuth"
+        bad_secret = "verySecretAuth"
 
         # Extract API key from the headers
-        commonSeceret = request.headers.get('Authorization')
-        if not commonSeceret:
+        common_seceret = request.headers.get('Authorization')
+        if not common_seceret:
             return jsonify({'message': 'API key is required'}), 403
 
         # Fetch the first pending job
-        pendingJob = (
+        pending_job = (
             db.session.query(CompilingHandler)
             .join(Virus, CompilingHandler.virus_id == Virus.id)
             .filter(
@@ -104,28 +104,28 @@ def getPendingJob():
             )
             .first()
         )
-        if not pendingJob:
+        if not pending_job:
             return jsonify({'message': 'No pending jobs available'}), 404
 
         # Fetch the associated virus
-        virus = Virus.query.get(pendingJob.virus_id)
+        virus = Virus.query.get(pending_job.virus_id)
         if not virus:
             return jsonify({'message': 'Associated virus not found'}), 404
 
         # Validate the API key
-        if badSecret != commonSeceret:
+        if bad_secret != common_seceret:
             return jsonify({'message': 'Invalid API key'}), 403
 
         # Prepare the response data
-        responseData = {
-            'job_id': pendingJob.id,
+        response_data = {
+            'job_id': pending_job.id,
             'virus_id': virus.id,
             'virus_name': virus.name,
             'heartbeat_rate': virus.heartbeat_rate,
             'use_case_settings': virus.use_case_settings.split(','),  # Return as a list
             'virus_api': virus.virus_api,
         }
-        return jsonify(responseData), 200
+        return jsonify(response_data), 200
 
     except Exception as e:
         print(f"Error fetching pending job: {e}")
@@ -139,29 +139,29 @@ def upload_compiledJob():
         print(request)
         print(request.form)
         print(request.files)
-        apiKey = sanitise(request.headers.get('Authorization'))
-        if not apiKey:
+        api_key = sanitise(request.headers.get('Authorization'))
+        if not api_key:
             return jsonify({'message': 'API key is required'}), 403
 
         # Extract the job ID and file from the request
-        jobId = request.form.get('job_id')
+        job_id = request.form.get('job_id')
         file = request.files.get('compiled_file')
 
-        if not jobId or not file:
+        if not job_id or not file:
             return jsonify({'message': 'Job ID and compiled file are required'}), 400
 
         # Fetch the compiling job
-        compilingJob = CompilingHandler.query.get(jobId)
-        if not compilingJob:
+        compiling_job = CompilingHandler.query.get(job_id)
+        if not compiling_job:
             return jsonify({'message': 'Compiling job not found'}), 404
 
         # Fetch the associated virus
-        virus = Virus.query.get(compilingJob.virus_id)
+        virus = Virus.query.get(compiling_job.virus_id)
         if not virus:
             return jsonify({'message': 'Associated virus not found'}), 404
 
         # Validate the API key
-        if virus.virus_api != apiKey:
+        if virus.virus_api != api_key:
             return jsonify({'message': 'Invalid API key'}), 403
 
         # Save the uploaded file
@@ -174,7 +174,7 @@ def upload_compiledJob():
         db.session.commit()
 
         # Mark the job as completed
-        compilingJob.status = "done"
+        compiling_job.status = "done"
         db.session.commit()
 
         return jsonify({'message': 'Compiled file uploaded and job updated successfully'}), 200
@@ -490,7 +490,7 @@ def save_virus():
 #     print(token)
 #     if token == userToken :
 #         try:
-#             dbConnect()
+#             db_connect()
 #             curs.execute("INSERT INTO Virus (virus_type, name, heartbeat_rate, user_id) VALUES (?, ?, ?, ?)", (virus_type, name, heartbeat_rate, user_id))
 #             conn.commit()
 #             conn.close()
@@ -520,7 +520,7 @@ def save_host():
     last_heartbeat = data['last_heartbeat']
     if validate_token():
         try:
-            dbConnect()
+            db_connect()
             curs.execute("INSERT INTO Hosts (user_id, virus_id, pc_name, country, host_notes, settings, last_heartbeat) VALUES (?, ?, ?, ?, ?, ?, ?)", (user_id, virus_id, pc_name, country, host_notes, settings, last_heartbeat))
             conn.commit()
             conn.close()
@@ -548,7 +548,7 @@ def save_host():
 #     print("getactivevirus")
 #     try:
 #         if validate_token():
-#             dbConnect()
+#             db_connect()
 #             print("Trying to get virus table data")
 
 #             curs.execute("SELECT * FROM Virus WHERE user_id = ? AND is_alive = 1", (str(current_user.id)))
@@ -572,7 +572,7 @@ def save_host():
 #     try:
 #         # Validates session token against DB token
 #         if validate_token():
-#             dbConnect()
+#             db_connect()
 #             print("Trying to get virus table data")
 
 #             curs.execute("SELECT * FROM Virus WHERE user_id = ?", (str(current_user.id)))
@@ -598,7 +598,7 @@ def get_hosts():
         
         # Calls helper function to validate session token to db token
         if validate_token():
-            dbConnect()
+            db_connect()
             print("Trying to get Hosts table data")
             curs.execute("SELECT * FROM Hosts WHERE user_id = ?", (str(current_user.id)))
             rows = curs.fetchall()
@@ -688,7 +688,7 @@ def delete_virus():
                 return redirect(url_for('views.virus'))  
 
             # Delete the virus
-            dbConnect()
+            db_connect()
             print("Trying to delete Virus")
             curs.execute("DELETE FROM virus WHERE id = ? AND user_id = ?", (virus_id, current_user.id))
             conn.commit()
@@ -727,7 +727,7 @@ def delete_virus():
 #     print(token)
 #     if token == userToken:
 #         try:
-#             dbConnect()
+#             db_connect()
 #             print("Trying to delete Virus")
 #             curs.execute("DELETE FROM virus WHERE id = ? AND user_id = ?", (virus_id, user_id))
 #             conn.commit()
@@ -754,7 +754,7 @@ def delete_host():
     print(id)
     print(token)
     try:
-        dbConnect()
+        db_connect()
         print("Trying to delete Host")
         curs.execute("DELETE FROM Hosts WHERE id = ? AND user_id = ?", (id, str(current_user.id)))
         conn.commit()
