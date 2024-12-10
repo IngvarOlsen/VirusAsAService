@@ -58,7 +58,7 @@ def validate_token():
 
 def sanitise(input_value, input_type="string"):
     #blacklist = [r"_", r"--", r";", r"/*", r"*/", r"@", r"union", r"select", r"insert", r"update", r"delete"]
-    blacklist = [r"_", r"--", r";", r"union", r"select", r"insert", r"update", r"delete"]
+    blacklist = [r"_", r"--", r";", r"union", r"select", r"insert", r"update", r"delete", r"drop", r"alter", r"create", r"union", r"join", r"truncate", r"replace", r"into", r"values", r"where", r"from", r"having", r"group by", r"order by", r"limit", r"offset"]
     # Validate input type
     if input_type == "string" and not isinstance(input_value, str):
         flash(f"Invalid input type: {input_value} is not a string.",category='error')
