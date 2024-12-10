@@ -1,7 +1,7 @@
 # Note for API, for now internal calls on the webpage will be using /function, while externals will be using /api/function 
 
 from flask import Blueprint, render_template, request, flash, jsonify, send_file, redirect, url_for, session, send_from_directory
-from flask_login import login_required, current_user
+from flask_login import login_required, current_user, logout_user
 from werkzeug.utils import secure_filename
 from datetime import datetime
 #from .models import Note, ImageSet, Image
@@ -37,7 +37,7 @@ os.makedirs(uploadFolder, exist_ok=True)
 ##### Helper Functions ######
 #############################
 
-# Connects to DB for manual SQL statements, though most DB access goes through SQLalchemy
+# Connects to DB for manual SQL statements, though most DB access goes through SQLalchemy and does not use this helper function
 # Needs to be param bound and closed after
 def dbConnect():
     global conn
