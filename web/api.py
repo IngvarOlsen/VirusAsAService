@@ -108,7 +108,7 @@ def getPendingJob():
 
 
 @api.route('/api/uploadcompiledjob', methods=['POST'])
-def uploadCompiledJob():
+def upload_compiledJob():
     try:
         # Extract API key from the headers
         print(request)
@@ -212,7 +212,7 @@ def heartbeat():
 
 # Takes log data from the test virus and saves it to the host model, with foregin keys to user.id and virus.id
 @api.route('/api/datatosend', methods=['POST'])
-def datatosend():
+def data_to_send():
     try:
         # Debugging the raw JSON data
         print("JSON data:", request.json)
@@ -269,7 +269,7 @@ def datatosend():
 ####### USECASE APIs ########
 #############################
 @api.route('/api/dnstunneling', methods=['GET', 'POST'])
-def dnsTunnelingHandler():
+def dns_tunneling_handler():
     try:
         # Extract the subdomain 
         full_host = request.headers.get('Host')
@@ -348,7 +348,7 @@ def dnsTunnelingHandler():
 
 @api.route('/savevirus', methods=['POST'])
 @login_required
-def saveVirus():
+def save_virus():
     print("Save virus called")
     try:
         # Validates token against session and on DB
@@ -480,7 +480,7 @@ def saveVirus():
 
 ## saves a hosts 
 @api.route('/savehost', methods=['POST'])
-def saveHost():
+def save_host():
     data = json.loads(request.data)
     print(data)
     user_id = data['user_id']
@@ -561,7 +561,7 @@ def saveHost():
 #         return jsonify({'message': 'token not valid'})        
 
 @api.route('/gethosts', methods=['GET'])
-def getHosts():
+def get_hosts():
     print("getHosts")
     try:
         #token = "shit"
@@ -590,7 +590,7 @@ def getHosts():
 ####### Archive ########
 @api.route('/archivevirus', methods=['POST'])
 @login_required
-def archiveVirus():
+def archive_virus():
     print("archiveVirus called")
     try:
         # Validates session token against DB token
@@ -638,7 +638,7 @@ def archiveVirus():
 ####### DELETE APIS ##########
 @api.route('/deletevirus', methods=['POST'])
 @login_required
-def deleteVirus():
+def delete_virus():
     print("deleteVirus called")
     try:
         # Validates session token against DB token
@@ -715,7 +715,7 @@ def deleteVirus():
 
 @api.route('/deletehost', methods=['DELETE'])
 @login_required
-def deleteHost():
+def delete_host():
     print("deleteHost called")
     data = request.get_json()
     print("data:")
@@ -747,7 +747,7 @@ def deleteHost():
 # Sets the virus to is_alive = False
 @api.route('/setinactive', methods=['POST'])
 @login_required
-def setInactive():
+def set_inactive():
     try:
         # Retrieve the virus ID from the request form data
         virus_id = request.form.get('virus_id')
@@ -778,7 +778,7 @@ def setInactive():
 
 # External API endoint, takes API key and matches it with the relative virus and downloads it
 @api.route('/api/virusdownload', methods=['POST'])
-def virusDownload():
+def virus_download():
     try:
         # Retrieve the virus ID from the form
         virus_api = request.json.get('api_key')
@@ -821,7 +821,7 @@ def virusDownload():
 # Acts as a dashboard method for virus and checks if the user is logged in and tokens are valid
 @login_required
 @api.route('/internalvirusdownload', methods=['POST'])
-def internalVirusDownload():
+def internal_virus_download():
     try:
         if validateToken():
             # Retrieve the virus ID from the form
