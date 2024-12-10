@@ -1,6 +1,6 @@
 {% for row in dataToHtml %}
     <div class="card" style="margin-bottom: 15px;">
-        <h5 class="card-header" style="color:black; background-color: rgb(199, 223, 255);">
+        <h5 class="card-header {% if not row.is_alive %}deactivated-header{% else %}active-header{% endif %}">
             {{ row.name }}
         </h5>
         <div class="card-body" style="text-align: left;">
@@ -26,7 +26,7 @@
             </form>
             <form method="POST" action="{{ url_for('api.set_inactive') }}">
                 <input type="hidden" name="virus_id" value="{{ row.id }}"> 
-                <button type="submit" class="cardButton">Deactivate</button>
+                <button type="submit" class="cardButton">{{ "Deactivate" if row.is_alive else "Activate" }}</button>
             </form>
             <form method="POST" action="{{ url_for('api.internal_virus_download') }}">
                 <input type="hidden" name="virus_id" value="{{ row.id }}"> 
@@ -35,3 +35,15 @@
         </div>
     </div>
 {% endfor %}
+
+<style>
+    .active-header {
+        background-color: rgb(199, 223, 255); /* Light blue for active */
+        color: black;
+    }
+
+    .deactivated-header {
+        background-color: rgb(255, 159, 159); /* Red for deactivated */
+        color: black;
+    }
+</style>
