@@ -26,7 +26,7 @@ views = Blueprint('views', __name__)
 def hosts():
     print(current_user.id)
     #dataToHtml = api.getHosts(str(current_user.id), "1234567890") #In real
-    dataToSend = api.getHosts() # debug for user1
+    dataToSend = api.get_hosts() # debug for user1
     print(dataToSend)
 
     return render_template("hosts.html", user=current_user, dataToHtml = dataToSend)
@@ -49,7 +49,7 @@ def virus():
 
     try:
         # Validate the token
-        if not api.validateToken():
+        if not api.validate_token():
             flash("Invalid token. Please log in again.", category="error")
             return redirect(url_for("auth.login"))
 
@@ -136,7 +136,7 @@ def archived():
 
 @views.route('/virusinfo', methods=['POST'])
 @login_required
-def virusInfo():
+def virus_info():
     try:
         virus_id = request.form.get("virus_id")
         print("virus_id: ", virus_id)

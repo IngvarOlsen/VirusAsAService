@@ -13,7 +13,7 @@ Virus
   <div style="text-align: left; margin-bottom: 20px;">
       <h3>Create a New Test Virus</h3>
     
-      <form method="POST" action="{{ url_for('api.saveVirus') }}">
+      <form method="POST" action="{{ url_for('api.save_virus') }}">
       <!-- <form method="POST" action="/save-virus"> -->
       <!-- <form method="POST"> -->
         <div class="form-group">
@@ -86,30 +86,30 @@ Virus
                 <p style="color:black"><strong>Status:</strong> {{ row.is_alive }}</p>
             </div>
             <div class="card-footer" style="display: flex;">
-                <form method="POST" action="{{ url_for('views.virusInfo') }}">
+                <form method="POST" action="{{ url_for('views.virus_info') }}">
                     
                     <input type="hidden" name="virus_id" value="{{ row.id }}"> 
                     <button type="submit" class="cardButton">Info</button>
                 </form>
-                <!-- <form method="POST" action="{{ url_for('api.archiveVirus', virus_id=row[0]) }}"> -->
-                <form method="POST" action="{{ url_for('api.archiveVirus') }}">
+                <!-- <form method="POST" action="{{ url_for('api.archive_virus', virus_id=row[0]) }}"> -->
+                <form method="POST" action="{{ url_for('api.archive_virus') }}">
                     
                     <input type="hidden" name="virus_id" value="{{ row.id }}"> 
                     <button type="submit" class="cardButton">Archive</button>
                 </form>
                 <!-- Form for deleting a virus -->
-                <form method="POST" action="{{ url_for('api.deleteVirus') }}">
+                <form method="POST" action="{{ url_for('api.delete_virus') }}">
                     <input type="hidden" name="virus_id" value="{{ row.id }}"> 
                     
                     <!-- <input type="hidden" name="user_id" value="{{ user.id }}"> -->
                     <!-- <input type="hidden" name="user_token" value="1234567890"> -->
                     <button type="submit" class="cardButton">Delete</button>
                 </form>
-                <form method="POST" action="{{ url_for('api.setInactive') }}">
+                <form method="POST" action="{{ url_for('api.set_inactive') }}">
                     <input type="hidden" name="virus_id" value="{{ row.id }}"> 
                     <button type="submit" class="cardButton">Deactivate</button>
                 </form>
-                <form method="POST" action="{{ url_for('api.internalVirusDownload') }}">
+                <form method="POST" action="{{ url_for('api.internal_virus_download') }}">
                     <input type="hidden" name="virus_id" value="{{ row.id }}"> 
                     <button type="submit" class="cardButton">Download ZIP</button>
                 </form>

