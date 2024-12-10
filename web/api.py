@@ -14,6 +14,7 @@ import socketio
 import secrets
 import requests
 import base64
+import re
 
 
 auth = Blueprint('auth', __name__)  # Creating a Blueprint named 'auth'
@@ -54,6 +55,30 @@ def validate_token():
         return False
     return True
 
+
+def sanitise(input_value, input_type="string"):
+    #blacklist = [r"_", r"--", r";", r"/*", r"*/", r"@", r"union", r"select", r"insert", r"update", r"delete"]
+    blacklist = [r"_", r"--", r";", r"union", r"select", r"insert", r"update", r"delete"]
+    # Validate input type
+    if input_type == "string" and not isinstance(input_value, str):
+        flash(f"Invalid input type: {input_value} is not a string.",category='error')
+        return False
+    if input_type == "integer" and not isinstance(input_value, int):
+        flash(f"Invalid input type: {input_value} is not an integer.",category='error')
+        return False
+    if input_type == "float" and not isinstance(input_value, (float, int)):
+        flash(f"Invalid input type: {input_value} is not a float.",category='error')
+        return False
+    if input_type == "list" and not isinstance(input_value, list):
+        flash(f"Invalid input type: {input_value} is not a list.",category='error')
+        return False
+    # Check against the blacklist
+    for pattern in blacklist:
+        #print(pattern)
+        if re.search(pattern, str(input_value), re.IGNORECASE):
+            flash(f"Input '{input_value}' contains disallowed pattern: {pattern}",category='error')
+            return False
+    return input_value
 
 #############################
 ###### Compiling APIs #######
@@ -114,7 +139,7 @@ def upload_compiledJob():
         print(request)
         print(request.form)
         print(request.files)
-        apiKey = request.headers.get('Authorization')
+        apiKey = sanitise(request.headers.get('Authorization'))
         if not apiKey:
             return jsonify({'message': 'API key is required'}), 403
 
@@ -171,9 +196,9 @@ def heartbeat():
     try:
         # Retrieve the API key from the request
         # virus_api = request.headers.get('Authorization')
-        virus_api = request.json.get('api_key')
+        virus_api = sanitise(request.json.get('api_key'))
         #data = request.json.get('data')
-        hostname = request.json.get('host_name')
+        hostname = sanitise(request.json.get('host_name'))
         print(hostname)
         #hostname = request.form.get('host_name')
         print(virus_api)
@@ -217,8 +242,8 @@ def data_to_send():
         # Debugging the raw JSON data
         print("JSON data:", request.json)
 
-        virus_api = request.json.get('api_key')
-        data = request.json.get('data')
+        virus_api = sanitise(request.json.get('api_key'))
+        data = sanitise(request.json.get('data'))
         
         if not virus_api or not data:
             return jsonify({'message': 'api_key and data are required'}), 400
@@ -354,9 +379,9 @@ def save_virus():
         # Validates token against session and on DB
         if validate_token():
             # Get form data
-            name = request.form.get('name') 
-            heartbeat_rate = request.form.get('heartbeat_rate') 
-            use_case_settings = request.form.getlist('use_case_settings')  
+            name = sanitise(request.form.get('name'))
+            heartbeat_rate = sanitise(request.form.get('heartbeat_rate'))
+            use_case_settings = sanitise(request.form.getlist('use_case_settings'), input_type="list")
             # Generate a unique API key
             virus_api = secrets.token_hex(32)
             
@@ -366,9 +391,12 @@ def save_virus():
             print(f"Use Case Settings: {use_case_settings}")
             print(f"API key: {virus_api}")
 
+            # Check if 
+
             # Validate required fields
             if not name or not heartbeat_rate:
-                return jsonify({'message': 'Name and Heartbeat Rate are required'}), 400
+                #return jsonify({'message': 'Name and Heartbeat Rate are required'}), 400
+                return redirect(url_for('views.virus'))
 
             # Save the virus to the database
             new_virus = Virus(
@@ -481,7 +509,7 @@ def save_virus():
 ## saves a hosts 
 @api.route('/savehost', methods=['POST'])
 def save_host():
-    data = json.loads(request.data)
+    data = json.loads(sanitise(request.data))
     print(data)
     user_id = data['user_id']
     virus_id = data['virus_id']
@@ -595,7 +623,7 @@ def archive_virus():
     try:
         # Validates session token against DB token
         if validate_token():
-            virus_id = request.form.get("virus_id")
+            virus_id = sanitise(request.form.get("virus_id"))
             # Retrieve the virus from the database
             virus = Virus.query.get(virus_id)
 
@@ -645,7 +673,7 @@ def delete_virus():
         if validate_token():
             # Retrieve the virus from the database
             
-            virus_id = request.form.get("virus_id")
+            virus_id = sanitise(request.form.get("virus_id"))
             virus = Virus.query.get(virus_id)
             print("virus_id")
             print(virus_id)
@@ -717,7 +745,7 @@ def delete_virus():
 @login_required
 def delete_host():
     print("deleteHost called")
-    data = request.get_json()
+    data = sanitise(request.get_json())
     print("data:")
     print(data)
     id = data['host_id']
@@ -750,7 +778,7 @@ def delete_host():
 def set_inactive():
     try:
         # Retrieve the virus ID from the request form data
-        virus_id = request.form.get('virus_id')
+        virus_id = sanitise(request.form.get('virus_id'))
         if not virus_id:
             return jsonify({'message': 'Virus ID is required'}), 400
         # Query the virus associated with the current user
@@ -781,7 +809,7 @@ def set_inactive():
 def virus_download():
     try:
         # Retrieve the virus ID from the form
-        virus_api = request.json.get('api_key')
+        virus_api = sanitise(request.json.get('api_key'))
         print(virus_api)
 
         if not virus_api:
@@ -825,7 +853,7 @@ def internal_virus_download():
     try:
         if validate_token():
             # Retrieve the virus ID from the form
-            virus_id = request.form.get('virus_id')
+            virus_id = sanitise(request.form.get('virus_id'))
 
             if not virus_id:
                 flash('Virus ID is required', category='error')
