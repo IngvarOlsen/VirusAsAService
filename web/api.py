@@ -57,7 +57,6 @@ def validate_token():
 
 
 def sanitise(input_value, input_type="string"):
-    #blacklist = [r"_", r"--", r";", r"/*", r"*/", r"@", r"union", r"select", r"insert", r"update", r"delete"]
     blacklist = [r"_", r"--", r";", r"union", r"select", r"insert", r"update", r"delete", r"drop", r"alter", r"create", r"union", r"join", r"truncate", r"replace", r"into", r"values", r"where", r"from", r"having", r"group by", r"order by", r"limit", r"offset"]
     # Validate input type
     if input_type == "string" and not isinstance(input_value, str):
@@ -74,7 +73,6 @@ def sanitise(input_value, input_type="string"):
         return False
     # Check against the blacklist
     for pattern in blacklist:
-        #print(pattern)
         if re.search(pattern, str(input_value), re.IGNORECASE):
             flash(f"Input '{input_value}' contains disallowed pattern: {pattern}",category='error')
             return False
@@ -778,10 +776,9 @@ def set_inactive():
             return redirect(url_for('auth.logout'))   
     except Exception as e:
         print(f"Error in set_inactive: {e}")
-        
         flash('Could not set the virus as inactiave.', category='error')
         return redirect(url_for('views.virus'))  
-        #return jsonify({'message': 'Internal server error'}), 500    
+   
 
 
 #############################
