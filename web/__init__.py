@@ -81,31 +81,25 @@ def setup_demo_data():
 def create_app():
     print("create_app")
     app = Flask(__name__)
+    # Generates a app secret if there is none, gets used for session handling
     app.config['SECRET_KEY'] = get_or_generate_secret_key()
     print(app.config['SECRET_KEY'])
     app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{DB_NAME}'
     db.init_app(app)
-
     from .views import views
     from .auth import auth
     from .api import api
-    
-    app.register_blueprint(views, url_prefix='/')
+    app.register_blueprint(views, url_prefix='/') # Registers views
     app.register_blueprint(auth, url_prefix='/')
     app.register_blueprint(api, url_prefix='/')
-
     from .models import User, Virus, Hosts, Archived
-
     with app.app_context():
-        db.create_all()
+        db.create_all() 
         setup_demo_data()  # Call setup_demo_data within the app context
-
     login_manager = LoginManager()
     login_manager.login_view = 'auth.login'
     login_manager.init_app(app)
-
     @login_manager.user_loader
     def load_user(id):
         return User.query.get(int(id))
-
     return app

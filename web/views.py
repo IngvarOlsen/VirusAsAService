@@ -26,38 +26,47 @@ views = Blueprint('views', __name__)
 def hosts():
     print(current_user.id)
     #dataToHtml = api.getHosts(str(current_user.id), "1234567890") #In real
-    dataToSend = api.get_hosts() # debug for user1
-    print(dataToSend)
+    data_to_send = api.get_hosts() # debug for user1
+    print(data_to_send)
 
-    return render_template("hosts.html", user=current_user, dataToHtml = dataToSend)
+    return render_template("hosts.html", user=current_user, dataToHtml = data_to_send)
 
 # @views.route('/', methods=['GET', 'POST'])
 # @views.route('/virus', methods=['GET', 'POST'])
 # @login_required
 # def virus():
 #     print(current_user.id)
-#     dataToSend = api.getActiveVirus() 
-#     print(dataToSend)
+#     data_to_send = api.getActiveVirus() 
+#     print(data_to_send)
 
-#     return render_template("virus.html", user=current_user, dataToHtml = dataToSend)
+#     return render_template("virus.html", user=current_user, dataToHtml = data_to_send)
 
 @views.route('/', methods=['GET', 'POST'])
 @views.route('/virus', methods=['GET', 'POST'])
 @login_required
 def virus():
     print(f"User ID: {current_user.id}")
-
     try:
+        # Default filter is just all
+        filter_option = request.form.get('filter', 'all')
         # Validate the token
         if not api.validate_token():
             flash("Invalid token. Please log in again.", category="error")
             return redirect(url_for("auth.login"))
 
         # Query the database using SQLAlchemy
-        active_viruses = Virus.query.filter_by(user_id=current_user.id, is_alive=True).all()
+
+        if filter_option == 'active':
+            viruses = Virus.query.filter_by(user_id=current_user.id, is_alive=True).all()
+        elif filter_option == 'inactive':
+            viruses = Virus.query.filter_by(user_id=current_user.id, is_alive=False).all()
+        else:  # 'all' or no filter
+            viruses = Virus.query.filter_by(user_id=current_user.id).all()
+
+        #viruses = Virus.query.filter_by(user_id=current_user.id, is_alive=True).all()
 
         # Format the data as a list of dictionaries
-        dataToSend = [
+        data_to_send = [
             {
                 'id': virus.id,
                 'name': virus.name,
@@ -66,13 +75,24 @@ def virus():
                 'user_id': virus.user_id,
                 'is_alive': virus.is_alive,
             }
-            for virus in active_viruses
+            for virus in viruses
         ]
 
-        print("Formatted Data:", dataToSend)
+        print("Formatted Data:", data_to_send)
+
+        # If the request is POST, return the filtered HTML for AJAX update
+        if request.method == 'POST':
+            print("POST used")
+            return render_template('partials/virus_list.html', dataToHtml=data_to_send)
+
+        # For initial GET request, render the entire page
+        return render_template('virus.html', user=current_user, dataToHtml=data_to_send)
+
+
+
 
         # Render the template with the fetched data
-        return render_template("virus.html", user=current_user, dataToHtml=dataToSend)
+        # return render_template("virus.html", user=current_user, dataToHtml=data_to_send)
 
     except Exception as e:
         # Handle exceptions and redirect to home

@@ -72,7 +72,17 @@ Virus
 
 <!-- List of existing viruses -->
 <h3>Existing Viruses</h3>
-<div>
+
+<div style="text-align: right; margin-bottom: 20px;">
+    <label for="virusFilter">Filter:</label>
+    <select id="virusFilter" onchange="filterViruses()">
+        <option value="all">All</option>
+        <option value="active">Active</option>
+        <option value="inactive">Inactive</option>
+    </select>
+</div>
+
+<div id="virusList">
     {% for row in dataToHtml %}
         <div class="card" style="margin-bottom: 15px;">
             <h5 class="card-header" style="color:black; background-color: rgb(199, 223, 255);">
@@ -152,6 +162,24 @@ Virus
 </style>
 
 <script>
+
+function filterViruses() {
+        console.log("filterViruses called")
+        const filter = document.getElementById('virusFilter').value;
+        const form = new FormData();
+        form.append('filter', filter);
+
+        fetch('{{ url_for("views.virus") }}', {
+            method: 'POST',
+            body: form,
+        })
+        .then(response => response.text())
+        .then(html => {
+            //console.log(response)
+            document.getElementById('virusList').innerHTML = html;
+        })
+        .catch(error => console.error('Error:', error));
+}
 //     // Needs actual token logic
 //     var testToken = "1234567890";
 
