@@ -752,10 +752,10 @@ def delete_host():
 ######    UPDATE APIS    #######
 ################################
     
-# Sets the virus to is_alive = False
-@api.route('/setinactive', methods=['POST'])
+# Sets the virus to false if active, and true if deactiaved
+@api.route('/activetoggle', methods=['POST'])
 @login_required
-def set_inactive():
+def active_toggle():
     try:
         if validate_token():
             # Retrieve the virus ID from the request form data
@@ -767,16 +767,19 @@ def set_inactive():
             if not virus:
                 return jsonify({'message': 'Virus not found or unauthorized'}), 404
             # Update the is_alive attribute
-            virus.is_alive = False
+            if virus.is_alive:
+                virus.is_alive = False
+            else:
+                virus.is_alive = True
             db.session.commit()
-            flash('Virus set as inactive.', category='success')
+            flash(f'Virus set as set as {virus.is_alive}.', category='success')
             return redirect(url_for('views.virus'))
         else:
             flash('Authentication failed for token', category='error')
             return redirect(url_for('auth.logout'))   
     except Exception as e:
         print(f"Error in set_inactive: {e}")
-        flash('Could not set the virus as inactiave.', category='error')
+        flash('Could not set the virus as inactiave or active.', category='error')
         return redirect(url_for('views.virus'))  
    
 

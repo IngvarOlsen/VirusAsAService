@@ -24,7 +24,7 @@
                 <input type="hidden" name="virus_id" value="{{ row.id }}"> 
                 <button type="submit" class="cardButton">Delete</button>
             </form>
-            <form method="POST" action="{{ url_for('api.set_inactive') }}">
+            <form method="POST" action="{{ url_for('api.active_toggle') }}">
                 <input type="hidden" name="virus_id" value="{{ row.id }}"> 
                 <button type="submit" class="cardButton">{{ "Deactivate" if row.is_alive else "Activate" }}</button>
             </form>
