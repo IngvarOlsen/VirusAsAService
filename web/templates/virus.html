@@ -121,6 +121,45 @@ Virus
 
 <script>
 
+function handleButtonClick(event) {
+    console.log("handleButtonClick")
+    const button = event.target; // Get the clicked button
+    const endpoint = button.getAttribute("data-endpoint"); // Extract the endpoint
+    const virusId = button.getAttribute("data-virus-id"); // Extract the virus ID
+
+    if (!endpoint || !virusId) {
+        console.error("Missing endpoint or virus ID for button action.");
+        return;
+    }
+
+    // Prepare form data
+    const formData = new FormData();
+    formData.append("virus_id", virusId);
+
+    // Send AJAX request
+    fetch(endpoint, {
+        method: "POST",
+        body: formData,
+    })
+    .then((response) => {
+        if (response.ok) {
+            return response.json();
+        } else {
+            throw new Error(`Request failed with status ${response.status}`);
+        }
+    })
+    .then((data) => {  
+       // Handle other actions
+        console.log(data.message);
+        //alert(data.message);
+        filterViruses(); // Reload filtered viruses  
+    })
+    .catch((error) => {
+        console.error("Error processing button action:", error);
+        //alert("An error occurred while processing your request.");
+    });
+}
+
 function filterViruses() {
         console.log("filterViruses called")
         const filter = document.getElementById('virusFilter').value;
@@ -140,8 +179,18 @@ function filterViruses() {
 }
 
 document.addEventListener("DOMContentLoaded", function () {
-        filterViruses(); // Default filter is "all"
-    });
+    console.log("DOM fully loaded and parsed.");
+
+    // // Attach a click handler to a static parent element
+    // document.body.addEventListener("click", function (event) {
+    //     if (event.target.classList.contains("action-btn")) {
+    //         console.log("Action button clicked.");
+    //         handleButtonClick(event); // Call the generic handler
+    //     }
+    // });
+
+    filterViruses(); // Load filtered viruses on page load
+});
 
 //     // Needs actual token logic
 //     var testToken = "1234567890";

@@ -11,7 +11,29 @@
             <p style="color:black"><strong>Status:</strong> {{ "Active" if row.is_alive else "Inactive" }}</p>
         </div>
         <div class="card-footer" style="display: flex;">
-            <!-- Actions -->
+            <!-- Testing atm -->
+             <!-- Info -->
+            <!-- <form method="POST" action="{{ url_for('views.virus_info') }}">
+                <input type="hidden" name="virus_id" value="{{ row.id }}"> 
+                <button type="submit" class="cardButton action-btn">Info</button>
+            </form>
+            
+            <button type="button" class="cardButton action-btn" data-endpoint="{{ url_for('api.archive_virus') }}" data-virus-id="{{ row.id }}">Archive</button>
+            
+
+            <button type="button" class="cardButton action-btn" data-endpoint="{{ url_for('api.delete_virus') }}" data-virus-id="{{ row.id }}">Delete</button>
+            
+
+            <button type="button" class="cardButton action-btn" data-endpoint="{{ url_for('api.active_toggle') }}" data-virus-id="{{ row.id }}">
+                {{ "Deactivate" if row.is_alive else "Activate" }}
+            </button>
+
+            <form method="POST" action="{{ url_for('api.internal_virus_download') }}">
+                <input type="hidden" name="virus_id" value="{{ row.id }}"> 
+                <button type="submit" class="cardButton">Download</button>
+            </form> -->
+
+
             <form method="POST" action="{{ url_for('views.virus_info') }}">
                 <input type="hidden" name="virus_id" value="{{ row.id }}"> 
                 <button type="submit" class="cardButton">Info</button>

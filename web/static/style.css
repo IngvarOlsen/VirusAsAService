@@ -17,6 +17,8 @@
 
 
   .cardButton {
+    width: 120px;
+    height: 60px;
     -webkit-appearance: none;
        -moz-appearance: none;
             appearance: none;
@@ -27,7 +29,6 @@
     margin: 3px;
     color: #1d1d1d;
     border-radius: 3px;
-    width: 120px;
     cursor: pointer;
     font-size: 18px;
     transition-duration: 0.25s;

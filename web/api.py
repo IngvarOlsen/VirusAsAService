@@ -772,14 +772,19 @@ def active_toggle():
             else:
                 virus.is_alive = True
             db.session.commit()
-            flash(f'Virus set as set as {virus.is_alive}.', category='success')
+            #flash(f'Virus set as set as {virus.is_alive}.', category='success')
+            #return jsonify({'message': 'Success', 'status': 'ok'})
+            #return render_template('partials/virus_list.html')
             return redirect(url_for('views.virus'))
         else:
             flash('Authentication failed for token', category='error')
+            #return jsonify({'message': f'Error: {str(e)}', 'status': 'error'}), 500
+            #return render_template('partials/virus_list.html')
             return redirect(url_for('auth.logout'))   
     except Exception as e:
         print(f"Error in set_inactive: {e}")
         flash('Could not set the virus as inactiave or active.', category='error')
+        #return jsonify({'message': f'Error: {str(e)}', 'status': 'error'}), 500
         return redirect(url_for('views.virus'))  
    
 
