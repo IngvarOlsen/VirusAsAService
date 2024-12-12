@@ -54,3 +54,4 @@ web/zippedFiles/test/lib/idna/py.typed
 web/zippedFiles/test/lib/urllib3/py.typed
 web/zippedFiles/test/lib/urllib3/contrib/emscripten/emscripten_fetch_worker.js
 secret_key.txt
+compiler/test_virus.py
