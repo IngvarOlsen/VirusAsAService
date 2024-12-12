@@ -52,7 +52,7 @@ def validate_token():
     if 'token' not in session or session['token'] != current_user.token:
         flash('Session expired or invalid token. Please log in again.', category='error')
         logout_user()
-        return False
+        return redirect(url_for('auth.login'))
     return True
 
 
@@ -630,16 +630,20 @@ def archive_virus():
             db.session.commit()
 
             flash('Virus archived successfully!', category='success')
-            return redirect(url_for('views.virus'))  
+            # return redirect(url_for('views.virus'))  
+            return jsonify({'message': 'Success', 'status': 'ok'})
+
         else:
             print("Token did not match ")
-            return redirect(url_for('auth.logout')) 
+            return jsonify({'message': f'Session token did not match', 'status': 'error'}), 500
+            # return redirect(url_for('auth.logout')) 
 
     except Exception as e:
         # Log the error and redirect with an error message
         print(f"Error archiving virus: {e}")
         flash('An error occurred while archiving the virus.', category='error')
-        return redirect(url_for('auth.logout'))  
+        return jsonify({'message': f'Error: {str(e)}', 'status': 'error'}), 500
+        # return redirect(url_for('auth.logout'))  
 
 
 
@@ -677,15 +681,19 @@ def delete_virus():
             # db.session.commit()
 
             flash('Virus deleted successfully!', category='success')
-            return redirect(url_for('views.virus')) 
+            return jsonify({'message': 'Success', 'status': 'ok'})
+            # return redirect(url_for('views.virus')) 
         else:
             print("Token did not match ")
-            return redirect(url_for('auth.logout'))  
+     
+            return jsonify({'message': f'Session token did not match', 'status': 'error'}), 500
+            # return redirect(url_for('auth.logout'))  
 
     except Exception as e:
         print(f"Error deleting virus: {e}")
         flash('An error occurred while deleting the virus.', category='error')
-        return redirect(url_for('views.virus'))  
+        return jsonify({'message': f'Error: {str(e)}', 'status': 'error'}), 500
+        #return redirect(url_for('views.virus'))  
 
 # Old Api to delete virus with binded executed param
 # @api.route('/deletevirus', methods=['POST'])
@@ -773,19 +781,19 @@ def active_toggle():
                 virus.is_alive = True
             db.session.commit()
             #flash(f'Virus set as set as {virus.is_alive}.', category='success')
-            #return jsonify({'message': 'Success', 'status': 'ok'})
+            return jsonify({'message': 'Success', 'status': 'ok'})
             #return render_template('partials/virus_list.html')
-            return redirect(url_for('views.virus'))
+            #return redirect(url_for('views.virus'))
         else:
             flash('Authentication failed for token', category='error')
-            #return jsonify({'message': f'Error: {str(e)}', 'status': 'error'}), 500
+            return jsonify({'message': f'Error: {str(e)}', 'status': 'error'}), 500
             #return render_template('partials/virus_list.html')
-            return redirect(url_for('auth.logout'))   
+            #return redirect(url_for('auth.logout'))   
     except Exception as e:
         print(f"Error in set_inactive: {e}")
         flash('Could not set the virus as inactiave or active.', category='error')
-        #return jsonify({'message': f'Error: {str(e)}', 'status': 'error'}), 500
-        return redirect(url_for('views.virus'))  
+        return jsonify({'message': f'Error: {str(e)}', 'status': 'error'}), 500
+        #return redirect(url_for('views.virus'))  
    
 
 

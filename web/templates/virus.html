@@ -181,13 +181,13 @@ function filterViruses() {
 document.addEventListener("DOMContentLoaded", function () {
     console.log("DOM fully loaded and parsed.");
 
-    // // Attach a click handler to a static parent element
-    // document.body.addEventListener("click", function (event) {
-    //     if (event.target.classList.contains("action-btn")) {
-    //         console.log("Action button clicked.");
-    //         handleButtonClick(event); // Call the generic handler
-    //     }
-    // });
+    // Attach a click handler to a static parent element
+    document.body.addEventListener("click", function (event) {
+        if (event.target.classList.contains("action-btn")) {
+            console.log("Action button clicked.");
+            handleButtonClick(event); // Call the generic handler
+        }
+    });
 
     filterViruses(); // Load filtered viruses on page load
 });

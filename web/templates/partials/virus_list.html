@@ -13,7 +13,7 @@
         <div class="card-footer" style="display: flex;">
             <!-- Testing atm -->
              <!-- Info -->
-            <!-- <form method="POST" action="{{ url_for('views.virus_info') }}">
+            <form method="POST" action="{{ url_for('views.virus_info') }}">
                 <input type="hidden" name="virus_id" value="{{ row.id }}"> 
                 <button type="submit" class="cardButton action-btn">Info</button>
             </form>
@@ -31,10 +31,10 @@
             <form method="POST" action="{{ url_for('api.internal_virus_download') }}">
                 <input type="hidden" name="virus_id" value="{{ row.id }}"> 
                 <button type="submit" class="cardButton">Download</button>
-            </form> -->
+            </form>
 
 
-            <form method="POST" action="{{ url_for('views.virus_info') }}">
+            <!-- <form method="POST" action="{{ url_for('views.virus_info') }}">
                 <input type="hidden" name="virus_id" value="{{ row.id }}"> 
                 <button type="submit" class="cardButton">Info</button>
             </form>
@@ -53,7 +53,7 @@
             <form method="POST" action="{{ url_for('api.internal_virus_download') }}">
                 <input type="hidden" name="virus_id" value="{{ row.id }}"> 
                 <button type="submit" class="cardButton">Download ZIP</button>
-            </form>
+            </form> -->
         </div>
     </div>
 {% endfor %}
