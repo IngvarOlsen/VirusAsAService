@@ -23,16 +23,16 @@ views = Blueprint('views', __name__)
 
 # Helper function to allow both external and localhost calls
 def get_base_url():
-    external_url = "https://bitlus.online"
-    local_url = "http://127.0.0.1"
+    external_url = "https://www.bitlus.online"
+    local_url = "http://127.0.0.1:5000"
     try:
         # Try reaching the external domain
-        response = requests.head(external_url, timeout=2) 
+        response = requests.get(external_url, timeout=2) 
         if response.status_code == 200:
-            print(f"External domain '{external_url}' is reachable.")
+            print(f"### External domain '{external_url}' is reachable.")
             return external_url
     except requests.RequestException:
-        print(f"External domain '{external_url}' is not reachable. Falling back to localhost.")
+        print(f"### External domain '{external_url}' is not reachable. Falling back to localhost.")
     # Fallback to localhost
     print(local_url)
     return local_url

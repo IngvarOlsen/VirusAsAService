@@ -33,7 +33,7 @@ Virus
         <div id="ps-command-box" style="display: none; margin-top: 10px;">
             <pre class="code-box">
     <code id="ps-command">
-    Invoke-WebRequest -Uri "{{ data.url }}:5000/api/virusdownload" -Method POST -Headers @{'Content-Type'='application/json'} -Body (@{api_key='{{ data.virus.virus_api }}'} | ConvertTo-Json) -OutFile "C:\Path\To\Save\file.zip"
+    Invoke-WebRequest -Uri "{{ data.url }}/api/virusdownload" -Method POST -Headers @{'Content-Type'='application/json'} -Body (@{api_key='{{ data.virus.virus_api }}'} | ConvertTo-Json) -OutFile "C:\Path\To\Save\file.zip"
     </code>
             </pre>
             <button class="btn btn-secondary copy-btn" data-target="ps-command">Copy PowerShell Command</button>
@@ -45,7 +45,7 @@ Virus
         <div id="curl-command-box" style="display: none; margin-top: 10px;">
             <pre class="code-box">
     <code id="curl-command">
-    curl -X POST "http://127.0.0.1:5000/api/virusdownload" -H "Content-Type: application/json" -d '{"api_key":"{{ data.virus.virus_api }}"}' -o "file.zip"
+    curl -X POST "{{ data.url }}/api/virusdownload" -H "Content-Type: application/json" -d '{"api_key":"{{ data.virus.virus_api }}"}' -o "file.zip"
     </code>
             </pre>
             <button class="btn btn-secondary copy-btn" data-target="curl-command">Copy Curl Command</button>
