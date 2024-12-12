@@ -4,10 +4,13 @@
             {{ row.name }}
         </h5>
         <div class="card-body" style="text-align: left;">
-            <p style="color:black"><strong>ID:</strong> {{ row.id }}</p>
+            <!-- <p style="color:black"><strong>ID:</strong> {{ row.id }}</p> -->
             <p style="color:black"><strong>Name:</strong> {{ row.name }}</p>
             <p style="color:black"><strong>Heartbeat Rate:</strong> {{ row.heartbeat_rate }} ms</p>
-            <p style="color:black"><strong>Enabled usecases:</strong> {{ row.use_case_settings }}</p>
+            <p style="color:black"><strong>Enabled usecases:</strong>             
+                {% for usecase in row.use_case_settings.split(",") %}
+                <li>{{ usecase.strip() }}</li>
+                {% endfor %}</p>
             <p style="color:black"><strong>Status:</strong> {{ "Active" if row.is_alive else "Inactive" }}</p>
         </div>
         <div class="card-footer" style="display: flex;">
@@ -15,7 +18,7 @@
              <!-- Info -->
             <form method="POST" action="{{ url_for('views.virus_info') }}">
                 <input type="hidden" name="virus_id" value="{{ row.id }}"> 
-                <button type="submit" class="cardButton action-btn">Info</button>
+                <button type="submit" class="cardButton">Info</button>
             </form>
             
             <button type="button" class="cardButton action-btn" data-endpoint="{{ url_for('api.archive_virus') }}" data-virus-id="{{ row.id }}">Archive</button>

