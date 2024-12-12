@@ -393,7 +393,7 @@ def ransomware_simulation():
 
 def dns_tunneling():
     logging_func("DNS tunneling simulation starting")
-    DNS_TUNNEL_API = f"{base_url}:5000/api/dnstunneling"
+    DNS_TUNNEL_API = f"{base_url}/api/dnstunneling"
     try:
         print("Executing DNS Tunneling Use-Case")
 
@@ -563,7 +563,7 @@ def heart_beat():
         print(hostname)
         while True:
             response = requests.post(
-                f"{base_url}:5000/api/heartbeat",
+                f"{base_url}/api/heartbeat",
                 json={"host_name": hostname, "api_key":API_KEY},
             )
             print(response.raw)
