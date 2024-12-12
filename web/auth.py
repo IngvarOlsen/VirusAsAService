@@ -44,7 +44,7 @@ def login():
                 logout_user()
                 login_user(user, remember=False)
                 #login_user(user, remember=True)  # Log in the user and remember the session
-                return redirect(url_for('views.virus', token=token))  # Redirect the user to the home page
+                return redirect(url_for('views.virus'))  # Redirect the user to the home page
             else:  # If the password doesn't match
                 flash('Incorrect password, try again.', category='error')  # Display a flash message indicating incorrect password
         else:  # If no user with the email is found
