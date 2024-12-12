@@ -1,8 +1,8 @@
 {% block content %}
 
-<script src="{{url_for('static', filename='/jquery.js')}}"></script>
+<script src="{{url_for('static', filename='/jquery.js' _external=True, _scheme='https')}}"></script>
 
-<script src="{{url_for('static', filename='bootstrap.min.js')}}" crossorigin="anonymous"></script>
+<script src="{{url_for('static', filename='bootstrap.min.js' _external=True, _scheme='https')}}" crossorigin="anonymous"></script>
 {% endblock %}
 
 
