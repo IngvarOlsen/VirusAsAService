@@ -95,7 +95,11 @@ def sign_up():
             db.session.add(new_user)  # Add the new user to the database session
             db.session.commit()  # Commit the changes to the database
             logout_user()
+            token = secrets.token_hex(32)
+            new_user.token = token 
+            db.session.commit()
             login_user(new_user, remember=False)  # Log in the new user and remember the session
+            session['token'] = token
             flash('Account created!', category='success')  # Display a flash message indicating successful account creation
             return redirect(url_for('views.virus'))  # Redirect the user to the home page
 
