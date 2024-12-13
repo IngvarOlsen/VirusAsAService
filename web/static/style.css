@@ -88,3 +88,15 @@ button {
     border-radius: 4px;
     transition: background-color 0.3s;
 }
+
+.code-box {
+    background-color: #f8f9fa;
+    border: 1px solid #ced4da;
+    padding: 10px;
+    border-radius: 5px;
+    overflow-x: auto;
+    text-align: left; /* Align text in code boxes to the left */
+}
+.container, .wrapper, .virus-details, .hosts-list, .host-card, p, h1, h2, h3 {
+    text-align: left; /* Align all text elements to the left */
+}

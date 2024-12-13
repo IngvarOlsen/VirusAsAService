@@ -624,7 +624,7 @@ def archive_virus():
                 user_id=current_user.id
             )
             db.session.add(archived_entry)
-
+            
             # Update the virus to mark it as not alive
             virus.is_alive = False
             db.session.commit()

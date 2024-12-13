@@ -33,7 +33,7 @@ Virus
         <div id="ps-command-box" style="display: none; margin-top: 10px;">
             <pre class="code-box">
     <code id="ps-command">
-    Invoke-WebRequest -Uri "{{ data.url }}/api/virusdownload" -Method POST -Headers @{'Content-Type'='application/json'} -Body (@{api_key='{{ data.virus.virus_api }}'} | ConvertTo-Json) -OutFile "C:\Path\To\Save\file.zip"
+Invoke-WebRequest -Uri "{{ data.url }}/api/virusdownload" -Method POST -Headers @{'Content-Type'='application/json'} -Body (@{api_key='{{ data.virus.virus_api }}'} | ConvertTo-Json) -OutFile "file.zip"
     </code>
             </pre>
             <button class="btn btn-secondary copy-btn" data-target="ps-command">Copy PowerShell Command</button>
@@ -45,7 +45,7 @@ Virus
         <div id="curl-command-box" style="display: none; margin-top: 10px;">
             <pre class="code-box">
     <code id="curl-command">
-    curl -X POST "{{ data.url }}/api/virusdownload" -H "Content-Type: application/json" -d '{"api_key":"{{ data.virus.virus_api }}"}' -o "file.zip"
+curl -X POST "{{ data.url }}/api/virusdownload" -H "Content-Type: application/json" -d '{"api_key":"{{ data.virus.virus_api }}"}' -o "file.zip"
     </code>
             </pre>
             <button class="btn btn-secondary copy-btn" data-target="curl-command">Copy Curl Command</button>
@@ -89,6 +89,7 @@ Virus
                 }
             });
         });
+        
     
         // Copy command functionality
         const copyButtons = document.querySelectorAll(".copy-btn");
@@ -107,20 +108,7 @@ Virus
         });
     });
     </script>
-    
-    <style>
-    .code-box {
-        background-color: #f8f9fa;
-        border: 1px solid #ced4da;
-        padding: 10px;
-        border-radius: 5px;
-        overflow-x: auto;
-        text-align: left; /* Align text in code boxes to the left */
-    }
-    .container, .wrapper, .virus-details, .hosts-list, .host-card, p, h1, h2, h3 {
-        text-align: left; /* Align all text elements to the left */
-    }
-    </style>
+
 {% include 'scriptsImport.html' %}
 
 {% endblock %}

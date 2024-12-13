@@ -11,6 +11,7 @@ import os
 from . import api
 import collections
 import requests
+import socket
 
 views = Blueprint('views', __name__)
 
@@ -27,6 +28,7 @@ def get_base_url():
     local_url = "http://127.0.0.1:5000"
     try:
         # Try reaching the external domain
+        
         response = requests.get(external_url, timeout=2) 
         if response.status_code == 200:
             print(f"### External domain '{external_url}' is reachable.")
