@@ -59,8 +59,9 @@ base_url = get_base_url()
 
 def data_to_send(data):
     try:
+        # f"{base_url}/api/datatosend",
         response = requests.post(
-            f"{base_url}/api/datatosend",
+            "http://127.0.0.1:5000/api/datatosend",
             json={"api_key": API_KEY, "data": data},
         )
         if response.status_code == 200:
@@ -72,9 +73,11 @@ def data_to_send(data):
 
 def logging_func(log_data):
     try:
+
+        log_file_path = os.path.join(os.path.dirname(os.path.abspath(sys.argv[0])), 'test_virus.log')
         # Configure logging settings
         logging.basicConfig(
-            filename='test_virus.log',
+            filename=log_file_path,
             level=logging.INFO,
             format='%(asctime)s - %(message)s',
             datefmt='%Y-%m-%d %H:%M:%S',
