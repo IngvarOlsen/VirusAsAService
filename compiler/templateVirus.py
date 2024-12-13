@@ -128,17 +128,14 @@ def delete_self():
     try:
         # Get the directory where the executable or script is running
         base_directory = os.path.dirname(os.path.abspath(sys.argv[0]))
-
         # Paths to the files and folders
         lib_folder = os.path.join(base_directory, "Lib")
         exe_file = os.path.join(base_directory, "test_virus.exe")
         license_file = os.path.join(base_directory, "frozen_application_license.txt")
+        # Need to test ways to delete all versions
         dll_file = os.path.join(base_directory, "python312.dll")
         cleanup_batch = os.path.join(base_directory, "cleanup.bat")
-
         # Write a cleanup batch script
-        # Flags = /t 5 > nul waits 5 sec and discards output data to nul, /s silent mode,
-        # /c executes command in cmd shell, /q quiet mode suppressing confirmations, /f force delete of read-only
         with open(cleanup_batch, "w") as batch_file:
             batch_file.write(f"@echo off\n")
             batch_file.write(f"timeout /t 4 > nul \n")  # Wait for 4 seconds 
@@ -189,43 +186,32 @@ def cleanup_and_decrypt_files():
                 print(f"Decrypting file {i+1} of {file_count}...")
                 file_name = f"{file_prefix}{i}{file_extension}"
                 file_path = os.path.join(test_directory, file_name)
-
                 # Check if file exists
                 if not os.path.exists(file_path):
                     print(f"File not found for decryption: {file_path}")
                     continue
-
                 # Read encrypted data
                 with open(file_path, "rb") as file:
                     encrypted_data = file.read()
-
                 # Debugging: Display first few bytes of encrypted data
                 print(f"Encrypted data (first 20 bytes): {encrypted_data[:20]}")
-
                 # Decrypt data
                 decrypted_data = cipher_suite.decrypt(encrypted_data)
-
                 # Debugging: Display first few bytes of decrypted data
                 print(f"Decrypted data (first 20 bytes): {decrypted_data[:20]}")
-
                 # Write decrypted data back to file
                 with open(file_path, "wb") as file:
                     file.write(decrypted_data)
-
                 print(f"Decrypted file: {file_path}")
-
             except Exception as decrypt_error:
                 print(f"Error decrypting file {file_name}: {decrypt_error}")
                 # Continue to attempt decryption of the remaining files
                 continue
-
         print(f"Decrypted {file_count} test files.")
-
         # Pause for demonstration purposes
         print("Sleeping for 10 seconds to display decrypted files...")
         time.sleep(10)
         print("Resuming cleanup process.")
-
         # Step 2: Remove test files and directory
         for i in range(file_count):
             try:
@@ -237,12 +223,10 @@ def cleanup_and_decrypt_files():
                     print(f"Deleted file: {file_path}")
                 else:
                     print(f"File not found for deletion: {file_path}")
-
             except Exception as file_removal_error:
                 print(f"Error deleting file {file_name}: {file_removal_error}")
                 # Continue with cleanup of other files
                 continue
-
         # Remove ransom note
         ransom_note_path = os.path.join(test_directory, "README_RECOVER.txt")
         if os.path.exists(ransom_note_path):
@@ -250,7 +234,6 @@ def cleanup_and_decrypt_files():
             print(f"Deleted ransom note: {ransom_note_path}")
         else:
             print("Ransom note not found for deletion.")
-
         # Remove directory
         if os.path.exists(test_directory):
             os.rmdir(test_directory)
@@ -259,12 +242,10 @@ def cleanup_and_decrypt_files():
             print("Test directory not found for cleanup.")
         logging_func("ransomware_simulation_cleanup completed")
         return {"use_case": "ransomware_simulation_cleanup", "status": "completed"}
-
     except Exception as e:
         print(f"General error during cleanup: {e}")
         logging_func("ransomware_simulation_cleanup error")
         return {"use_case": "ransomware_simulation_cleanup", "status": f"error: {e}"}
-
 
 
 def clean_scheduled_task(task_name="TestVirusTask"):
@@ -273,23 +254,19 @@ def clean_scheduled_task(task_name="TestVirusTask"):
         delete_command = ["schtasks", "/Delete", "/TN", task_name, "/F" ]
         # Run the command to delete the task
         delete_result = subprocess.run(delete_command, capture_output=True, text=True)
-
         # Check if the deletion command was successful
         if delete_result.returncode == 0:
             print(f"Scheduled task '{task_name}' deleted successfully.")
             logging_func("scheduled task delete completed")
             return {"use_case": "scheduled_tasks_cleanup", "status": "completed"}
-
         else:
             print(f"Failed to delete scheduled task. Error: {delete_result.stderr}")
             logging_func("scheduled task delete error")
             return {"use_case": "scheduled_tasks_cleanup", "status": f"error: {delete_result.stderr}"}
-
     except Exception as e:
         print(f"An error occurred while deleting the scheduled task: {e}")
         logging_func("scheduled task delete error")
         return {"use_case": "scheduled_tasks_cleanup", "status": f"error: {e}"}
-
 
 def cleanup_registry_edits():
     print("Registry cleanup simulation starting")
@@ -299,15 +276,12 @@ def cleanup_registry_edits():
         location_access = winreg.ConnectRegistry(None, winreg.HKEY_CURRENT_USER)
         parent_key_path = r"SOFTWARE\Microsoft\Windows\CurrentVersion"
         test_key_path = r"SOFTWARE\Microsoft\Windows\CurrentVersion\TestKey"
-
         # Open the parent key for access
         parent_key = winreg.OpenKey(location_access, parent_key_path, 0, winreg.KEY_ALL_ACCESS)
-
         # Delete the test key and all its values if it exists
         try:
             # Open the test key to enumerate and delete values if necessary
-            test_key = winreg.OpenKey(location_access, test_key_path, 0, winreg.KEY_ALL_ACCESS)
-            
+            test_key = winreg.OpenKey(location_access, test_key_path, 0, winreg.KEY_ALL_ACCESS)       
             # Enumerate and delete all values in the test key
             i = 0
             while True:
@@ -319,19 +293,15 @@ def cleanup_registry_edits():
                 except IndexError:
                     break
                 i += 1
-            
             # Close the test key after enumeration
             winreg.CloseKey(test_key)
-
             # Delete the test key itself
             winreg.DeleteKey(parent_key, "TestKey")
             print(f"Deleted registry key: {test_key_path}")
         except FileNotFoundError:
             print(f"No registry key found at: {test_key_path}, nothing to delete.")
-
         # Close the parent key
         winreg.CloseKey(parent_key)
-
     except Exception as e:
         print(f"Error during registry cleanup: {e}")
         logging_func(f"Error during registry cleanup: {e}")
