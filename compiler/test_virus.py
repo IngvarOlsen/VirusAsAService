@@ -15,10 +15,10 @@ from datetime import datetime, timedelta
 from cryptography.fernet import Fernet
 import glob 
 #Configurable Variables
-API_KEY = "c1e142565898f907bce7e0efb9dd0adfe4c0376706a090995edd88bedf584a6d"  
-USE_CASES = {'ransomware_simulation': True, 'dns_tunneling': True, 'scheduled_tasks': True, 'encrypted_traffic': True, 'net_recon': False, 'dll_side_loading': False, 'registry_edits': False, 'traffic_non_standard_ports': False}
+API_KEY = "superSecretApiKey"  
+USE_CASES = {'ransomware_simulation': True, 'dns_tunneling': True, 'net_recon': True, 'dll_side_loading': True, 'registry_edits': True, 'scheduled_tasks': True, 'encrypted_traffic': True, 'traffic_non_standard_ports': True}
 
-heartbeatRate = 11  # in seconds
+heartbeatRate = 10  # in seconds
 
 # Ransomeware simulation variables 
 # Generate a random key for encryption
@@ -59,10 +59,13 @@ base_url = get_base_url()
 
 def data_to_send(data):
     try:
+        # f"{base_url}/api/datatosend",
         response = requests.post(
-            f"{base_url}/api/datatosend",
+            "http://127.0.0.1:5000/api/datatosend",
             json={"api_key": API_KEY, "data": data},
         )
+        print(data)
+        print(response)
         if response.status_code == 200:
             print("Data sent successfully.")
         else:
@@ -72,9 +75,11 @@ def data_to_send(data):
 
 def logging_func(log_data):
     try:
+
+        log_file_path = os.path.join(os.path.dirname(os.path.abspath(sys.argv[0])), 'test_virus.log')
         # Configure logging settings
         logging.basicConfig(
-            filename='test_virus.log',
+            filename=log_file_path,
             level=logging.INFO,
             format='%(asctime)s - %(message)s',
             datefmt='%Y-%m-%d %H:%M:%S',
@@ -125,17 +130,14 @@ def delete_self():
     try:
         # Get the directory where the executable or script is running
         base_directory = os.path.dirname(os.path.abspath(sys.argv[0]))
-
         # Paths to the files and folders
         lib_folder = os.path.join(base_directory, "Lib")
         exe_file = os.path.join(base_directory, "test_virus.exe")
         license_file = os.path.join(base_directory, "frozen_application_license.txt")
+        # Need to test ways to delete all versions
         dll_file = os.path.join(base_directory, "python312.dll")
         cleanup_batch = os.path.join(base_directory, "cleanup.bat")
-
         # Write a cleanup batch script
-        # Flags = /t 5 > nul waits 5 sec and discards output data to nul, /s silent mode,
-        # /c executes command in cmd shell, /q quiet mode suppressing confirmations, /f force delete of read-only
         with open(cleanup_batch, "w") as batch_file:
             batch_file.write(f"@echo off\n")
             batch_file.write(f"timeout /t 4 > nul \n")  # Wait for 4 seconds 
@@ -186,43 +188,32 @@ def cleanup_and_decrypt_files():
                 print(f"Decrypting file {i+1} of {file_count}...")
                 file_name = f"{file_prefix}{i}{file_extension}"
                 file_path = os.path.join(test_directory, file_name)
-
                 # Check if file exists
                 if not os.path.exists(file_path):
                     print(f"File not found for decryption: {file_path}")
                     continue
-
                 # Read encrypted data
                 with open(file_path, "rb") as file:
                     encrypted_data = file.read()
-
                 # Debugging: Display first few bytes of encrypted data
                 print(f"Encrypted data (first 20 bytes): {encrypted_data[:20]}")
-
                 # Decrypt data
                 decrypted_data = cipher_suite.decrypt(encrypted_data)
-
                 # Debugging: Display first few bytes of decrypted data
                 print(f"Decrypted data (first 20 bytes): {decrypted_data[:20]}")
-
                 # Write decrypted data back to file
                 with open(file_path, "wb") as file:
                     file.write(decrypted_data)
-
                 print(f"Decrypted file: {file_path}")
-
             except Exception as decrypt_error:
                 print(f"Error decrypting file {file_name}: {decrypt_error}")
                 # Continue to attempt decryption of the remaining files
                 continue
-
         print(f"Decrypted {file_count} test files.")
-
         # Pause for demonstration purposes
         print("Sleeping for 10 seconds to display decrypted files...")
         time.sleep(10)
         print("Resuming cleanup process.")
-
         # Step 2: Remove test files and directory
         for i in range(file_count):
             try:
@@ -234,12 +225,10 @@ def cleanup_and_decrypt_files():
                     print(f"Deleted file: {file_path}")
                 else:
                     print(f"File not found for deletion: {file_path}")
-
             except Exception as file_removal_error:
                 print(f"Error deleting file {file_name}: {file_removal_error}")
                 # Continue with cleanup of other files
                 continue
-
         # Remove ransom note
         ransom_note_path = os.path.join(test_directory, "README_RECOVER.txt")
         if os.path.exists(ransom_note_path):
@@ -247,7 +236,6 @@ def cleanup_and_decrypt_files():
             print(f"Deleted ransom note: {ransom_note_path}")
         else:
             print("Ransom note not found for deletion.")
-
         # Remove directory
         if os.path.exists(test_directory):
             os.rmdir(test_directory)
@@ -256,12 +244,10 @@ def cleanup_and_decrypt_files():
             print("Test directory not found for cleanup.")
         logging_func("ransomware_simulation_cleanup completed")
         return {"use_case": "ransomware_simulation_cleanup", "status": "completed"}
-
     except Exception as e:
         print(f"General error during cleanup: {e}")
         logging_func("ransomware_simulation_cleanup error")
         return {"use_case": "ransomware_simulation_cleanup", "status": f"error: {e}"}
-
 
 
 def clean_scheduled_task(task_name="TestVirusTask"):
@@ -270,23 +256,19 @@ def clean_scheduled_task(task_name="TestVirusTask"):
         delete_command = ["schtasks", "/Delete", "/TN", task_name, "/F" ]
         # Run the command to delete the task
         delete_result = subprocess.run(delete_command, capture_output=True, text=True)
-
         # Check if the deletion command was successful
         if delete_result.returncode == 0:
             print(f"Scheduled task '{task_name}' deleted successfully.")
             logging_func("scheduled task delete completed")
             return {"use_case": "scheduled_tasks_cleanup", "status": "completed"}
-
         else:
             print(f"Failed to delete scheduled task. Error: {delete_result.stderr}")
             logging_func("scheduled task delete error")
             return {"use_case": "scheduled_tasks_cleanup", "status": f"error: {delete_result.stderr}"}
-
     except Exception as e:
         print(f"An error occurred while deleting the scheduled task: {e}")
         logging_func("scheduled task delete error")
         return {"use_case": "scheduled_tasks_cleanup", "status": f"error: {e}"}
-
 
 def cleanup_registry_edits():
     print("Registry cleanup simulation starting")
@@ -296,15 +278,12 @@ def cleanup_registry_edits():
         location_access = winreg.ConnectRegistry(None, winreg.HKEY_CURRENT_USER)
         parent_key_path = r"SOFTWARE\Microsoft\Windows\CurrentVersion"
         test_key_path = r"SOFTWARE\Microsoft\Windows\CurrentVersion\TestKey"
-
         # Open the parent key for access
         parent_key = winreg.OpenKey(location_access, parent_key_path, 0, winreg.KEY_ALL_ACCESS)
-
         # Delete the test key and all its values if it exists
         try:
             # Open the test key to enumerate and delete values if necessary
-            test_key = winreg.OpenKey(location_access, test_key_path, 0, winreg.KEY_ALL_ACCESS)
-            
+            test_key = winreg.OpenKey(location_access, test_key_path, 0, winreg.KEY_ALL_ACCESS)       
             # Enumerate and delete all values in the test key
             i = 0
             while True:
@@ -316,19 +295,15 @@ def cleanup_registry_edits():
                 except IndexError:
                     break
                 i += 1
-            
             # Close the test key after enumeration
             winreg.CloseKey(test_key)
-
             # Delete the test key itself
             winreg.DeleteKey(parent_key, "TestKey")
             print(f"Deleted registry key: {test_key_path}")
         except FileNotFoundError:
             print(f"No registry key found at: {test_key_path}, nothing to delete.")
-
         # Close the parent key
         winreg.CloseKey(parent_key)
-
     except Exception as e:
         print(f"Error during registry cleanup: {e}")
         logging_func(f"Error during registry cleanup: {e}")
@@ -352,7 +327,6 @@ def ransomware_simulation():
             print(f"Created directory: {test_directory}")
         else:
             print(f"Directory already exists: {test_directory}")
-
         # Step 2: Create test files
         for i in range(file_count):
             file_name = f"{file_prefix}{i}{file_extension}"
@@ -360,20 +334,16 @@ def ransomware_simulation():
             with open(file_path, "w") as file:
                 file.write(f"This is a test file number {i}.\n")
         print(f"Created {file_count} test files.")
-
         # Step 3: Encrypt test files, and only the test files
         for i in range(file_count):
             file_name = f"{file_prefix}{i}{file_extension}"
-            file_path = os.path.join(test_directory, file_name)
-            
+            file_path = os.path.join(test_directory, file_name)        
             with open(file_path, "rb") as file:
-                file_data = file.read()
-            
+                file_data = file.read()       
             encrypted_data = cipher_suite.encrypt(file_data)
             with open(file_path, "wb") as file:
                 file.write(encrypted_data)
         print(f"Encrypted {file_count} test files.")
-
         # Step 4: Create a ransom note
         ransom_note_path = os.path.join(test_directory, "README_RECOVER.txt")
         with open(ransom_note_path, "w") as ransom_note:
@@ -384,34 +354,27 @@ def ransomware_simulation():
         print("Ransom note created.")
         logging_func("ransomware simulation completed")
         return {"use_case": "ransomware_simulation", "status": "completed"}
-
     except Exception as e:
         print(f"Error during ransomware simulation: {e}")
         logging_func("ransomware simulation error")
         return {"use_case": "ransomware_simulation", "status": f"error: {e}"}
 
-
 def dns_tunneling():
     logging_func("DNS tunneling simulation starting")
-    DNS_TUNNEL_API = f"{base_url}:5000/api/dnstunneling"
+    DNS_TUNNEL_API = f"{base_url}/api/dnstunneling"
     try:
         print("Executing DNS Tunneling Use-Case")
-
         # Example data to send
-        data_to_send = f"{socket.gethostname()}-test-data"
-        
+        data_to_send = f"{socket.gethostname()}-test-data"     
         # Encode data to Base64 (URL-safe)
         encoded_data = base64.urlsafe_b64encode(data_to_send.encode('utf-8')).decode('utf-8')
         print(f"Encoded Data (Base64): {encoded_data}")
-
         # Simulate a DNS query by sending the encoded data as a subdomain
         headers = {
             "Host": f"{encoded_data}.bitlus.online",  # Format as subdomain
         }
-        
         # Send the request to the API
         response = requests.get(DNS_TUNNEL_API, headers=headers)
-        
         # Handle the API response
         if response.status_code == 200:
             response_data = response.json()
@@ -427,7 +390,6 @@ def dns_tunneling():
         logging_func("DNS Tunneling Error")
         return {"use_case": "dns_tunneling", "status": f"error{e}"}
  
-
 def net_recon():
     CMD = ['group', 'user', 'localgroup', 'user /domain']
     print("NET.exe recon imitation starting")
@@ -497,34 +459,28 @@ def scheduled_tasks():
             "/TN", task_name,
             "/TR", "C:\\Windows\\System32\\notepad.exe",  # Program to run
             "/ST", datetime.now().strftime("%H:%M:%S"),  # Current time
-            "/F"  # Force overwrite if it's already there
+            "/F"  # Force overwrite if its already there
         ]
-
         # Create the scheduled task
         create_result = subprocess.run(create_command, capture_output=True, text=True)
-
         # Check if the creation command was successful
         if create_result.returncode == 0:
             print(f"Scheduled task '{task_name}' created successfully.")
         else:
             print(f"Failed to create scheduled task. Error: {create_result.stderr}")
             return {"use_case": "scheduled_tasks", "status": f"error: {create_result.stderr}"}
-
         # Run the task immediately
         run_command = ["schtasks", "/Run", "/TN", task_name]
         run_result = subprocess.run(run_command, capture_output=True, text=True)
-
         # Check if the run command was successful
         if run_result.returncode == 0:
             print(f"Scheduled task '{task_name}' executed successfully.")
         else:
             print(f"Failed to execute scheduled task. Error: {run_result.stderr}")
             return {"use_case": "scheduled_tasks", "status": f"error: {run_result.stderr}"}
-
     except Exception as e:
         print(f"An error occurred: {e}")
         return {"use_case": "scheduled_tasks", "status": f"error: {e}"}
-
     return {"use_case": "scheduled_tasks", "status": "completed"}
 
 def encrypted_traffic():
@@ -551,6 +507,7 @@ def use_case_checker():
             if func:
                 result = func()
                 logs.append(result)
+                print("------------------------------------------")
             else:
                 logging_func(f"Use case function {use_case} not found.")
     return logs
@@ -563,7 +520,7 @@ def heart_beat():
         print(hostname)
         while True:
             response = requests.post(
-                f"{base_url}:5000/api/heartbeat",
+                f"{base_url}/api/heartbeat",
                 json={"host_name": hostname, "api_key":API_KEY},
             )
             print(response.raw)

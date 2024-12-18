@@ -57,7 +57,7 @@ def validate_token():
 
 
 def sanitise(input_value, input_type="string"):
-    blacklist = [r"_", r"--", r";", r"union", r"select", r"insert", r"update", r"delete", r"drop", r"alter", r"create", r"union", r"join", r"truncate", r"replace", r"into", r"values", r"where", r"from", r"having", r"group by", r"order by", r"limit", r"offset"]
+    blacklist = [r"--", r";", r"union", r"select", r"insert", r"update", r"delete", r"drop", r"alter", r"create", r"union", r"join", r"truncate", r"replace", r"into", r"values", r"where", r"from", r"having", r"group by", r"order by", r"limit", r"offset"]
     # Validate input type
     if input_type == "string" and not isinstance(input_value, str):
         flash(f"Invalid input type: {input_value} is not a string.",category='error')
@@ -225,46 +225,46 @@ def heartbeat():
 def data_to_send():
     try:
         # Debugging the raw JSON data
-        print("JSON data:", request.json)
+        print("Raw JSON data received:", request.json)
 
         virus_api = sanitise(request.json.get('api_key'))
-        data = sanitise(request.json.get('data'))
-        
+        data = request.json.get('data')
+
         if not virus_api or not data:
+            print("Missing api_key or data.")
             return jsonify({'message': 'api_key and data are required'}), 400
-        
+
         hostname = data.get('host_name')
         use_case_logs = data.get('data')
 
         if not hostname or not use_case_logs:
+            print("Missing host_name or logs.")
             return jsonify({'message': 'host_name and data logs are required'}), 400
-        
+
         print(f"virus_api = {virus_api}, hostname = {hostname}, logs = {use_case_logs}")
 
         # Find the virus using the API key
         virus = Virus.query.filter_by(virus_api=virus_api).first()
         if not virus:
+            print("Invalid API key.")
             return jsonify({'message': 'Invalid API key'}), 404
 
         # Check if the host already exists
         host = Hosts.query.filter_by(host_name=hostname, virus_id=virus.id).first()
 
         if not host:
-            # Create a new host if it doesn't exist
             host = Hosts(
                 host_name=hostname,
                 last_heartbeat=datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S'),
                 user_id=virus.user_id,
                 virus_id=virus.id,
-                log_info=str(use_case_logs)  # Save logs as a string
+                log_info=str(use_case_logs)
             )
             db.session.add(host)
         else:
-            # Update existing host
             host.last_heartbeat = datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')
-            host.log_info = str(use_case_logs)  # Update logs
+            host.log_info = sanitise(str(use_case_logs))
 
-        # Commit changes to the database
         db.session.commit()
 
         return jsonify({'message': f'Logs saved for host {hostname}', 'status': 'success'}), 200

