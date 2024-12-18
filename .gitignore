@@ -30,6 +30,7 @@ test.zip
 *.dat
 *.rst
 test.spec
+test/*
 test/frozen_application_license.txt
 test/python312.dll
 test/test.exe

