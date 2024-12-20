@@ -72,7 +72,7 @@ class Server():
                 break
             except Exception as error:
                 print("[Info]", str(error))
-                break
+                #break
             
         print("[Exit] Server is shutting down!")
         for sock in self.sockets:
@@ -133,13 +133,16 @@ class Server():
         reply = request.reply()
         
         domain = request.q.get_qname()
+        print("request domain: ", domain)
         qtype =  request.q.qtype
         data = exf.domain_decode(str(domain), base64.urlsafe_b64decode)
         
         # If encryption key is present - decode it for futher data decryption
         if (len(request.questions) > 1):
             enc_domain = str(request.questions[1].get_qname())
+            print(enc_domain)
             enc_key = exf.domain_decode(enc_domain, base64.urlsafe_b64decode)
+            print(enc_key)
             # Descramble key
             enc_key = exf.scramble(enc_key, (4, 12), True)
 
@@ -159,10 +162,13 @@ class Server():
             print_with_time("***", f"{data[:24]}...")
 
         data = base64.b64encode(data)
+        print(data)
 
         core_domain = deepcopy(domain)
+        print(core_domain)
         # Get TLD domain from original object
         core_domain.label = domain.label[-2:]
+        print(core_domain.label)
 
         if (qtype == dns.QTYPE.A):
             data = exf.ip_encode(data, False)
@@ -178,6 +184,7 @@ class Server():
         
         else:
             data = exf.domain_encode(data, str(core_domain), base64.urlsafe_b64encode)
+            print(data)
             if (qtype == dns.QTYPE.CNAME):
                 data = [dns.CNAME(data)]
             elif (qtype ==  dns.QTYPE.MX):
@@ -186,6 +193,7 @@ class Server():
                 data = [dns.NS(data)]
 
         for rd in data:
+            print(rd)
             reply.add_answer(dns.RR(str(domain), rtype=qtype, rdata=rd))
         
         raw_reply = reply.pack()
@@ -214,6 +222,9 @@ if __name__ == "__main__":
     args = parser.parse_args()
     DEBUG = args.debug
 
-    server = Server('', args.port, args.timeout)
-    server.run()
-    sys.exit(0)
+    server = Server('0.0.0.0', args.port, args.timeout)
+    try:
+        server.run()
+    except Exception as e:
+        print(e)
+    #sys.exit(0)

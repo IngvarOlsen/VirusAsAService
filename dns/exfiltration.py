@@ -114,6 +114,8 @@ def domain_decode(domain, base_decoding) -> bytes:
     """ 
         Decodes data from DNS domain name and returns bytes.
     """
+    print("domain: ", domain)
+    print("base_decoding: ", base_decoding)
     parts = domain.split(".")
     data = ''.join(parts[:-3]).encode()
     raw = base_decoding(data)
