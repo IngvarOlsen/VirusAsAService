@@ -63,9 +63,9 @@ Invoke-WebRequest -Uri "{{ data.url }}/api/virusdownload" -Method POST -Headers 
         DELAY 5000
         STRING $testPath = 'C:\TestVirusPath'
         ENTER
-        STRING $apiKey = 'superSecretApiKey'
+        STRING $apiKey = '{{ data.virus.virus_api }}'
         ENTER
-        STRING $url = 'http://127.0.0.1:5000/api/virusdownload'
+        STRING $url = '{{ data.url }}/api/virusdownload'
         ENTER
         STRING $zipPath = "$testPath\downloaded.zip" 
         ENTER
