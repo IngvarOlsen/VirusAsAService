@@ -5,6 +5,6 @@ flask-socketio
 eventlet
 cryptography
 pycryptodome
-pyinstaller
 flask-cors
-flask-wtf
+dnslib
+bitstring
