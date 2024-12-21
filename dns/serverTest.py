@@ -39,7 +39,7 @@ def main():
                     base64_label = labels[0]
                     try:
                         print("base64_label0: ", base64_label)
-                        decoded_data = base64.urlsafe_b64decode(base64_label.encode('ascii')).decode('utf-8', errors='ignore')
+                        decoded_data = base64.urlsafe_b64decode(text_bytes).decode('ascii', errors='ignore')
                         print(f"Decoded data: {decoded_data}")
                     except Exception as decode_err:
                         print(f"Base64 decode failed: {decode_err}")
