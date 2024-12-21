@@ -1,55 +1,51 @@
 import socket
 import sys
 from datetime import datetime
-from dnslib import DNSRecord, QTYPE, RR, A  
+from dnslib import DNSRecord, QTYPE, RR, A
 import base64
 
 def main():
-    # Bind to all interfaces on UDP port 53
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     try:
         sock.bind(("0.0.0.0", 53))
     except PermissionError:
-        print("You need to run this as root or with sudo.")
+        print("Run as root or use sudo.")
         sys.exit(1)
     except OSError as e:
-        print(f"Error binding to port 53: {e}")
+        print(f"Failed to bind: {e}")
         sys.exit(1)
 
     print("[Info] Listening on port 53 (UDP). Press Ctrl+C to stop.")
+
     while True:
         try:
-            data, addr = sock.recvfrom(512)  # 512 is enough for typical DNS packets
+            data, addr = sock.recvfrom(512)
             now = datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")[:-3]
             print(f"\n[{now}] Received {len(data)} bytes from {addr}")
-            print("Raw packet (hex):", data.hex())
+            
             try:
                 dns_msg = DNSRecord.parse(data)
-                print("DNS Query/Response:")
+                print("DNS Query:")
                 print(dns_msg)
 
+                # Build a reply
                 reply = dns_msg.reply()
 
-                qname_str = str(dns_msg.q.qname)
-                print(f"QNAME: {qname_str}")
+                # Extract first label from QNAME
+                qname_str = str(dns_msg.q.qname).rstrip('.')
+                # e.g. "dGVzdA==.dns.bitlus.online"
+                labels = qname_str.split('.')
+                if len(labels) >= 1:
+                    base64_label = labels[0]
+                    try:
+                        print("base64_label0: ", base64_label)
+                        decoded_data = base64.urlsafe_b64decode(base64_label.encode('ascii')).decode('utf-8', errors='ignore')
+                        print(f"Decoded data: {decoded_data}")
+                    except Exception as decode_err:
+                        print(f"Base64 decode failed: {decode_err}")
 
-                # Parse out the subdomain base64
-                dns_msg = DNSRecord.parse(data)
-                qname_str = str(dns_msg.q.qname)  # e.g. "dGVzdA.dns.bitlus.online."
-                labels = qname_str.strip('.').split('.')  # ["dGVzdA", "dns", "bitlus", "online"]
-
-                # The first label might be the base64 data
-                subdomain_b64 = labels[0]
-                try:
-                    #test_decode = base64.urlsafe_b64encode(text.encode("ascii")).
-                    decoded_data = base64.urlsafe_b64decode(subdomain_b64).decode('ascii', errors='ignore')
-                    print("Decoded data from subdomain:", decoded_data)
-                except Exception as decode_err:
-                    print("Failed to decode base64 subdomain:", decode_err)
-
-                # Check if query is type A
+                # If it's an A record query, add a dummy IP
                 if dns_msg.q.qtype == QTYPE.A:
-                    # Add an A-record pointing 127.0.0.1
                     reply.add_answer(RR(
                         rname=dns_msg.q.qname,
                         rtype=QTYPE.A,
@@ -57,20 +53,16 @@ def main():
                         ttl=60,
                         rdata=A("127.0.0.1")
                     ))
-                else:
-                    # For any other
-                    pass
-                # Pack the reply
+                
                 raw_reply = reply.pack()
-                # Send the DNS reply to the client
                 sock.sendto(raw_reply, addr)
-                print(f"Sent a DNS response ({len(raw_reply)} bytes) back to {addr}")
+                print(f"Sent DNS response ({len(raw_reply)} bytes) to {addr}")
 
             except Exception as parse_err:
-                print(f"Failed to parse or build DNS packet: {parse_err}")
+                print(f"Failed to parse DNS: {parse_err}")
 
         except KeyboardInterrupt:
-            print("\n[Exit] Stopping listener.")
+            print("\n[Exit] Stopping DNS server.")
             break
         except Exception as e:
             print(f"Error: {e}")
