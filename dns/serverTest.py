@@ -41,7 +41,8 @@ def main():
                 # The first label might be the base64 data
                 subdomain_b64 = labels[0]
                 try:
-                    decoded_data = base64.urlsafe_b64decode(subdomain_b64).decode('utf-8', errors='ignore')
+                    #test_decode = base64.urlsafe_b64encode(text.encode("ascii")).
+                    decoded_data = base64.urlsafe_b64decode(subdomain_b64).decode('ascii', errors='ignore')
                     print("Decoded data from subdomain:", decoded_data)
                 except Exception as decode_err:
                     print("Failed to decode base64 subdomain:", decode_err)
