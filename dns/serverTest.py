@@ -1,7 +1,8 @@
 import socket
 import sys
 from datetime import datetime
-from dnslib import DNSRecord
+from dnslib import DNSRecord, QTYPE, RR, A  
+import base64
 
 def main():
     # Bind to all interfaces on UDP port 53
@@ -16,29 +17,48 @@ def main():
         sys.exit(1)
 
     print("[Info] Listening on port 53 (UDP). Press Ctrl+C to stop.")
-
     while True:
         try:
             data, addr = sock.recvfrom(512)  # 512 is enough for typical DNS packets
             now = datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")[:-3]
             print(f"\n[{now}] Received {len(data)} bytes from {addr}")
-
-            # Print raw data in hex
             print("Raw packet (hex):", data.hex())
-
-            # Attempt to parse with dnslib for additional info
             try:
-                try:
-                    sock.sendto(b'OK', addr)
-                    print("Sent back message")
-                except Exception as returnError:
-                    print("returnError: ", returnError)
                 dns_msg = DNSRecord.parse(data)
                 print("DNS Query/Response:")
                 print(dns_msg)
 
-            except Exception as e:
-                print(f"Failed to parse DNS packet: {e}")
+                reply = dns_msg.reply()
+
+                qname_str = str(dns_msg.q.qname)
+                print(f"QNAME: {qname_str}")
+
+                # Parse out the subdomain base64
+                subdomain = qname_str.split('.')[0]
+                decode_data = base64.urlsafe_b64decode(subdomain).decode('utf-8', errors='ignore')
+                print("Decoded data from subdomain:", decode_data)
+
+                # Check if query is type A
+                if dns_msg.q.qtype == QTYPE.A:
+                    # Add an A-record pointing 127.0.0.1
+                    reply.add_answer(RR(
+                        rname=dns_msg.q.qname,
+                        rtype=QTYPE.A,
+                        rclass=1,
+                        ttl=60,
+                        rdata=A("127.0.0.1")
+                    ))
+                else:
+                    # For any other
+                    pass
+                # Pack the reply
+                raw_reply = reply.pack()
+                # Send the DNS reply to the client
+                sock.sendto(raw_reply, addr)
+                print(f"Sent a DNS response ({len(raw_reply)} bytes) back to {addr}")
+
+            except Exception as parse_err:
+                print(f"Failed to parse or build DNS packet: {parse_err}")
 
         except KeyboardInterrupt:
             print("\n[Exit] Stopping listener.")
