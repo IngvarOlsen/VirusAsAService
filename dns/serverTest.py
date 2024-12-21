@@ -29,7 +29,7 @@ def main():
             # Attempt to parse with dnslib for additional info
             try:
                 try:
-                    sock.sendto("OK", addr)
+                    sock.sendto(b'OK', addr)
                     print("Sent back message")
                 except Exception as returnError:
                     print("returnError: ", returnError)
