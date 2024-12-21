@@ -28,9 +28,15 @@ def main():
 
             # Attempt to parse with dnslib for additional info
             try:
+                try:
+                    sock.sendto("OK", addr)
+                    print("Sent back message")
+                except Exception as returnError:
+                    print("returnError: ", returnError)
                 dns_msg = DNSRecord.parse(data)
                 print("DNS Query/Response:")
                 print(dns_msg)
+
             except Exception as e:
                 print(f"Failed to parse DNS packet: {e}")
 
