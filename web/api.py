@@ -81,6 +81,10 @@ def sanitise(input_value, input_type="string"):
 #############################
 ###### Compiling APIs #######
 #############################
+@api.route('/api/testdnstunnel', methods=['GET'])
+def get_pending_job():
+    print("Test DNS tunnel activate")
+
 @api.route('/api/getpendingjob', methods=['GET'])
 def get_pending_job():
     try:
