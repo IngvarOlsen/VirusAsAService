@@ -34,9 +34,17 @@ def main():
                 print(f"QNAME: {qname_str}")
 
                 # Parse out the subdomain base64
-                subdomain = qname_str.split('.')[0]
-                decode_data = base64.urlsafe_b64decode(subdomain).decode('utf-8', errors='ignore')
-                print("Decoded data from subdomain:", decode_data)
+                dns_msg = DNSRecord.parse(data)
+                qname_str = str(dns_msg.q.qname)  # e.g. "dGVzdA.dns.bitlus.online."
+                labels = qname_str.strip('.').split('.')  # ["dGVzdA", "dns", "bitlus", "online"]
+
+                # The first label might be the base64 data
+                subdomain_b64 = labels[0]
+                try:
+                    decoded_data = base64.urlsafe_b64decode(subdomain_b64).decode('utf-8', errors='ignore')
+                    print("Decoded data from subdomain:", decoded_data)
+                except Exception as decode_err:
+                    print("Failed to decode base64 subdomain:", decode_err)
 
                 # Check if query is type A
                 if dns_msg.q.qtype == QTYPE.A:
