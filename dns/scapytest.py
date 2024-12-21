@@ -10,15 +10,9 @@ def dns_request(sub_domain):
     else:
         print("No response received.")
 
-text = "test"
+text = "testSuperSecret"
 text_bytes = base64.urlsafe_b64encode(text.encode("ascii"))
-#text_decodeTest = base64.urlsafe_b64decode(text_bytes).decode('ascii', errors='ignore')
-print("text_bytes", text_bytes)
+text_str = text_bytes.decode("ascii")       # e.g. "dGVzdA=="
+print("text_str: ", text_str)
+dns_request(text_str)
 
-dns_request(text_bytes)
-# chunks = [text_bytes[i:i+6] for i in range(0, len(text_bytes), 6)]
-
-# for chunk in chunks:
-#     print(chunk)
-#     #dns_request(chunk.decode('utf-8').rstrip('='))
-#     dns_request(text_bytes)
