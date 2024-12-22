@@ -3,21 +3,19 @@ import sys
 from dnslib import DNSRecord, QTYPE, RR, A
 import base64
 from datetime import datetime
+import requests
 
 def run_dns_server():
-
-    print("[DNS] Starting DNS server on port 53. (Needs root privileges)")
-
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     try:
         sock.bind(("0.0.0.0", 53))
-    except PermissionError:
-        print("[DNS] PermissionError: must run as root or with capabilities to bind port 53.")
+    except Exception as e:
+        print(f"[DNS] Error: {e}")
         sys.exit(1)
     except OSError as e:
         print(f"[DNS] Failed to bind port 53: {e}")
         sys.exit(1)
-    print("[DNS] DNS server running. Press Ctrl+C to stop.")
+    print("[DNS] DNS server running")
     while True:
         try:
             data, addr = sock.recvfrom(512)  # typical DNS packet size
@@ -36,6 +34,8 @@ def run_dns_server():
                     try:
                         decoded = base64.urlsafe_b64decode(base64_label).decode('utf-8', errors='ignore')
                         print(f"[DNS] Decoded subdomain = {decoded}")
+                        r = requests.post("http://127.0.0.1/api/dnstunneltest", json={"payload": decoded})
+                        print("[DNS] Posted data to Flask, response:", r.status_code)
                     except Exception as decode_err:
                         print(f"[DNS] Base64 decode error: {decode_err}")
                 raw_reply = reply.pack()
