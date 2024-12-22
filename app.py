@@ -10,12 +10,18 @@ import os
 
 # Starts the dns sever in the background and closes with flask with daemon=True
 def start_dns_in_background():
-    t = Thread(target=run_dns_server, daemon=True)
-    t.start()
+    try:
+        print("Trying to start DNS server...")
+        t = Thread(target=run_dns_server, daemon=True)
+        t.start()
+    except Exception as e:
+        print(e)
+
 
 app = create_app()
 
 if __name__ == '__main__':
+
     start_dns_in_background()
 
     app.run(host="0.0.0.0", port=5000, debug=True)
