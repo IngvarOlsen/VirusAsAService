@@ -35,10 +35,11 @@ def run_dns_server():
                         decoded = base64.urlsafe_b64decode(base64_label).decode('utf-8', errors='ignore')
                         print(f"[DNS] Decoded subdomain = {decoded}")
                         raw_reply = reply.pack()
+                        # Only send back an answer if its propper base64
                         sock.sendto(raw_reply, addr)
-        
-                        r = requests.post("https://127.0.0.1:5000/api/dnstunneltest", json={"payload": decoded})
-                        print("[DNS] Posted data to Flask, response:", r.status_code)
+                          
+                        # r = requests.post("https://127.0.0.1:5000/api/dnstunneltest", json={"payload": decoded})
+                        # print("[DNS] Posted data to Flask, response:", r.status_code)
                     except Exception as decode_err:
                         print(f"[DNS] Base64 decode error: {decode_err}")
                 # raw_reply = reply.pack()
