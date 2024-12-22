@@ -37,7 +37,7 @@ def run_dns_server():
                         raw_reply = reply.pack()
                         sock.sendto(raw_reply, addr)
         
-                        r = requests.post("127.0.0.1:5000/api/dnstunneltest", json={"payload": decoded})
+                        r = requests.post("https://127.0.0.1:5000/api/dnstunneltest", json={"payload": decoded})
                         print("[DNS] Posted data to Flask, response:", r.status_code)
                     except Exception as decode_err:
                         print(f"[DNS] Base64 decode error: {decode_err}")
