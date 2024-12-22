@@ -20,6 +20,7 @@ def start_dns_in_background():
 start_dns_in_background()
 app = create_app()
 
+# Does not get run by "flask run"
 if __name__ == '__main__':
 
     app.run(host="0.0.0.0", port=5000, debug=True)
