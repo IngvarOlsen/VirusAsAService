@@ -17,12 +17,10 @@ def start_dns_in_background():
     except Exception as e:
         print(e)
 
-
+start_dns_in_background()
 app = create_app()
 
 if __name__ == '__main__':
-
-    start_dns_in_background()
 
     app.run(host="0.0.0.0", port=5000, debug=True)
     #app.run(host="0.0.0.0", port=5000, debug=True, ssl_context=('cert.pem', 'certpriv_key.pem')) # For SSL
