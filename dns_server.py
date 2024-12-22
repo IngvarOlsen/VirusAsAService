@@ -34,7 +34,7 @@ def run_dns_server():
                     try:
                         decoded = base64.urlsafe_b64decode(base64_label).decode('utf-8', errors='ignore')
                         print(f"[DNS] Decoded subdomain = {decoded}")
-                        r = requests.post("http://127.0.0.1:80/api/dnstunneltest", json={"payload": decoded})
+                        r = requests.post("http://127.0.0.1:443/api/dnstunneltest", json={"payload": decoded})
                         print("[DNS] Posted data to Flask, response:", r.status_code)
                     except Exception as decode_err:
                         print(f"[DNS] Base64 decode error: {decode_err}")
