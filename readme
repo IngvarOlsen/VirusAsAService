@@ -26,6 +26,7 @@ python3 -m venv compiler-venv
 pip install --upgrade cx_Freeze
 pip install requests
 pip install cryptography
+pip install scapy
 python3 compiler.py
 
 

@@ -13,6 +13,6 @@ def dns_request(sub_domain):
 text = "testSuperSecret"
 text_bytes = base64.urlsafe_b64encode(text.encode("ascii"))
 text_str = text_bytes.decode("ascii")   
-print("text_str: ", text_str)
+# print("text_str: ", text_str)
 dns_request(text_str)
 
