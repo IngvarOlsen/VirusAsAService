@@ -88,3 +88,5 @@ web/zippedFiles/test/lib/ctypes/macholib/fetch_macholib.bat
 web/zippedFiles/test/lib/ctypes/macholib/README.ctypes
 web/zippedFiles/test/lib/scapy/py.typed
 web/zippedFiles/test/lib/scapy/VERSION
+compiler/settingsTest.py
+compiler/test_virus.py

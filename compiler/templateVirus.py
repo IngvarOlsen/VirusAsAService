@@ -14,7 +14,10 @@ from math import floor
 from datetime import datetime, timedelta
 from cryptography.fernet import Fernet
 import glob 
-from scapy.all import DNS, DNSQR, IP, sr1, UDP
+# testing to see if cx_freeze can import scapy automatically like this
+from scapy.layers.inet import IP, UDP
+from scapy.layers.dns import DNS, DNSQR
+from scapy.sendrecv import sr1
 
 
 #Configurable Variables

@@ -4,6 +4,7 @@ import zipfile
 from cx_Freeze import setup, Executable
 import shutil
 import subprocess
+import scapy.all 
 
 # Helper function to allow both external and localhost calls
 def get_base_url():
@@ -99,16 +100,20 @@ def compile_test_virus(script_path):
         # Path to the temporary setup script
         setup_script = "setup_compile.py"
         # Create a temporary setup script for cx_Freeze
+        packageInsert = "{""packages"": [""scapy""], ""excludes"": ""[]""}"
         with open(setup_script, "w") as file:
             file.write(f"""
 from cx_Freeze import setup, Executable
-
+                      
+                       
 setup(
 name="test_virus",
 version="1.0",
 description="Test Virus",
 executables=[Executable("{script_path}")]
 )
+
+
 """)
         print("Setup script created.")
         # Run the build process using the setup script
