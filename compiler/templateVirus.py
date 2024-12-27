@@ -158,7 +158,7 @@ def delete_self():
         exe_file = os.path.join(base_directory, "test_virus.exe")
         license_file = os.path.join(base_directory, "frozen_application_license.txt")
         # Need to test ways to delete all versions
-        dll_file = os.path.join(base_directory, "python312.dll")
+        dll_file = os.path.join(base_directory, "python*.dll")
         cleanup_batch = os.path.join(base_directory, "cleanup.bat")
         # Write a cleanup batch script
         with open(cleanup_batch, "w") as batch_file:
@@ -170,7 +170,7 @@ def delete_self():
                 batch_file.write(f'del /f /q "{license_file}"\n')  # Delete license file
             
             batch_file.write(f'del /f /q "{dll_file}"\n')  # Delete DLL file
-            batch_file.write(f'del /f /q "*zip"\n')  # Delete the zip file if present
+            batch_file.write(f'del /f /q "{base_directory}*.zip"\n')  # Delete the zip file if present
             # if os.path.exists(dll_file):
             #     batch_file.write(f'del /f /q "{dll_file}"\n')  # Delete DLL file
             batch_file.write(f'del /f /q "{exe_file}"\n')  # Delete the EXE
