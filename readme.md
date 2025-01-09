@@ -48,9 +48,9 @@ Run the app, with the optional --debug for more info
 flask --debug run
 ```
 
-For hosting dev
+For hosting dev (Our project just gets free SSL encryption with CloudFlare proxy)
 ```
-flask run --host=0.0.0.0 --port=80 (Our project just gets free SSL encryption with CloudFlare proxy)
+flask run --host=0.0.0.0 --port=80 
 ```
 
 For Browsers like Brave, disable shields as it will interfere with cookies and login session
