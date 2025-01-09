@@ -1,4 +1,4 @@
-# VirusAsAService
+# Bitlus - VirusAsAService
 
 This Bachelor project demonstrates a proof-of-concept “Virus-as-a-Service” platform.
 The goal is it to be service and tool for making test-virusses, to find out if a clients ID, IPS or endpointprotection systems are able to detect the activity from the test-virus.
