@@ -73,16 +73,17 @@ def get_pending_job():
 # Modifies the template py testvirus and inserts the varibles for api_key, heartbeat_rate and use_cases
 def create_test_virus(template_path, output_path, job_data):
     try:
-        with open(template_path, 'r') as template_file:
-            script_content = template_file.read()
+        with open(template_path, 'r') as template_file: # Open the template virus file
+            script_content = template_file.read() # Read its content into a string
+        # Replace placeholders in the template with actual data from job_data
         script_content = script_content.replace("PLACEHOLDER_API_KEY", job_data["virus_api"])
         script_content = script_content.replace("PLACEHOLDER_HEARTBEAT_RATE", str(job_data["heartbeat_rate"]))
         script_content = script_content.replace("PLACEHOLDER_USE_CASES", str(format_use_case_settings(job_data["use_case_settings"])))
-        with open(output_path, 'w') as output_file:
+        with open(output_path, 'w') as output_file: # Write the modified content to a new file
             output_file.write(script_content)
 
         print(f"Test virus script created at {output_path}")
-        return output_path
+        return output_path # Return the path to the newly created script
     except Exception as e:
         print(f"Error creating test virus script: {e}")
         return None
@@ -221,7 +222,6 @@ if __name__ == "__main__":
     compile_test_virus(script_path)
     # Step 4 Zip the compiled virus
     zip_path = zip_compiled_virus(build_dir, compiled_zip_path)
-    #zip_path = zip_compiled_virus(compiled_zip_path)
     if not zip_path:
         print("Failed to zip the compiled virus.")
         exit()
@@ -232,7 +232,6 @@ if __name__ == "__main__":
         clean_up_folders(build_dir, compiled_zip_path)
     else:
         print("Could not upload the zip file")
-
 
 
 ### Start base of testing ###

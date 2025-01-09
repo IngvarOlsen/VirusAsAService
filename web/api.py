@@ -45,18 +45,18 @@ def db_connect():
     curs = conn.cursor()
 
 
-def validate_token():
-    session_token = session['token']
+def validate_token(): # Checks if session token matches current users token
+    session_token = session['token'] # Retrieve token from user session
     print(f"session[token] = {session_token}")
     print(f"current_user.token = {current_user.token}")
     if 'token' not in session or session['token'] != current_user.token:
         flash('Session expired or invalid token. Please log in again.', category='error')
-        logout_user()
-        return redirect(url_for('auth.login'))
-    return True
+        logout_user() # End the users session in flask-login
+        return redirect(url_for('auth.login')) # Redirect to login screen
+    return True # If tokens match, return True
 
 
-def sanitise(input_value, input_type="string"):
+def sanitise(input_value, input_type="string"): # Verifies correct data type & blocks SQL injection patterns
     blacklist = [r"--", r";", r"union", r"select", r"insert", r"update", r"delete", r"drop", r"alter", r"create", r"union", r"join", r"truncate", r"replace", r"into", r"values", r"where", r"from", r"having", r"group by", r"order by", r"limit", r"offset"]
     # Validate input type
     if input_type == "string" and not isinstance(input_value, str):
@@ -71,12 +71,11 @@ def sanitise(input_value, input_type="string"):
     if input_type == "list" and not isinstance(input_value, list):
         flash(f"Invalid input type: {input_value} is not a list.",category='error')
         return False
-    # Check against the blacklist
-    for pattern in blacklist:
+    for pattern in blacklist: # Check against the blacklist
         if re.search(pattern, str(input_value), re.IGNORECASE):
             flash(f"Input '{input_value}' contains disallowed pattern: {pattern}",category='error')
             return False
-    return input_value
+    return input_value  # Return the original value if all checks pass
 
 #############################
 ###### Compiling APIs #######
@@ -777,30 +776,24 @@ def active_toggle():
             virus_id = sanitise(request.form.get('virus_id'))
             if not virus_id:
                 return jsonify({'message': 'Virus ID is required'}), 400
-            # Query the virus associated with the current user
+            # Gets the first virus associated with the virudID and logged in userID
             virus = Virus.query.filter_by(id=virus_id, user_id=current_user.id).first()
             if not virus:
                 return jsonify({'message': 'Virus not found or unauthorized'}), 404
-            # Update the is_alive attribute
-            if virus.is_alive:
+            if virus.is_alive: # Update the is_alive attribute
                 virus.is_alive = False
             else:
                 virus.is_alive = True
-            db.session.commit()
-            #flash(f'Virus set as set as {virus.is_alive}.', category='success')
+            db.session.commit() # Saves updste to DB
             return jsonify({'message': 'Success', 'status': 'ok'})
-            #return render_template('partials/virus_list.html')
-            #return redirect(url_for('views.virus'))
         else:
             flash('Authentication failed for token', category='error')
-            return jsonify({'message': f'Error: {str(e)}', 'status': 'error'}), 500
-            #return render_template('partials/virus_list.html')
-            #return redirect(url_for('auth.logout'))   
+            return jsonify({'message': f'Error: {str(e)}', 'status': 'error'}), 500  
     except Exception as e:
         print(f"Error in set_inactive: {e}")
         flash('Could not set the virus as inactiave or active.', category='error')
         return jsonify({'message': f'Error: {str(e)}', 'status': 'error'}), 500
-        #return redirect(url_for('views.virus'))  
+
    
 
 

