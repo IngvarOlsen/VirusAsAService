@@ -21,33 +21,42 @@ Below are the steps to get both environments up and running.
 
 ### Clone the Repository
 
+Clone down the project in the current folder
+```
+git clone https://github.com/IngvarOlsen/VirusAsAService.git .
 ```
 
-Clone down the project in the current folder
-git clone https://github.com/IngvarOlsen/VirusAsAService.git .
-
 Make venv
+```
 python3 -m venv flask-venv 
+```
 
 Activate venv
+```
 flask-venv\Scripts\activate.ps1 (Windows)
+or
 source flask-venv/bin/activate (Linux)
+```
 
 Install requirements
+```
 pip install -r requirements.txt
+```
 
 Run the app, with the optional --debug for more info
+```
 flask --debug run
+```
 
 For hosting dev
-flask run --host=0.0.0.0 --port=80 (Our project just gets free SSL encryption with CloudFlare proxy) 
-
+```
+flask run --host=0.0.0.0 --port=80 (Our project just gets free SSL encryption with CloudFlare proxy)
 ```
 
 For Browsers like Brave, disable shields as it will interfere with cookies and login session
 
 
-## 1. Compiler enviroment 
+## 2. Compiler enviroment 
 
 ```
 cd compiler
