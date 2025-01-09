@@ -12,7 +12,7 @@ It consists of two main components:
 
 2. A **Windows** Compiler environment in /compiler/, which generates the test-virus using `ex_freeze`.
 
-The test folder consists of diferent kinds of tests and research, and also contains code from other githubs to better understand different concepts like DNS-Tunneling
+The test folder consists of diferent kinds of tests and research, and also contains code from other github repos to better understand different concepts like DNS-Tunneling.
 
 Below are the steps to get both environments up and running.
 
