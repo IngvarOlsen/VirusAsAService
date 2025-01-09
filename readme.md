@@ -12,7 +12,6 @@ It consists of two main components:
 
 Below are the steps to get both environments up and running.
 
----
 
 ## 1. Flask App Environment
 
@@ -21,6 +20,8 @@ Below are the steps to get both environments up and running.
 - Git installed
 
 ### Clone the Repository
+
+```
 
 Clone down the project in the current folder
 git clone https://github.com/IngvarOlsen/VirusAsAService.git .
@@ -41,20 +42,23 @@ flask --debug run
 For hosting dev
 flask run --host=0.0.0.0 --port=80 (Our project just gets free SSL encryption with CloudFlare proxy) 
 
+```
+
 For Browsers like Brave, disable shields as it will interfere with cookies and login session
 
----------------------------------------------------
-For the Compiler enviroment 
 
+## 1. Compiler enviroment 
+
+```
 cd compiler
 python3 -m venv compiler-venv 
 pip install --upgrade cx_Freeze
 pip install requests
 pip install cryptography
 pip install scapy
-
+```
 Once a compiling job is ready run: 
-
+```
 python3 compiler.py
-
+```
 Note that it will be made into a compiling loop in future updates
