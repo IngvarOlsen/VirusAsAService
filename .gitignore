@@ -45,8 +45,9 @@ test/lib/library.zip
 test/lib/select.pyd
 test/lib/unicodedata.pyd
 test/lib/email/architecture.rst
-
+*test_virus.py
 *test_virus*
+test_virus.py
 compiler/test/frozen_application_license.txt
 web/zippedFiles/test/frozen_application_license.txt
 web/zippedFiles/test/lib/certifi/py.typed
