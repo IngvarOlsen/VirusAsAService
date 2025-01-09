@@ -78,28 +78,29 @@ def setup_demo_data():
     else:
         print("Demo data already exists.")
 
-def create_app():
+def create_app(): # Creates and configures a flask app
     print("create_app")
-    app = Flask(__name__)
+    app = Flask(__name__) # Initialize Flask instance
     # Generates a app secret if there is none, gets used for session handling
-    app.config['SECRET_KEY'] = get_or_generate_secret_key()
+    app.config['SECRET_KEY'] = get_or_generate_secret_key() # Makes new key if there is none
     print(app.config['SECRET_KEY'])
-    app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{DB_NAME}'
-    db.init_app(app)
-    from .views import views
-    from .auth import auth
-    from .api import api
+    app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{DB_NAME}' # Local SQLite DB
+    db.init_app(app) # Bind DB to this app instance
+    from .views import views # Frontend routes
+    from .auth import auth # Auth routes
+    from .api import api # API routes
     app.register_blueprint(views, url_prefix='/') # Registers views
-    app.register_blueprint(auth, url_prefix='/')
-    app.register_blueprint(api, url_prefix='/')
-    from .models import User, Virus, Hosts, Archived
+    app.register_blueprint(auth, url_prefix='/') # Register auth blueprint
+    app.register_blueprint(api, url_prefix='/') # Register API blueprint
+    from .models import User, Virus, Hosts, Archived # Import models from DB
     with app.app_context():
-        db.create_all() 
-        setup_demo_data()  # Call setup_demo_data within the app context
-    login_manager = LoginManager()
-    login_manager.login_view = 'auth.login'
-    login_manager.init_app(app)
+        db.create_all() # Create tables if they dont exist
+        setup_demo_data()  # Insert demo data on startup
+    login_manager = LoginManager() # flask-login manager
+    login_manager.login_view = 'auth.login' # Redirect for unauthenticated access
+    login_manager.init_app(app) # Attach login_manager to app
     @login_manager.user_loader
-    def load_user(id):
+    def load_user(id): # Internal funnktion returns ID of logged in user
         return User.query.get(int(id))
-    return app
+    return app # Return the configured flask application
+

