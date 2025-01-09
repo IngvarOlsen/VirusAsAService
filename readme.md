@@ -7,7 +7,7 @@ The use-cases activities right now is: DNS-Tunneling, ransomeware, net.exe recon
 
 It consists of two main components:
 
-1. A **Flask** Web application in /web/, hosted on Linux or any environment supporting Python 3.
+1. A **Flask** Web application in /web/, hosted on Linux or any environment supporting Python 3.\
    In the web appilication there is also a DNS-server which is connected with a daemon.
 
 2. A **Windows** Compiler environment in /compiler/, which generates the test-virus using `ex_freeze`.
