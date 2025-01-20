@@ -207,31 +207,66 @@ def clean_up_folders(build_folder, zip_path):
 
 # Main execution flow
 if __name__ == "__main__":
-    # Step 1 Fetch a pending job
-    job_data = get_pending_job()
-    if not job_data:
-        print("No jobs available.")
-        exit()
-    # Step 2 Create the test virus script
-    output_script_path = "test_virus.py"
-    script_path = create_test_virus(template_path, output_script_path, job_data)
-    if not script_path:
-        print("Failed to create test virus script.")
-        exit()
-    # Step 3 Compile the test virus
-    compile_test_virus(script_path)
-    # Step 4 Zip the compiled virus
-    zip_path = zip_compiled_virus(build_dir, compiled_zip_path)
-    if not zip_path:
-        print("Failed to zip the compiled virus.")
-        exit()
-    else:
-        print(f"Compiled and zipped virus is ready at: {zip_path}")
-    # Step 5 Upload the compiled virus, and cleans up the build project in case its successfull
-    if upload_compiled_virus(zip_path, job_data["job_id"], job_data["virus_api"]):
-        clean_up_folders(build_dir, compiled_zip_path)
-    else:
-        print("Could not upload the zip file")
+    while True:
+        job_data = get_pending_job()
+
+        if not job_data:
+            print("No pending job found")
+            time.sleep(2)
+            continue
+
+        output_script_path = "test_virus.py"
+        script_path = create_test_virus(template_path, output_script_path, job_data)
+        if not script_path:
+            print("Failed to create test virus script.")
+            # Sleep before next attempt
+            time.sleep(2)
+            continue
+
+        compile_test_virus(script_path)
+        zip_path = zip_compiled_virus(build_dir, compiled_zip_path)
+
+        if not zip_path:
+            print("Failed to zip the compiled virus")
+            time.sleep(2)
+            continue
+        else:
+            print(f"Compiled and zipped virus is ready at: {zip_path}")
+
+        if upload_compiled_virus(zip_path, job_data["job_id"], job_data["virus_api"]):
+            clean_up_folders(build_dir, compiled_zip_path)
+        else:
+            print("Could not upload the zip file. No cleanup performed.")
+
+        # Sleep a bit before checking for next job
+        print("Job finished. Checking for new jobs in 10 seconds...")
+        time.sleep(2)
+
+    # # Step 1 Fetch a pending job
+    # job_data = get_pending_job()
+    # if not job_data:
+    #     print("No jobs available.")
+    #     exit()
+    # # Step 2 Create the test virus script
+    # output_script_path = "test_virus.py"
+    # script_path = create_test_virus(template_path, output_script_path, job_data)
+    # if not script_path:
+    #     print("Failed to create test virus script.")
+    #     exit()
+    # # Step 3 Compile the test virus
+    # compile_test_virus(script_path)
+    # # Step 4 Zip the compiled virus
+    # zip_path = zip_compiled_virus(build_dir, compiled_zip_path)
+    # if not zip_path:
+    #     print("Failed to zip the compiled virus.")
+    #     exit()
+    # else:
+    #     print(f"Compiled and zipped virus is ready at: {zip_path}")
+    # # Step 5 Upload the compiled virus, and cleans up the build project in case its successfull
+    # if upload_compiled_virus(zip_path, job_data["job_id"], job_data["virus_api"]):
+    #     clean_up_folders(build_dir, compiled_zip_path)
+    # else:
+    #     print("Could not upload the zip file")
 
 
 ### Start base of testing ###

