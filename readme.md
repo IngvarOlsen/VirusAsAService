@@ -64,6 +64,7 @@ For Browsers like Brave, disable shields as it will interfere with cookies and l
 ```
 cd compiler
 python3 -m venv compiler-venv 
+compiler-venv\Scripts\activate.ps1
 pip install --upgrade cx_Freeze
 pip install requests
 pip install cryptography
