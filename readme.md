@@ -76,4 +76,4 @@ Once a compiling job is ready run:
 ```
 python3 compiler.py
 ```
-Note that it will be made into a compiling loop in future updates
+
