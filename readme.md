@@ -77,3 +77,21 @@ Once a compiling job is ready run:
 python3 compiler.py
 ```
 
+## 3. Project Diagrams
+
+The diagrams from the bachelor projects, gives a better overview of the project, which haven't been changed since the bachelor handin
+
+![1](https://github.com/user-attachments/assets/b7700823-699c-40c8-ba29-2683f1aaea1e)
+
+![2](https://github.com/user-attachments/assets/1dcb7edf-fced-4310-8c8e-f88c26b8ad4f)
+
+![3](https://github.com/user-attachments/assets/be2b7d55-c8b9-4441-8297-5cb468ec1086)
+
+![4](https://github.com/user-attachments/assets/dd97af38-d634-4572-a565-96ea12dafdd7)
+
+
+
+
+
+
+
