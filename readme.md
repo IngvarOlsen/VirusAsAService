@@ -17,6 +17,8 @@ The test folder consists of diferent kinds of tests and research, and also conta
 On the dashboard part of the solution the passwords are hashed and secured against SQL injections.
 The DNS server setup is not included in this setup guide, but if anyone is interested feel free to reach out.
 
+The solution is set up to reachout to the online website first, and defaults to a localhost site if the online one is unreachable.
+
 Below are the steps to get both environments up and running.
 
 ## 1. Flask App Environment
