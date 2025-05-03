@@ -14,6 +14,8 @@ It consists of two main components:
 
 The test folder consists of diferent kinds of tests and research, and also contains code from other github repos to better understand different concepts like DNS-Tunneling.
 
+On the dashboard part of the solution the passwords are hashed and secured against SQL injection.
+
 Below are the steps to get both environments up and running.
 
 ## 1. Flask App Environment
